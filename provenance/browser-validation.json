@@ -1,0 +1,35 @@
+{
+  "author": "chatgpt_gpt6",
+  "date": "2026-10-16",
+  "groups": [
+    "Live A/B: independent click, both fold/expand, physical Hover, swap; two 9-node diagrams",
+    "Queue: real iframe controls/Hover, navigation, draft preservation, four-case JSON export (automated test)",
+    "Capture: external dataset, image and crop zoom, page navigation, required reason, save/reload, missing candidate",
+    "Record review: different dataset/case count, source preview, reason validation, atomic save/reload, list search and row-to-page binding"
+  ],
+  "errors": [],
+  "reviewer": "Agent automated checks; no new Human approval",
+  "screenshots": [
+    "screenshots/interactive-comparison.png",
+    "screenshots/review-queue.png",
+    "screenshots/capture.png",
+    "screenshots/record-review.png"
+  ],
+  "image_read": {
+    "reader": "Main / chatgpt_gpt6",
+    "method": "view_image on all four final rendered screen PNGs; record screen reread after contrast fix",
+    "human_approval": false,
+    "observations": [
+      "Interactive A/B allows actual embedded diagrams; fit view produces small text, use individual frames or resize for fine reading.",
+      "Queue puts criterion and vote beside a scrollable live diagram.",
+      "Capture displays source region and candidate with visible target box and zoom.",
+      "Record viewer shows item list, evidence page and vote; Save hover contrast repaired and directly reread."
+    ],
+    "screenshots_may_show": "Automated test selections only, not new Human decisions"
+  },
+  "contrast_regression": {
+    "before_ratio": 1.1245471257801467,
+    "after_assertion": "Save button physical Hover text/background contrast >= 4.5:1 passed",
+    "scope": "This button/state, not an accessibility audit of every screen"
+  }
+}

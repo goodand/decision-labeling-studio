@@ -1,0 +1,57 @@
+{
+  "kind": "record",
+  "title": "항목·근거 검수 · 합성 예제",
+  "question": "검수 항목이 원본 근거의 같은 항목을 가리키나요?",
+  "pages": [
+    "page.svg",
+    "page2.svg"
+  ],
+  "cases": [
+    {
+      "id": "item-alpha",
+      "label": "Input Alpha",
+      "group": "합성 데이터셋 A",
+      "page": 1,
+      "match_pages": [
+        1
+      ],
+      "fields": [
+        {
+          "label": "분류",
+          "value": "시연용"
+        }
+      ],
+      "candidates": [
+        {
+          "raw_name": "Input Alpha",
+          "source_path": "page.svg",
+          "anchor": "page 1 / Input Alpha"
+        }
+      ]
+    },
+    {
+      "id": "item-beta",
+      "label": "Item Beta",
+      "group": "합성 데이터셋 B",
+      "page": 2,
+      "match_pages": [
+        2
+      ],
+      "fields": [
+        {
+          "label": "상태",
+          "value": "확인 필요"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "id": "item-gamma",
+      "label": "별도 검토 항목",
+      "group": "합성 데이터셋 B",
+      "page": 2,
+      "match_pages": [],
+      "candidates": []
+    }
+  ]
+}

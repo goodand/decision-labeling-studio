@@ -1,0 +1,111 @@
+{
+  "author": "chatgpt_gpt6",
+  "files": [
+    {
+      "source": "outputs/dds-external-comparison/index.html",
+      "target": "examples/interactive-comparison/index.html",
+      "source_sha256": "6f6028999a7ad794ad3a25159da82461e51efe8cb6c355c9cfbbc861bcb31ce5",
+      "target_sha256": "24d3d4a8611a5a6e6812c5d37cc6276c17cd4e07e2bfa64c6648ed66705b8b60",
+      "changes": "Retain two self-contained DDS variants and one same-input case; remove unavailable alternatives/report links; clarify historical snapshot labels."
+    },
+    {
+      "source": "outputs/dds-external-comparison/artifacts/R92/r92-same-input.html",
+      "target": "examples/interactive-comparison/artifacts/R92/r92-same-input.html",
+      "source_sha256": "276ee853520605b24592d8ecbeab8d4666af81187d754dddace51fcab3b77cbf",
+      "target_sha256": "df55b3a6f1d337f4270deaec665918a23c35cd782600765dda493e8181d25e2c",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-external-comparison/artifacts/D0/r92-same-input.html",
+      "target": "examples/interactive-comparison/artifacts/D0/r92-same-input.html",
+      "source_sha256": "de89ee99f86f9675869c93fac50d817ec6f873d47988128df9456e52a289fcbe",
+      "target_sha256": "9b11eab76703ce23987e49622ac3dadf25af137e8b189db5396ea6147e39d5cc",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-pending-human-review-20261016/pair-diamond-then-diamond-expanded.html",
+      "target": "examples/review-queue/pair-diamond-then-diamond-expanded.html",
+      "source_sha256": "2d3aafbf2545f8da7cea1e11142ea53b7f7fd751e12fc3a56a2e58ad174ff959",
+      "target_sha256": "41c3ff1af974d092128017c887ee3a4436592e5557a1687c04cc24923b1edc7f",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-pending-human-review-20261016/pair-cycle-then-cycle-expanded.html",
+      "target": "examples/review-queue/pair-cycle-then-cycle-expanded.html",
+      "source_sha256": "7c4be6ac99dc717f9dbb66faaf40845a4a60afa3d89af4aaa2ecd58d2e600ac7",
+      "target_sha256": "2601fcecfd6ef4fa91af57930f313fe04b83d41185c381ceb297dc9c0e95ebd9",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-pending-human-review-20261016/pair-diamond-then-cycle-task-a.html",
+      "target": "examples/review-queue/pair-diamond-then-cycle-task-a.html",
+      "source_sha256": "b87c0a2376078747774d92c84ab1430ac64978d2332c02b3ffa4e86b6642a0c4",
+      "target_sha256": "365f67e5cf6f46afc1b5cc702f487926f4868819bfd8ae28b5bff5f6da3933f1",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-pending-human-review-20261016/pair-cycle-then-diamond-task-a.html",
+      "target": "examples/review-queue/pair-cycle-then-diamond-task-a.html",
+      "source_sha256": "cf1ca7434e0b264c740b29f9446076603feea7a6894003565d8b67f7c520b44e",
+      "target_sha256": "b630be6da55fb4b3fa561855681b294badef4d5916b55db01dcd62ad1777aaf5",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-pending-human-review-20261016/index.html",
+      "target": "examples/review-queue/index.html",
+      "source_sha256": "88d7f16a11bd7e19dc30405efdf9411170fb620051d35a2e55bbcb8d302a8e74",
+      "target_sha256": "87cd020fa950ea7fa6b6d64b5f4316922806c8b306b510065d416a24e929840e",
+      "changes": "Replace original-machine file URLs in exported source metadata with bundled relative artifact paths; other UI behavior unchanged."
+    },
+    {
+      "source": "outputs/dds-design-decisions-20261014.json",
+      "target": "decisions/dds/design-decisions-20261014.json",
+      "source_sha256": "484f238864f31ba0a0cda220a1f2ea27d78992a444dd2e3ddbbaa78978797dc0",
+      "target_sha256": "8aab3acf824919bb76f65bf4db3c29f3160634d865ebe4de917bed2e43986e32",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-v3.95-linked/design-decisions-20261013.json",
+      "target": "decisions/dds/design-decisions-20261013.json",
+      "source_sha256": "a8356d695941a894343319332685733b24fdd439783604aed08cc672a5d97795",
+      "target_sha256": "a8356d695941a894343319332685733b24fdd439783604aed08cc672a5d97795",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-diagonal-trial-20261014/decision-log.json",
+      "target": "decisions/dds/cycle-connector-experiment.json",
+      "source_sha256": "520704da9454b7401c944132b155a64ffadea64aabecc4412af2cd77d1ab74e5",
+      "target_sha256": "05ee13058fd706b599305551ad7c8f47c2d42e823ce8ee20fc28f57a6d6e1d32",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-pending-human-review-20261016/shared-hover-human-followup.json",
+      "target": "decisions/dds/shared-hover-human-followup.json",
+      "source_sha256": "783190563269f120927bbc8068d7f215a7fe37f6765a6a769df7eb96dac2baf3",
+      "target_sha256": "783190563269f120927bbc8068d7f215a7fe37f6765a6a769df7eb96dac2baf3",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "outputs/dds-pending-human-review-20261016/internal-hover-human-followup.json",
+      "target": "decisions/dds/internal-hover-human-followup.json",
+      "source_sha256": "45c7a45ad2a200ca7acf8c7994bcaaa233e01a3e1e2aac7195bc85f4a5c5259f",
+      "target_sha256": "45c7a45ad2a200ca7acf8c7994bcaaa233e01a3e1e2aac7195bc85f4a5c5259f",
+      "changes": "Content copied; text line endings normalized to LF for publication"
+    },
+    {
+      "source": "D:\\dev_eval_team\\jh_dev\\govparse-mvp-windows\\govparse-mvp\\docs\\experiments\\a1-a7\\human_review_app_v1\\capture.html",
+      "target": "ui/capture.html",
+      "source_sha256": "bd484f00b8c3baf5ab914b1541c468054367cf16ff8c0fdf90b38d608e7bb469",
+      "target_sha256": "1f91612b3df0f013ca2ebead0c2f246e580acb3f837ee67a0b275d3b8b1443a7",
+      "changes": "Preserved UI, navigation and validation; dataset title/question; generic labels. Record viewer uses pre-rendered image API instead of original rhwp/folder-search integrations."
+    },
+    {
+      "source": "D:\\dev_eval_team\\jh_dev\\govparse-mvp-windows\\govparse-mvp\\docs\\experiments\\a1-a7\\budget_name_eval_v1\\review_index.html",
+      "target": "ui/review_index.html",
+      "source_sha256": "a711e69dd7444ec684e0d78f0af872c7cff376a30c7357c97223d5fdbcf264df",
+      "target_sha256": "95d85e9e73f8209c25016d52c469956ff67a6bf830a9297d839e322f11641db4",
+      "changes": "Preserved UI, navigation and validation; dataset title/question; generic labels. Record viewer uses pre-rendered image API instead of original rhwp/folder-search integrations. Main IMAGE READ found low-contrast primary button hover; dark hover color and nonwrapping list header added after failed contrast check."
+    }
+  ],
+  "hash_policy": "source_sha256 hashes original bytes; target_sha256 hashes published LF-normalized bytes; .gitattributes preserves LF for text."
+}

@@ -1,0 +1,248 @@
+{
+  "author": "chatgpt_gpt6",
+  "recorded_on": "2026-10-14",
+  "recording_method": "Retrospective reconstruction from this conversation; not continuously recorded at decision time.",
+  "purpose": "Product decisions and proposals, not artifact approval or proof of implementation.",
+  "previous_log": "dds-v3.95-linked/design-decisions-20261013.json",
+  "decisions": [
+    {
+      "id": "DDS-FULL-BOUNDARY-NORMALIZATION-001",
+      "recorded_on": "2026-10-16",
+      "status": "implemented_verified_scope",
+      "decision": "Tool이 명시된 Core 사이 동일 데이터 connections를 Full 표시용 공유 경계로 자동 통합한다. 승인된 Core와 원본 Full은 보존한다. 기존 공유 ID PASS 사례는 변경하지 않는다.",
+      "evidence": ["tool using agent가 고려 할 필요 없이 Tool이 자동 적용하는 것이 더 좋긴하지", "그러면 수정 프로토콜 방식으로 수정해"],
+      "protocol": "dds-boundary-normalization-20261016/PROTOCOL.md",
+      "comparison": "dds-boundary-normalization-20261016/comparison-checks.json",
+      "adversarial_audit": "dds-boundary-normalization-20261016/audit-boundary-adversarial.json",
+      "scope": "Process_Full의 명시적 1:1 동일 데이터 경계. 라벨만 같은 노드는 통합하지 않는다. 반복선·다중 연결·추가 의미가 있는 연결 및 의미 충돌은 오류로 반환한다. 기존 shared-ID 연결은 유지한다.",
+      "human_verdict": "새 산출물은 Agent 검증 완료이며 새 Human PASS를 대신 기록하지 않는다."
+    },
+    {
+      "id": "DDS-FULL-SHARED-BOUNDARY-001",
+      "recorded_on": "2026-10-16",
+      "status": "accepted",
+      "decision": "공유 경계 Entity를 하나로 유지하고 Process 내부 상세를 접고 펼치는 Full 사례를 Human PASS 기준으로 삼는다. 모두 접힌 Full은 Input → Task A → Shared handoff → Task B → Output이며, 펼쳐도 Shared handoff는 하나로 유지된다. Summary와 달리 Core 사이 경계 Data·Entity가 표시될 수 있다.",
+      "evidence": "이거는 잘 되어 있네,",
+      "sweet_case_path": "dds-product-layout-20261015/cli-workflow-trial/fold-state-revision/hover-trial/shared-boundary/out/full/full.human.html",
+      "scope": "해당 사례의 공유 경계 표시 및 접기·펼치기 표현. 모든 Full 데이터와 취합 로직의 통과를 의미하지 않는다.",
+      "follow_up": "앞선 Intermediate 중복 사례와 공유 경계 사례의 Full 취합 데이터 및 로직을 대조한다. 이름 일치만으로 Entity를 병합하지 않는다."
+    },
+    {
+      "id": "DDS-ANIMATION-SWEET-CASE-001",
+      "recorded_on": "2026-10-16",
+      "status": "accepted",
+      "decision": "제시한 Full 애니메이션 GIF의 읽기 속도와 상태 변화는 Human PASS다. 구간당 1.8초 사례를 sweet case로 기록하며, Human은 1.6초까지 단축하는 것도 허용했다. 1.6초 자체를 직접 검수한 PASS로 기록하지 않는다.",
+      "evidence": "이것도 pass고 1.6초까지는 줄여도 될 것 같아",
+      "sweet_case_path": "dds-animation-review-20261016/full-animation.gif",
+      "response_path": "dds-animation-review-20261016/human-response.json",
+      "follow_up_human_quote": "'실제 시간 흐름에서 문구를 읽고 단계별 상태 변화를 따라갈 수 있는지 관찰' 이것도 pass로 해, 읽을 수 있으니깐 1.8초대 pass라고 한거지",
+      "follow_up_verdict": "PASS: 기존 1.8초대 Human 판정은 실제 재생 중 문구 읽기와 상태 변화 추적을 포함한다. 해당 항목의 추가 Human 검수는 필요하지 않다.",
+      "scope": "해당 사례의 문구 읽기 및 상태 변화. Hover·중단 동작이나 모든 사례의 적정 속도까지 확대하지 않는다."
+    },
+    {
+      "id": "DDS-LAYOUT-DEFAULT-001",
+      "recorded_on": "2026-10-16",
+      "author": "chatgpt_gpt6",
+      "status": "accepted",
+      "decision": "실행흐름 도식의 기본 진행 방향은 위에서 아래로 향하는 세로 배치로 정한다. 이는 표현의 일관성을 위한 기본값이며 가로 배치보다 우수하다는 판정이 아니다.",
+      "evidence": "우위는 정하지 않더라도 Default를 정하는 것이 일관성 유지에 유리하다면 \"세로 배치\"를 고르던가",
+      "scope": "기본 진행 방향의 선택이며 Graph Topology를 선형으로 제한하지 않는다. 분기와 반복은 해당 구조를 보존하여 표현한다.",
+      "change_principle": "의미·구조의 전달에 더 적합한 배치가 있으면 변경할 수 있다. 기본값은 변경의 기준선이며 불변 조건이나 UX PASS 조건이 아니다.",
+      "implementation_status": "의사결정 기록. 렌더러 기본값 적용 여부는 별도 확인 대상이다."
+    },
+    {
+      "id": "DDS-G1-SWEET-CASE-001",
+      "recorded_on": "2026-10-16",
+      "author": "chatgpt_gpt6",
+      "status": "accepted",
+      "decision": "G1의 적합한 의미를 일관되게 표현하는 항목은 Agent가 평가한다. 기존에 Human이 이슈를 제기하지 않은 사례를 sweet case 기준으로 삼는다. 단순 가로/세로 배치 차이를 이 의미 일관성 항목의 Human 검수 과제로 반복 제시하지 않는다.",
+      "evidence": "적합한 의미를 일관되게 표현한다는 가치 판단의 문제는 아니라서 내가 기존에 issue 제기 하지 않은건 sweet case기준으로 삼아,",
+      "scope": "G1 의미 표현 일관성의 기준 사례 선정에 대한 명시적 사용자 지시. 다른 UX 항목의 Human PASS로 확대하지 않는다.",
+      "provenance": "기존 사례 중 이슈 미제기 기준으로 선정한 사실과 실제 Human PASS 응답은 구분하여 보존한다.",
+      "review_responses": ["dds-semantic-review-20261016/role-flow/human-response.raw.json", "dds-semantic-review-20261016/number-state/human-response.raw.json", "dds-semantic-review-20261016/parallel-join/human-response.raw.json"]
+    },
+    {
+      "id": "DDS-ULTIMATE-GOAL-002",
+      "recorded_on": "2026-10-16",
+      "author": "chatgpt_gpt6",
+      "status": "accepted",
+      "supersedes": "DDS-ULTIMATE-GOAL-001",
+      "decision": "Human의 이해를 돕기 위해 Agent가 Human이 이해하기 적합한 Diagram으로 표현한다.",
+      "evidence": "Human이 이해를 돕기 위해서 Agent가 Human이 이해하기 적합한 Digram으로 표현하는 것이 보다 정확해",
+      "source": "Current user clarification; explicit Human definition."
+    },
+    {
+      "id": "DDS-ULTIMATE-GOAL-001",
+      "recorded_on": "2026-10-16",
+      "author": "chatgpt_gpt6",
+      "status": "superseded",
+      "superseded_by": "DDS-ULTIMATE-GOAL-002",
+      "decision": "DDS의 Ultimate Goal은 Human이 이해하는 것이다.",
+      "evidence": "DDS의 Ultimage Goal 은 Human이 이해를 하는 것이야,",
+      "source": "Current user message; explicit Human definition, not Agent synthesis."
+    },
+    {
+      "id": "DDS-UNDERSTANDING-SCOPE-001",
+      "recorded_on": "2026-10-16",
+      "author": "chatgpt_gpt6",
+      "status": "accepted",
+      "decision": "이해 대상은 기존에 있는 것과 새롭게 만드려는 것으로 구분한다. 두 대상 모두 여러 Relation Type을 가질 수 있으며, 현재 우선 대상으로 다루는 것은 실행흐름이다.",
+      "evidence": ["첫번째는 기존에 있는 것,", "두번째는 새롭게 만드려는 것", "첫번째와 두번째에서도 여러가지 Relation Type이 존재하지만, 우리가 Target해서 먼저 다루고 있는 것은 실행흐름이고"]
+    },
+    {
+      "id": "DDS-UNDERSTANDING-ASSESSMENT-RECOVERY-001",
+      "recorded_on": "2026-10-16",
+      "author": "chatgpt_gpt6",
+      "status": "unresolved",
+      "decision": "이전에 다룬 Human 이해 판정 방법의 정확한 결정 원문을 복구해야 한다. 의미 정합 검사나 Agent IMAGE READ를 Human의 이해 달성 증거로 자동 대체하지 않는다.",
+      "evidence": "그리고 그 Human의 이해를 판정하는 방법에 대해서도 다뤘었어,",
+      "related_existing_source": "../work/diagram-implementation/v3_8_cli/designing-relation-diagrams/references/cli.md:58",
+      "limitation": "해당 문서는 원천과 이미지의 의미 정합을 요구한다. 이것이 사용자가 말한 이해 판정 방법 전체인지는 확인되지 않았다."
+    },
+    {
+      "id": "LAYOUT-DIAMOND-001",
+      "recorded_on": "2026-10-14",
+      "author": "chatgpt_gpt6",
+      "status": "authorized",
+      "decision": "Balance the Diamond branch envelope about its split/join axis in six fixed fixtures, preserving topology and rechecking all twelve fixtures. Use the modification protocol and keep the preceding routing trial as baseline.",
+      "evidence": ["Diamond Pattern에서 현재는 한쪽이 더 많이 튀어나왔는데 중심점 찾아서 맞추는 것은 어때?", "수정 프로토콜"],
+      "implementation_status": "Isolated experiment dds-diamond-center-20261014 in progress; Human acceptance pending."
+    },
+    {
+      "id": "ROUTE-002",
+      "recorded_on": "2026-10-14",
+      "author": "chatgpt_gpt6",
+      "status": "authorized",
+      "decision": "Improve unnecessary bends across the fixed topology suite through shared routing logic, preserving graph topology. Validate route readability as well as collision avoidance; do not force all graphs into a linear layout.",
+      "evidence": ["불필요한 수직 꺾임이 많은 것이 한 두개가 아니라", "일괄적으로 개선해야 겠네"],
+      "implementation_status": "Isolated TDD experiment in progress: dds-routing-batch-20261014; Human visual acceptance pending."
+    },
+    {
+      "id": "UX-REFERENCE-001",
+      "recorded_on": "2026-10-14",
+      "author": "chatgpt_gpt6",
+      "status": "accepted",
+      "decision": "Preserve the user-derived UX checklist as a versioned reusable reference with provenance and limitations. It is not sufficient on its own to determine UX quality; evaluation evidence and Human feedback remain separate.",
+      "evidence": "저 UX Checklist만으로 평가가 되지는 않아도 재사용 할 수 있게 저것도 log를 남겨두면 재사용 할 수 있잖아",
+      "reference_log": "dds-fixed-topology-tests-20261014/ux-checklist-log.json"
+    },
+    {
+      "id": "FIXED-TOPOLOGY-001",
+      "recorded_on": "2026-10-14",
+      "author": "chatgpt_gpt6",
+      "status": "authorized",
+      "decision": "Prepare three fixed single-topology tests (Linear, Diamond, Cycle) and nine ordered two-Core combinations. These are test inputs, not mandatory topology choices for agents.",
+      "evidence": ["기존에 linear, diamond, cycle architecture를 test case로 사용하는 것도 괜찮을 것 같네", "병합 및 연결 test 할 때는 core 단위로 해서 2개 조합씩 해서 9(3*3)개 조합 만들어서 test하면 되겠네", "고정 test용 준비해"],
+      "scope": "Prepare fixed fixtures and expected results; no claim of full renderer or library E2E certification.",
+      "dependency_expectation": "Collapsed Full retains inter-Core entities under current behavior. Suppressing those boundary entity subdivisions should recover Summary Process direction and branching. Do not change current folding policy.",
+      "workflow_limitation": "Current Summary contract rejects cycles. Cycle single-topology fixture is a renderer test, not a supported production Summary unit."
+    },
+    {
+      "id": "DDS-HOVER-003",
+      "recorded_on": "2026-10-14",
+      "author": "chatgpt_gpt6",
+      "status": "direction_selected",
+      "decision": "Remove Hover/Dimming from standalone Process_Core. Retain it in Process_Full; Function_Definition and Process_Summary remain without Hover/Dimming. Core folding remains available.",
+      "evidence": ["Core 에서 Hover·Dimming 불필요한 것 같은데"],
+      "assistant_interpretation": "The user selected Core exclusion; the assistant explained Full-only scope and retaining Core folding. This is not evidence that implementation has changed.",
+      "supersedes": "Core focus applicability in references/workflow.md; does not supersede DDS-HOVER-001 union membership or DDS-HOVER-002 fold-aware focus",
+      "implementation_status": "2026-10-16: repository workflow-runtime.js now registers focus listeners only for l1_full. Core collapsed/expanded node Hover and edge event checks pass; fold round-trip remains functional; regenerated Full shared-boundary Hover remains active. This is Agent verification, not a new Human approval. Earlier generated artifacts and packages retain their earlier behavior.",
+      "implementation_evidence": "dds-boundary-product-check-20261016/core-hover-after/RESULT.md"
+    },
+    {
+      "id": "DDS-HOVER-004",
+      "recorded_on": "2026-10-14",
+      "author": "chatgpt_gpt6",
+      "status": "reconfirmed_from_evidence",
+      "decision": "In Full, a shared node activates the union of its associated parts, not only their intersection. A unique node activates its associated part. Fold-aware projection follows DDS-HOVER-002.",
+      "evidence": [
+        "중복되는 부분 위에 커서를 올리면 관련 부분 모두 활성화 하고, 중복되지 않는 고유 부분을 커서에 올렸을 때 관련된 부분 활성화 하면 될 것 같은데",
+        "중복 된 부분을 눌렀을 때 교집합만 보여주기로 했었나?",
+        "전체 펼치기를 한 다음에 합집합 활성화를 하면 문제 없으려나"
+      ],
+      "evidence_interpretation": "The intersection statement was a question recalling prior decisions, not an instruction adopting intersection. The explicit shared-part instruction and existing DDS-HOVER-001 specify union. No later accepted intersection decision was found in the searched decision logs or supplied conversation.",
+      "prior_log": "dds-v3.95-linked/design-decisions-20261013.json#DDS-HOVER-001",
+      "implementation_status": "Union observed in the diagonal trial browser review; this record changes no runtime code."
+    },
+    {
+      "id": "EVAL-001",
+      "status": "accepted",
+      "decision": "Use v3.92 as the Human-satisfactory expression baseline.",
+      "evidence": "v3.92를 기준으로 세우고 그 이후 부터는 사실 기능 문제로 볼 수 있잖아"
+    },
+    {
+      "id": "EVAL-002",
+      "status": "accepted",
+      "decision": "Compare individual reusable functions rather than require full-library feature parity. Exclude adoption cost; prioritize Human satisfaction, UX and expression fidelity.",
+      "evidence": [
+        "기능 동등성 미달 보다는 기능 단위로 비교하면 되잖아",
+        "도입 비용은 빼고",
+        "Human만족도와 UX, 표현 충실도 중요해보이네"
+      ]
+    },
+    {
+      "id": "UI-001",
+      "status": "accepted",
+      "decision": "Remove internal region boxes and titles.",
+      "evidence": "박스, 제목 있으니까 더 헿갈라니까 지워버려",
+      "implementation_status": "Not reverified in this logging turn"
+    },
+    {
+      "id": "RESEARCH-001",
+      "status": "authorized",
+      "decision": "Delegate external subtree/subflow implementation research to GPT-6.1-sol; search connection and folding together and evaluate their functions separately.",
+      "evidence": "그러면 6.1sol에게 위임해",
+      "implementation_status": "Research completed; Main read report"
+    },
+    {
+      "id": "ARCH-001",
+      "status": "direction_selected",
+      "decision": "Let the agent design internal architecture rather than enumerate all architecture cases as mandatory templates.",
+      "evidence": "architecture 자체는 생각 보다 경우의 수가 너무 많아서 agent가 직접 짜게 하는게 더 적합하겠네",
+      "implementation_status": "Not implemented by this log update",
+      "assistant_interpretation": "Agent supplies node/edge JSON; common code validates and renders. This implementation framing is not a separate verbatim Human decision."
+    },
+    {
+      "id": "SUMMARY-001",
+      "status": "under_consideration",
+      "decision": "Consider removing the mandatory Linear/Router Summary subtype split.",
+      "evidence": "Summary에서도 초기에 2가지로 나눈 Linear, Router 자체를 없애는 것도 고려해야겠네",
+      "implementation_status": "Not authorized as a code change by this statement"
+    },
+    {
+      "id": "ARCH-002",
+      "status": "explored_not_adopted",
+      "decision": "Linear / Structured Split-Join / Other DAG / Cyclic as a mandatory MECE implementation taxonomy.",
+      "evidence": "MECE하게 하려고 하니까 이거 Process의 수를 2개로 줄여도 경우의 수가 너무 많이 나오네",
+      "note": "The four-way formulation included assistant proposals; do not record it as Human-approved schema."
+    },
+    {
+      "id": "ARCH-003",
+      "status": "clarified",
+      "decision": "Architecture means directed graph structure, not software architecture.",
+      "evidence": "여기서 말하는 Architectur 는 SW Architecture가 아니라 Graph Digram Architecture를 말하는거 알지?"
+    },
+    {
+      "id": "ROUTE-001",
+      "status": "authorized",
+      "decision": "Test and optimize routing; increased code execution cost is acceptable.",
+      "evidence": [
+        "코드 실행 부담은 늘어나도 괜찮아",
+        "개선 test and optimize 진행해"
+      ]
+    },
+    {
+      "id": "SUBFLOW-001",
+      "status": "direction_selected",
+      "decision": "Prefer external GitHub subflow reuse for varied connection structures. User suggests 100+ stars as a trust signal; not proof of correctness.",
+      "evidence": "다양한 연결 구조 처리는 github repo subflow 재사용하는게 좋을 것 같고 100개 이상 star면 좀 믿고 사용해도 괜찮지"
+    },
+    {
+      "id": "SUBFLOW-002",
+      "status": "authorized",
+      "decision": "Isolated integration trials of CMGM and maxGraph with DDS renderer/runtime/libavoid; no product adoption implied.",
+      "evidence": "격리해서 실험해",
+      "implementation_status": "Isolated adapters and browser comparison in outputs/dds-subflow-integration-20261014"
+    }
+  ]
+}

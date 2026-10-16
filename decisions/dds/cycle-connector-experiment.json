@@ -1,0 +1,45 @@
+{
+  "author": "chatgpt_gpt6",
+  "decision_id": "cycle-feedback-route-and-layout-comparison",
+  "status": "isolated_experiment_verified",
+  "source_scope": "outputs/dds-diagonal-trial-20261014 only",
+  "human_requests": [
+    "Keep judge → generate feedback direction and connection unchanged while minimizing its two-bend orthogonal route.",
+    "Make both terminal stems clearly visible, then compare orthogonal and diagonal connectors on the same node geometry."
+  ],
+  "decisions": {
+    "feedback_edge": {
+      "id": "cy-loop",
+      "from": "judge",
+      "to": "generate",
+      "fromSide": "right",
+      "toSide": "right",
+      "route": "right → up → left",
+      "target_bends": 2,
+      "minimum_terminal_segment_svg_units": 32,
+      "marker_width_svg_units": 8,
+      "reason": "A 32-unit terminal segment leaves about 24 units beyond the marker's 8-unit footprint and preserves a visible shaft."
+    },
+    "comparison_layout": {
+      "algorithm": "reuse verified per-visible-state ELK node order and y-ranks",
+      "presentation_rule": "shift process-role nodes into an alternating horizontal lane (+240 SVG units); keep entity-role nodes in the base lane",
+      "purpose": "produce real diagonal forward edges in one variant while keeping identical node positions in both variants",
+      "semantic_ir_changes": false
+    },
+    "orthogonal_variant": "libavoid for all edges",
+    "diagonal_variant": "straight boundary-clipped connectors for non-loop edges; cy-loop stays libavoid right-to-right"
+  },
+  "constraints": [
+    "No change to node/edge IDs, labels, topology, endpoint direction, loop meaning, or linked approved sources.",
+    "The role-lane offset is an isolated comparison-fixture presentation rule, not a product layout default.",
+    "Two bends are a target for this loop; obstacle avoidance may require more bends elsewhere.",
+    "Both connector variants use exactly the same geometry in each visible state."
+  ],
+  "verification": {
+    "baseline": "right-right loop had 7-unit start and end segments while markerWidth was 8; saved as baseline-terminal-red.json with browser captures.",
+    "after": "both expanded states have 32-unit SVG start and end segments, 2 bends, right-right ports, endpoint error 0, and strict libavoid valid=true.",
+    "comparison": "all three user-reachable fold states have zero node overlaps and zero non-endpoint direct-line intrusion; diagonal forward-edge counts in full-open are orthogonal=0, diagonal=10.",
+    "browser": "SVG route/cache parity, shared hover union, feedback-hover activation, child-leaf loop deactivation, and variant switching all pass.",
+    "semantic_parity": "node/edge identity and source metadata are unchanged."
+  }
+}

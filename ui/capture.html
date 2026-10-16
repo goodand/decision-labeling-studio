@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>이미지 후보 검수</title>
+<style>
+  :root{font-family:system-ui,"Malgun Gothic",sans-serif;color:#172a3b;background:#edf2f6}
+  *{box-sizing:border-box}body{margin:0}button,select,textarea{font:inherit}
+  header{height:55px;background:#17344b;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+  h1{font-size:1.1rem;margin:0}#progress{font-size:.9rem;color:#d7e9f5}
+  main{height:calc(100vh - 55px);padding:10px;display:grid;grid-template-columns:180px minmax(280px,1fr) minmax(280px,1fr) 235px;gap:10px}
+  .pane{background:white;border:1px solid #d1dce5;border-radius:9px;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+  .pane-head{padding:10px 12px;border-bottom:1px solid #dce5ed;display:flex;align-items:center;justify-content:space-between;gap:5px;min-height:49px}
+  h2{font-size:.97rem;margin:0}.list{overflow:auto;padding:6px;flex:1}
+  .item{display:block;width:100%;text-align:left;border:1px solid transparent;border-radius:7px;background:transparent;padding:9px 7px;margin-bottom:3px;cursor:pointer;line-height:1.35}
+  .item.active{background:#e8f4fc;border-color:#2781b5}.item:hover{background:#f1f6fa}
+  .item strong{font-size:.87rem}.item small{display:block;color:#547083;font-size:.78rem}
+  .item .mark{float:right;color:#206e59}.viewport{flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;background:#e8edf1;padding:10px}
+  .image-wrap{position:relative;display:inline-block;line-height:0;max-width:100%;max-height:100%}
+  .image-wrap img{display:block;max-width:100%;max-height:calc(100vh - 152px);width:auto;height:auto;object-fit:contain;cursor:zoom-in}
+  #source-box{position:absolute;border:3px solid #e55a36;box-shadow:0 0 0 1px white inset;pointer-events:none}
+  .empty{color:#4d6576;text-align:center;padding:22px;line-height:1.5}
+  .controls{display:flex;align-items:center;gap:5px}button{border:1px solid #a4b8c6;background:white;color:#1a405b;border-radius:6px;padding:6px 9px;cursor:pointer}
+  button:hover{background:#eaf3f8}button:disabled{opacity:.4;cursor:default}
+  select{max-width:126px;border:1px solid #a4b8c6;border-radius:6px;background:white;padding:5px}
+  .meta{padding:7px 11px;font-size:.79rem;color:#5d7384;border-top:1px solid #e3eaf0;min-height:32px}
+  .vote{padding:12px;overflow:auto}#case-name{font-size:1.05rem;line-height:1.35;margin:0 0 16px}
+  .question{font-size:.91rem;line-height:1.45;margin:0 0 18px;color:#345168}
+  .choice{display:block;padding:12px 8px;border:1px solid #c9d7e1;border-radius:7px;margin:8px 0;cursor:pointer}
+  .choice:has(input:checked){border-color:#1682bd;background:#e8f4fc}.choice input{margin-right:7px}
+  #reason-wrap{margin-top:14px}textarea{width:100%;min-height:95px;padding:8px;border:1px solid #a4b8c6;border-radius:6px;resize:vertical}
+  .save{width:100%;margin-top:18px;padding:11px;background:#14699e;color:white;border-color:#14699e;font-weight:700}.save:hover{background:#0e5480}
+  #status{font-size:.87rem;min-height:35px;line-height:1.4;margin-top:11px;color:#166b52}.error{color:#ae3030!important}
+  .mini{font-size:.76rem;color:#607789;line-height:1.3;margin-top:16px}
+  dialog{border:0;border-radius:8px;padding:10px;max-width:97vw;max-height:97vh}dialog img{max-width:94vw;max-height:87vh;object-fit:contain}
+  @media(max-width:1100px){main{height:auto;min-height:calc(100vh - 55px);grid-template-columns:1fr 1fr}.list-pane{grid-column:1/-1;max-height:145px}.list{display:flex;gap:5px;overflow:auto}.item{min-width:160px}.vote-pane{grid-column:1/-1}.viewport{height:65vh}.image-wrap img{max-height:calc(65vh - 20px)}}
+  @media(max-width:640px){main{grid-template-columns:1fr}.source-pane,.extract-pane,.vote-pane{grid-column:1}.viewport{height:58vh}.image-wrap img{max-height:calc(58vh - 20px)}}
+</style>
+</head>
+<body>
+<header><h1>이미지 후보 검수</h1><span id="progress">불러오는 중</span></header>
+<main>
+  <section class="pane list-pane"><div class="pane-head"><h2>영역</h2><span id="case-count"></span></div><div class="list" id="case-list"></div></section>
+  <section class="pane source-pane"><div class="pane-head"><h2>원문 페이지</h2><div class="controls"><button id="prev-page" aria-label="이전 페이지">이전</button><span id="page-label"></span><button id="next-page" aria-label="다음 페이지">다음</button></div></div><div class="viewport" id="source-view"></div><div class="meta" id="source-meta"></div></section>
+  <section class="pane extract-pane"><div class="pane-head"><h2>추출 이미지</h2><div class="controls"><select id="candidate" aria-label="추출 후보"></select><select id="mode" aria-label="이미지 형식"></select></div></div><div class="viewport" id="extract-view"></div><div class="meta" id="extract-meta"></div></section>
+  <section class="pane vote-pane"><div class="pane-head"><h2>판정</h2></div><div class="vote"><h3 id="case-name"></h3><p class="question">목표 영역을 빠짐없이 읽을 수 있게 추출했나?</p>
+    <label class="choice"><input type="radio" name="choice" value="accurate">정확</label>
+    <label class="choice"><input type="radio" name="choice" value="error">오류</label>
+    <label class="choice"><input type="radio" name="choice" value="undecidable">판단불가</label>
+    <div id="reason-wrap" hidden><label for="reason">판단불가 사유</label><textarea id="reason" maxlength="4000" placeholder="확인할 수 없는 부분을 적어 줘."></textarea></div>
+    <button class="save" id="save">저장</button><p id="status" role="status" aria-live="polite"></p>
+    <p class="mini">주황 테두리는 원래 평가 대상 영역이야. 판정은 선택한 추출 후보와 형식에 저장돼.</p>
+  </div></section>
+</main>
+<dialog id="zoom"><button id="close-zoom">닫기</button><div><img id="zoom-image" alt="확대 이미지"></div></dialog>
+<script>
+"use strict";
+const state={cases:[],decisions:{},pageCount:0,current:null,page:1,dirty:false};
+const $=id=>document.getElementById(id);
+function txt(id,value){$(id).textContent=value??""}
+function choice(){return document.querySelector('input[name="choice"]:checked')?.value||""}
+function status(message,error=false){$("status").textContent=message;$("status").className=error?"error":""}
+function markDirty(){state.dirty=true;status("저장 전")}
+function askLeave(){return !state.dirty||window.confirm("저장하지 않은 판정이 있어. 이동할까?")}
+function selected(){return state.cases.find(c=>c.case_id===state.current)}
+function renderList(){
+  const list=$("case-list");list.replaceChildren();
+  txt("progress",`${Object.keys(state.decisions).length}/${state.cases.length} 저장`);
+  txt("case-count",state.cases.length+"건");
+  for(const c of state.cases){const button=document.createElement("button");button.className="item"+(c.case_id===state.current?" active":"");
+    const strong=document.createElement("strong");strong.textContent=c.case_id+" · "+c.label;button.appendChild(strong);
+    if(state.decisions[c.case_id]){const mark=document.createElement("span");mark.className="mark";mark.textContent="✓";button.appendChild(mark)}
+    const small=document.createElement("small");small.textContent=`${c.page}쪽 · ${c.candidates.length}후보`;button.appendChild(small);
+    button.addEventListener("click",()=>{if(askLeave())openCase(c.case_id)});list.appendChild(button)}
+}
+function image(container,url,alt,zoomUrl=url){
+  container.replaceChildren();const wrap=document.createElement("div");wrap.className="image-wrap";
+  const img=document.createElement("img");img.src=url;img.alt=alt;img.addEventListener("click",()=>{$("zoom-image").src=zoomUrl;$("zoom").showModal()});
+  img.addEventListener("error",()=>{container.replaceChildren();const p=document.createElement("p");p.className="empty";p.textContent="이미지를 열지 못했어";container.appendChild(p)});
+  wrap.appendChild(img);container.appendChild(wrap);return {wrap,img};
+}
+function sourcePage(){
+  const c=selected();if(!c)return;
+  txt("page-label",`${state.page} / ${state.pageCount}`);
+  $("prev-page").disabled=state.page<=1;$("next-page").disabled=state.page>=state.pageCount;
+  txt("source-meta",state.page===c.page?"주황 테두리: 평가 영역":"주변 페이지 확인 중");
+  const pageUrl=`/api/source-page?case=${c.case_id}&page=${state.page}`;
+  const zoomUrl=state.page===c.page?`/api/source-crop?case=${c.case_id}`:pageUrl;
+  const {wrap,img}=image($("source-view"),pageUrl,`원문 이미지 ${state.page}쪽`,zoomUrl);
+  if(state.page===c.page){const box=document.createElement("span");box.id="source-box";
+    const [w,h]=c.source_page_size,[x0,y0,x1,y1]=c.source_bbox;
+    box.style.left=`${100*x0/w}%`;box.style.top=`${100*y0/h}%`;box.style.width=`${100*(x1-x0)/w}%`;box.style.height=`${100*(y1-y0)/h}%`;
+    img.addEventListener("load",()=>wrap.appendChild(box));}
+}
+function fillCandidates(saved){
+  const c=selected(),sel=$("candidate");sel.replaceChildren();
+  if(!c.candidates.length){const option=new Option("후보 없음","");sel.add(option);sel.disabled=true;fillModes(null);return}
+  sel.disabled=false;
+  for(const item of c.candidates)sel.add(new Option(`후보 ${item.rank}`,String(item.rank)));
+  const rank=saved?.candidate_rank&&c.candidates.some(x=>x.rank===saved.candidate_rank)?saved.candidate_rank:1;
+  sel.value=String(rank);fillModes(saved?.candidate_mode||null);
+}
+function fillModes(preferred){
+  const c=selected(),rank=Number($("candidate").value),candidate=c?.candidates[rank-1],sel=$("mode");sel.replaceChildren();
+  if(!candidate){sel.disabled=true;$("extract-view").replaceChildren();const p=document.createElement("p");p.className="empty";p.textContent="추출된 후보가 없어";$("extract-view").appendChild(p);txt("extract-meta","검출 누락을 판정할 수 있어");return}
+  sel.disabled=false;
+  if(candidate.images.composite)sel.add(new Option("합성 캡처","composite"));
+  if(candidate.images.raw)sel.add(new Option("이미지 객체","raw"));
+  sel.value=preferred&&candidate.images[preferred]?preferred:(candidate.images.composite?"composite":"raw");
+  extracted();
+}
+function extracted(){const c=selected(),rank=Number($("candidate").value),mode=$("mode").value,candidate=c?.candidates[rank-1];
+  if(!candidate)return;const item=candidate.images[mode];
+  image($("extract-view"),item.url,`${c.label} 추출 후보 ${rank}`);
+  txt("extract-meta",`후보 ${rank}/${c.candidates.length} · ${mode==="composite"?"합성 캡처":"원본 이미지 객체"}`);
+}
+function openCase(id){const c=state.cases.find(x=>x.case_id===id);if(!c)return;
+  state.current=id;state.page=c.page;state.dirty=false;history.replaceState(null,"","#"+id);
+  txt("case-name",`${c.case_id} · ${c.label}`);const saved=state.decisions[id];
+  for(const input of document.querySelectorAll('input[name="choice"]'))input.checked=input.value===saved?.choice;
+  $("reason").value=saved?.reason||"";$("reason-wrap").hidden=saved?.choice!=="undecidable";
+  fillCandidates(saved);sourcePage();renderList();status(saved?"저장된 판정":"미판정");
+}
+async function save(){const c=selected(),vote=choice(),reason=vote==="undecidable"?$("reason").value.trim():"";
+  if(!vote)return status("판정을 골라 줘",true);if(vote==="undecidable"&&!reason)return status("판단불가 사유를 입력해 줘",true);
+  const rank=c.candidates.length?Number($("candidate").value):null,mode=rank?$("mode").value:null;
+  $("save").disabled=true;
+  try{const res=await fetch("/api/decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({case_id:c.case_id,choice:vote,reason,candidate_rank:rank,candidate_mode:mode})});
+    const data=await res.json();if(!res.ok)throw Error(data.error||"저장 실패");state.decisions[c.case_id]=data.decision;state.dirty=false;renderList();status("JSON에 저장됨");
+  }catch(error){status(error.message,true)}finally{$("save").disabled=false}
+}
+async function init(){try{const res=await fetch("/api/cases");const data=await res.json();if(!res.ok)throw Error(data.error);
+  document.querySelector("h1").textContent=data.dataset_title;if(data.question)document.querySelector(".question").textContent=data.question;state.cases=data.cases;state.decisions=data.decisions;state.pageCount=data.page_count;
+  openCase(state.cases.some(x=>x.case_id===location.hash.slice(1))?location.hash.slice(1):state.cases[0].case_id);
+}catch(error){txt("progress","불러오기 실패");status(error.message,true)}}
+$("prev-page").addEventListener("click",()=>{state.page--;sourcePage()});
+$("next-page").addEventListener("click",()=>{state.page++;sourcePage()});
+$("candidate").addEventListener("change",()=>{fillModes(null);if(choice()||state.decisions[state.current])markDirty()});
+$("mode").addEventListener("change",()=>{extracted();if(choice()||state.decisions[state.current])markDirty()});
+document.querySelectorAll('input[name="choice"]').forEach(input=>input.addEventListener("change",()=>{$("reason-wrap").hidden=input.value!=="undecidable";markDirty()}));
+$("reason").addEventListener("input",markDirty);$("save").addEventListener("click",save);
+$("close-zoom").addEventListener("click",()=>$("zoom").close());
+window.addEventListener("beforeunload",event=>{if(state.dirty){event.preventDefault();event.returnValue=""}});
+init();
+</script>
+</body>
+</html>

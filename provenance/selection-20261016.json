@@ -1,0 +1,60 @@
+{
+  "author": "chatgpt_gpt6",
+  "date": "2026-10-16",
+  "user_direction": "Prioritize real diagram interaction for A/B comparison over two static images. Upload selected HTML and decision logs. This explicitly updates earlier Web-only ledger publication scope for selected logs in this repo.",
+  "image_read": {
+    "method": "Main directly read browser-rendered PNGs via view_image",
+    "candidate_images": [
+      "interactive-ab.png",
+      "review-queue.png",
+      "ab-review.png",
+      "variant-switcher.png",
+      "label-layout-review.png"
+    ],
+    "workspace_evidence": "outputs/studio-selection-20261016",
+    "human_approval": "Not inferred from Agent visual review",
+    "final_evidence": "provenance/screenshots/"
+  },
+  "selected": [
+    {
+      "path": "examples/interactive-comparison/index.html",
+      "reason": "Two live diagrams; independent interaction, both-expand/collapse, left/right swap. No judgement collection built into this example.",
+      "visual_limit": "Small diagrams in side-by-side fit; read at original window/individual view as needed."
+    },
+    {
+      "path": "examples/review-queue/index.html",
+      "reason": "Live diagram beside criterion and verdict; four cases, previous/next, browser draft and JSON export.",
+      "visual_limit": "Deep diagrams require scrolling; no comparative superiority claim."
+    },
+    {
+      "path": "ui/capture.html",
+      "reason": "Portable external-dataset source-region/candidate review; original layout and navigation reused; final screenshot directly read."
+    },
+    {
+      "path": "ui/review_index.html",
+      "reason": "Portable external-dataset record/evidence review; filter/search/navigation and saved reasons reused; final screenshot directly read."
+    }
+  ],
+  "deferred": [
+    {
+      "path": "outputs/dds-human-ab-review-20261015/index.html",
+      "reason": "Static two-image comparison; lower priority under latest user direction."
+    },
+    {
+      "path": "outputs/dds-font-trial-20261015/index.html",
+      "reason": "Static variant switching; no verdict collection; lower priority."
+    },
+    {
+      "path": "outputs/dds-human-ab-review-20261015/long-label.html",
+      "reason": "Static images; incomplete one-sided pass choices and chat-save wording; not selected."
+    }
+  ],
+  "logs": "Historical retrospective product decisions, experiment decisions and recorded Human follow-ups remain distinct. Not a complete decision history; referenced external evidence is not bundled.",
+  "dataset_adaptation": {
+    "author": "chatgpt_gpt6",
+    "source": "original capture.html and review_index.html",
+    "runtime": "studio_server.py --dataset PATH --votes PATH",
+    "data_policy": "Only authored synthetic SVG/JSON fixtures; no original PDF/HWP, business database or converted document. Both datasets can be replaced externally.",
+    "validation": "7 API regressions and 4 actual-browser check groups passed; all four final screen types directly read by Main."
+  }
+}

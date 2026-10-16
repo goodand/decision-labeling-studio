@@ -1,0 +1,32 @@
+{
+  "author": "chatgpt_gpt6",
+  "recorded_on": "2026-10-16",
+  "recording_method": "Retrospective from this chat; not artifact approval",
+  "decisions": [
+    {
+      "id": "STUDIO-NAME-001",
+      "status": "accepted_direction",
+      "user_quote": "검수 용이성을 높이도록 UIUX를 잘 짜는게 중요하고, studio 좋은 것 같아",
+      "decision": "Name decision-labeling-studio; prioritize Human review ease."
+    },
+    {
+      "id": "STUDIO-SELECTION-001",
+      "status": "explicit_request",
+      "user_quote": "html도 모든 html을 올리는 것이 아니라 재사용성이 높은 것만 후보를 추리고 IMAGE READ를 직접 해서",
+      "decision": "Select reusable HTML; Main must directly read rendered images before publishing."
+    },
+    {
+      "id": "STUDIO-LIVE-AB-001",
+      "status": "accepted_direction",
+      "user_quote": "실제 digram 조작 까지 할 수 있게 해서 두 가지 대조하는거 괜찮더라",
+      "decision": "Prioritize live interactive diagram comparison over static two-image comparison."
+    },
+    {
+      "id": "STUDIO-DATASET-001",
+      "status": "explicit_request",
+      "user_quote": "그것을 다른 데이터셋이랑 연동해서 사용 할 수 있게 정리해서 push 할 수 있잖아",
+      "decision": "Adapt capture.html and review_index.html for external datasets before push."
+    }
+  ],
+  "implementation": "Four UI patterns, dataset adapter server, synthetic fixtures, selected historical DDS logs. Validation does not create new Human approvals."
+}

@@ -1,0 +1,578 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>diagram</title><style>svg.is-focus .dds-region:not(.on){opacity:.2}</style><style>html{height:100%}body{margin:0;height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:#fff;font-family:system-ui}#host{flex:1;min-height:0;min-width:0}#host>svg{display:block;width:100%;height:100%}svg.is-focus .dds-node:not(.on),svg.is-focus .dds-edge:not(.on){opacity:.2}.dds-token{pointer-events:none}.dds-controls{flex:0 0 auto;box-sizing:border-box;max-height:40dvh;overflow:auto;background:white;padding:12px;display:flex;gap:8px;flex-wrap:wrap}.dds-controls button{padding:8px;cursor:pointer}.dds-label{font-size:14px;font-weight:600}.dds-edge-label{font-size:11.5px}.dds-region-label{font-size:12px}.m-explain,.m-example{display:none}</style></head><body><div id="host"><svg style="background:#fff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 224 556" role="img" aria-label="diagram" class="dds-svg"><style>text{font-family:"Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}.dds-label{font-size:14px;font-weight:600}.dds-edge-label{font-size:11.5px}.dds-region-label{font-size:12px;font-weight:600}.m-explain,.m-example{display:none}</style><defs><marker id="ah-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#000000"/></marker><marker id="ah-white" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#FFFFFF"/></marker><marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#CF222E"/></marker><marker id="ah-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A7F37"/></marker><marker id="ah-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0969DA"/></marker></defs><g class="dds-edge" data-from="pair-diamond-then-cycle-a-in" data-to="__l0fold:6:task-a" data-i="0"><path d="M112,68 L112,140" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#ah-black)"/><path d="M112,68 L112,140" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/></g><g class="dds-edge" data-from="__l0fold:6:task-a" data-to="pair-diamond-then-cycle-boundary" data-i="1"><path d="M112,184 L112,256" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#ah-black)"/><path d="M112,184 L112,256" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/></g><g class="dds-edge" data-from="pair-diamond-then-cycle-boundary" data-to="__l0fold:6:task-b" data-i="2"><path d="M112,300 L112,372" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#ah-black)"/><path d="M112,300 L112,372" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/></g><g class="dds-edge" data-from="__l0fold:6:task-b" data-to="pair-diamond-then-cycle-b-out" data-i="3"><path d="M112,416 L112,488" fill="none" stroke="#000000" stroke-width="1.6" marker-end="url(#ah-black)"/><path d="M112,416 L112,488" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/></g><g class="dds-node" data-id="pair-diamond-then-cycle-a-in" tabindex="0"><rect x="24" y="24" width="176" height="44" rx="22" fill="#FFFFFF" stroke="#000000" stroke-width="1.6"/><text x="112" y="51" text-anchor="middle" class="dds-label" fill="#000000">입력</text></g><g class="dds-node" data-id="pair-diamond-then-cycle-boundary" tabindex="0"><rect x="24" y="256" width="176" height="44" rx="22" fill="#FFFFFF" stroke="#000000" stroke-width="1.6"/><text x="112" y="283" text-anchor="middle" class="dds-label" fill="#000000">Core 간 산출물</text></g><g class="dds-node" data-id="pair-diamond-then-cycle-b-out" tabindex="0"><rect x="24" y="488" width="176" height="44" rx="22" fill="#FFFFFF" stroke="#000000" stroke-width="1.6"/><text x="112" y="515" text-anchor="middle" class="dds-label" fill="#000000">최종 상태</text></g><g class="dds-node" data-id="__l0fold:6:task-a" tabindex="0"><rect x="24" y="140" width="176" height="44" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="1.6"/><text x="99" y="167" text-anchor="middle" class="dds-label" fill="#000000">Core A</text><g class="dds-plus" data-expand="__l0fold:6:task-a"><rect x="178" y="144" width="18" height="18" fill="#fff" stroke="#000"/><path d="M183,153 h8 M187,149 v8" stroke="#000" stroke-width="1.6"/></g></g><g class="dds-node" data-id="__l0fold:6:task-b" tabindex="0"><rect x="24" y="372" width="176" height="44" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="1.6"/><text x="99" y="399" text-anchor="middle" class="dds-label" fill="#000000">Core B</text><g class="dds-plus" data-expand="__l0fold:6:task-b"><rect x="178" y="376" width="18" height="18" fill="#fff" stroke="#000"/><path d="M183,385 h8 M187,381 v8" stroke="#000" stroke-width="1.6"/></g></g></svg></div><script>/* Diagram Design System v2 — Version B renderer, abstraction, validator.
+   One typed IR → SVG. All examples in the page go through this file. */
+(function (global) {
+  'use strict';
+  var PALETTE = { black: '#000000', white: '#FFFFFF', red: '#CF222E', green: '#1A7F37', blue: '#0969DA' };
+  var NS = 'http://www.w3.org/2000/svg';
+  var NW = 176, NH = 44;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+  function col(c) { return PALETTE[c] || c || PALETTE.black; }
+
+  /* ---------- abstraction: same IR, level-dependent view (ARG-065, §7) ---------- */
+  function byId(ir) { var m = {}; ir.nodes.forEach(function (n) { m[n.id] = n; }); return m; }
+  var VOPT = {};
+  function expanded(n, L) {
+    if (VOPT.collapse && VOPT.collapse.indexOf(n.id) >= 0) return false;
+    if (VOPT.expand && VOPT.expand.indexOf(n.id) >= 0) return true;
+    return n.expandAt === undefined || L >= n.expandAt;
+  }
+  function visibleAt(n, m, L) {
+    var p = n.parent ? m[n.parent] : null;
+    while (p) { if (!expanded(p, L)) return false; p = p.parent ? m[p.parent] : null; }
+    return true;
+  }
+  function liftTo(id, m, L) { // nearest visible node (self or ancestor)
+    var n = m[id];
+    while (n && !visibleAt(n, m, L)) n = m[n.parent];
+    // a visible group that is expanded is a region, not an endpoint: keep original
+    return n ? n.id : id;
+  }
+  function withAutoFolds(source) {
+    if (source && source.visible_layout_cache && source.visible_layout_signature !== layoutSignature(source)) throw new Error('Stale visible layout; regenerate with CLI finalize');
+    if (!source || !source.diagram_type || source.diagram_type === 'l0_summary') return source;
+    if (source.nodes.some(function (n) { return n.autoFold; })) return JSON.parse(JSON.stringify(source));
+    var ir = JSON.parse(JSON.stringify(source));
+    var refs = ir.diagram_type === 'l1_partial' ? (ir.l0_ref ? [{ ...ir.l0_ref, partial_id:ir.id, partial:Object.assign({},ir.partials[0],{e2e:ir.e2e}) }] : []) : (ir.l0_refs || []);
+    if (!refs.length) return ir;
+    var groups = new Map();
+    refs.forEach(function (ref) {
+      var key = ref.node_id, task = ref.snapshot.nodes.find(function (n) { return n.id === key; }), g = groups.get(key);
+      if (g && g.task.label !== task.label) throw Error('conflicting L0 labels for node_id: ' + key);
+      if (!g) { g = { key:key, task:task, children:new Set(), owners:new Set() }; groups.set(key,g); }
+      (ref.partial.nodes || []).forEach(function (id) { g.children.add(id); g.owners.add(id); });
+    });
+    if (ir.diagram_type === 'l1_full') {
+      var owners = new Map();
+      groups.forEach(function (g) { g.children.forEach(function (id) { owners.set(id,(owners.get(id)||0)+1); }); });
+      groups.forEach(function (g) { g.children.forEach(function (id) { if (ir.e2e.inputs.includes(id) || ir.e2e.outputs.includes(id) || owners.get(id)>1) g.children.delete(id); }); });
+    } else {
+      var ref = refs[0], boundary = new Set((ref.partial.e2e.inputs || []).concat(ref.partial.e2e.outputs || []));
+      groups.forEach(function (g) { g.children.forEach(function (id) { if (boundary.has(id)) g.children.delete(id); }); });
+    }
+    var generated = new Set();
+    groups.forEach(function (g) {
+      var id = '__l0fold:' + g.key.length + ':' + g.key;
+      if (generated.has(id) || ir.nodes.some(function (n) { return n.id === id; })) throw Error('auto-fold id collides with a source node');
+      generated.add(id);
+      if (!g.children.size) return;
+      var childNodes = ir.nodes.filter(function (n) { return g.children.has(n.id); });
+      var roots = childNodes.filter(function (n) { return !n.parent || !g.children.has(n.parent); });
+      // A single unchanged leaf has no hidden detail to unfold.
+      if (childNodes.length === 1 && roots.length === 1 && roots[0].role === 'process' && roots[0].expandAt === undefined && roots[0].label === g.task.label) return;
+      // A sole linked implementation already supplies the same semantic fold.
+      if (roots.length === 1 && roots[0].linked_detail && roots[0].label === g.task.label) return;
+      if (roots.some(function (n) { return n.parent && !g.children.has(n.parent); })) throw Error('L0 auto-fold conflicts with an existing parent group');
+      var points = childNodes.map(function (n) { var p=n.pos && (n.pos[1] || n.pos[0]); return p && Number.isFinite(p[0]) && Number.isFinite(p[1]) ? p : (Number.isFinite(n.x) && Number.isFinite(n.y) ? [n.x,n.y] : null); }).filter(Boolean);
+      var x = points.length ? points.reduce(function (sum,p) { return sum + p[0]; },0) / points.length : (Number.isFinite(g.task.x) ? g.task.x : 0);
+      var y = points.length ? points.reduce(function (sum,p) { return sum + p[1]; },0) / points.length : (Number.isFinite(g.task.y) ? g.task.y : 0);
+      ir.nodes.push({ id:id, label:g.task.label, role:'process', x:x, y:y, w:g.task.w, h:g.task.h, expandAt:2, autoFold:true, autoFoldKey:g.key });
+      g.children.forEach(function (nodeId) {
+        var n=ir.nodes.find(function (x) { return x.id===nodeId; });
+        if (n && !n.parent) n.parent=id;
+      });
+    });
+    // Only this validated, deterministic augmentation may rebind the cache.
+    if (ir.visible_layout_cache) ir.visible_layout_signature = layoutSignature(ir);
+    return ir;
+  }
+  // Conservative cache identity: source content and options, excluding generated caches.
+  // Revision also invalidates caches when the layout implementation changes.
+  function layoutSignature(ir) {
+    function canonical(value) {
+      if (Array.isArray(value)) return value.map(canonical);
+      if (value && typeof value === 'object') {
+        var out={}; Object.keys(value).sort().forEach(function(k){out[k]=canonical(value[k]);}); return out;
+      }
+      return value;
+    }
+    var source={}; Object.keys(ir).forEach(function(k){
+      if(k!=='visible_layout_cache' && k!=='visible_layout_signature' && k!=='routing_cache')source[k]=ir[k];
+    });
+    return JSON.stringify(['visible-layout-v1',canonical(source)]);
+  }
+  function view(ir, L, vopt) {
+    VOPT = vopt || {};
+    if (L === undefined || L === null) return ir;
+    if(ir.visible_layout_cache && ir.visible_layout_signature!==layoutSignature(ir))throw new Error('Stale visible layout; regenerate with CLI finalize');
+    ir = withAutoFolds(ir);
+    var m = byId(ir), nodes = [], groups = [], seen = {}, edges = [];
+    ir.nodes.forEach(function (n) {
+      if (!visibleAt(n, m, L)) return;
+      var isGroup = n.expandAt !== undefined;
+      var pos = n.pos ? (n.pos[L] || n.pos[2] || n.pos[1] || n.pos[0]) : [n.x, n.y];
+      if (isGroup && (pos[0] === undefined || pos[1] === undefined)) { // R10: no coordinates -> centre of its members
+        var kids = ir.nodes.filter(function (k) { var p = k.parent; while (p) { if (p === n.id) return true; p = m[p] && m[p].parent; } return false; })
+          .map(function (k) { return k.pos ? (k.pos[2] || k.pos[1] || k.pos[0]) : [k.x, k.y]; }).filter(function (q) { return q[0] !== undefined; });
+        if (kids.length) pos = [kids.reduce(function (a, q) { return a + q[0]; }, 0) / kids.length, kids.reduce(function (a, q) { return a + q[1]; }, 0) / kids.length];
+        n = Object.assign({}, n, { autoPos: true });
+      }
+      if (isGroup && expanded(n, L)) { if (n.drawRegion) groups.push({ id: n.id, label: n.label, members: [], certainty: n.certainty, regionDash: n.regionDash, regionWidth: n.regionWidth }); return; }
+      var c = Object.assign({}, n, { x: pos[0], y: pos[1], collapsed: isGroup });
+      if (isGroup && !c.role) c.role = 'process'; // R2: a collapsed group keeps its own role
+      nodes.push(c);
+    });
+    // region membership: visible descendants of expanded drawRegion groups
+    groups.forEach(function (g) {
+      nodes.forEach(function (n) { var p = n.parent; while (p) { if (p === g.id) { g.members.push(n.id); break; } p = m[p].parent; } });
+    });
+    ir.edges.forEach(function (e) {
+      var f = liftTo(e.from, m, L), t = liftTo(e.to, m, L);
+      if (f === t) return;
+      var k = f + '>' + t + (e.loop ? 'L' : '') + (f === e.from && t === e.to || ir.diagram_type && (m[f] && m[f].autoFold || m[t] && m[t].autoFold) ? ':' + e.id : '');
+      if (seen[k]) return; seen[k] = 1;
+      edges.push(Object.assign({}, e, { from: f, to: t }));
+    });
+    if(ir.visible_layout_cache){
+      var layoutKey=JSON.stringify([nodes.map(function(n){return n.id;}).sort(),edges.map(function(e){return [e.id,e.from,e.to];}).sort(function(a,b){return JSON.stringify(a).localeCompare(JSON.stringify(b));})]);
+      var layout=ir.visible_layout_cache[layoutKey];
+      if(!layout)throw new Error('Missing visible layout; regenerate with CLI finalize');
+      nodes=nodes.map(function(n){var p=layout.positions && layout.positions[n.id];if(!Array.isArray(p)||p.length!==2||!p.every(Number.isFinite))throw new Error('Invalid visible layout position: '+n.id);return Object.assign({},n,{x:p[0],y:p[1]});});
+    }
+    return Object.assign({}, ir, { nodes: nodes, groups: groups, edges: edges, level: L });
+  }
+
+  /* ---------- geometry ---------- */
+  function textW(t) { var w = 0; String(t).split('').forEach(function (ch) { w += /[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af\u4e00-\u9fff]/.test(ch) ? 14.5 : 8.6; }); return w; }
+  function box(n) {
+    var w = n.w || NW, h = n.h || NH;
+    var need = textW(n.label) + 2 * 18 + (n.collapsed ? 26 : 0) + (n.role === 'entity' ? h / 2 : 0);
+    if ((n.collapsed || !n.w) && need > w) w = need; // R13·R16: room for label (and [+]); an explicit w is kept (checked by VB-LABEL-FIT)
+    return { x: n.x - w / 2, y: n.y - h / 2, w: w, h: h, cx: n.x, cy: n.y };
+  }
+  function route(e, m) {
+    if (!m[e.from] || !m[e.to]) {
+      var miss = !m[e.from] ? e.from : e.to;
+      throw new Error('edge ' + e.from + ' -> ' + e.to + ': "' + miss + '"은(는) 이 단계에서 node로 보이지 않는다. 펼친 전체 node(영역)는 edge의 끝점이 될 수 없다. 영역 안의 부분 node를 가리키거나 그 전체를 접어라 (VB-EDGE-ENDPOINT)');
+    }
+    var s = box(m[e.from]), t = box(m[e.to]);
+    var sdx = e.sdx || 0, tdx = e.tdx || 0;
+    if (e.route === 'hvh') { // fan-in/out bus: horizontal, vertical at busX, horizontal
+      var d1 = t.cx > s.cx ? 1 : -1, ax = s.cx + d1 * s.w / 2, bx = t.cx - d1 * t.w / 2;
+      var bus = e.busX !== undefined ? e.busX : (ax + bx) / 2;
+      if (Math.abs(s.cy - t.cy) < 1) return { pts: [[ax, s.cy], [bx, t.cy]] };
+      return { pts: [[ax, s.cy], [bus, s.cy], [bus, t.cy], [bx, t.cy]] };
+    }
+    if (Math.abs(s.cy - t.cy) < 1) {
+      var dir = t.cx > s.cx ? 1 : -1;
+      var a = [s.cx + dir * s.w / 2, s.cy], b = [t.cx - dir * t.w / 2, t.cy];
+      if (e.route === 'curve') { var bd = e.bend === undefined ? -40 : e.bend; return { d: 'M' + a + ' C' + [a[0] + dir * 40, a[1] + bd] + ' ' + [b[0] - dir * 40, b[1] + bd] + ' ' + b, pts: [a, b], curve: true }; }
+      return { pts: [a, b] };
+    }
+    var down = t.cy > s.cy ? 1 : -1;
+    var sy = s.cy + down * s.h / 2, ty = t.cy - down * t.h / 2;
+    var sx = s.cx + sdx, tx = t.cx + tdx;
+    if (Math.abs(sx - tx) < 1 && e.route !== 'curve') return { pts: [[sx, sy], [tx, ty]] };
+    if (e.route === 'curve') return { d: 'M' + [sx, sy] + ' C' + [sx, (sy + ty) / 2] + ' ' + [tx, (sy + ty) / 2] + ' ' + [tx, ty], pts: [[sx, sy], [tx, ty]], curve: true };
+    var my = e.midY !== undefined ? e.midY : (sy + ty) / 2;
+    return { pts: [[sx, sy], [sx, my], [tx, my], [tx, ty]] };
+  }
+  function pathD(r) { return r.d || ('M' + r.pts.map(function (p) { return p.join(','); }).join(' L')); }
+  function routingKey(v) {
+    return JSON.stringify([v.nodes.map(function(n){var b=box(n);return [n.id,b.x,b.y,b.w,b.h];}),v.edges.map(function(e){var key=[e.id,e.from,e.to];if(e.fromSide!==undefined||e.toSide!==undefined)key.push(e.fromSide||null,e.toSide||null);return key;})]);
+  }
+  function longestSeg(pts) {
+    var best = 0, bi = 0;
+    for (var i = 0; i < pts.length - 1; i++) { var l = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]); if (l > best) { best = l; bi = i; } }
+    return [(pts[bi][0] + pts[bi + 1][0]) / 2, (pts[bi][1] + pts[bi + 1][1]) / 2];
+  }
+  function longestSeg2(pts, at) {
+    var best = -1, bi = 0;
+    for (var i = 0; i < pts.length - 1; i++) { var l = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]); if (l > best) { best = l; bi = i; } }
+    var a = pts[bi], b = pts[bi + 1];
+    var u = at === undefined ? 0.5 : at, hz = Math.abs(a[1] - b[1]) < 1;
+    if (hz && a[0] > b[0]) { var t = a; a = b; b = t; } // horizontal: measure from the left end
+    return { x: a[0] + (b[0] - a[0]) * u, y: a[1] + (b[1] - a[1]) * u, h: hz };
+  }
+  function dash(c) {
+    if (!c || c === 'solid') return '';
+    var gap = c === 'dashed' ? 6 : +c;
+    return ' stroke-dasharray="6 ' + gap + '"';
+  }
+
+  /* ---------- render ---------- */
+  function render(irIn, opt) {
+    opt = opt || {};
+    var ir = view(irIn, opt.level === undefined ? 2 : opt.level, { expand: opt.expand, collapse: opt.collapse });
+    var m = byId(ir), W = ir.w || 780, H = ir.h || 400, out = [];
+    var cached = ir.edge_routing === 'libavoid' && ir.routing_cache && ir.routing_cache[routingKey(ir)];
+    if (ir.edge_routing === 'libavoid' && !cached) throw new Error('Missing routing cache for visible state; regenerate with CLI finalize');
+    function edgeRoute(e,i) { return cached ? cached[i] : route(e,m); }
+    var routedLabels = [], occupiedLabels = [];
+    if (cached) ir.edges.forEach(function(e,i) {
+      if (!e.label) return;
+      var ls=longestSeg2(cached[i].pts,e.labelAt), tw=e.label.length*11+8;
+      var choices=ls.h ? [[ls.x-tw/2,ls.y-25],[ls.x-tw/2,ls.y+8]] : [[ls.x+8,ls.y-9],[ls.x-tw-8,ls.y-9]];
+      var obstacles=ir.nodes.map(box).concat(occupiedLabels);
+      function score(p) { return obstacles.reduce(function(sum,b){return sum+Math.max(0,Math.min(p[0]+tw,b.x+b.w)-Math.max(p[0],b.x))*Math.max(0,Math.min(p[1]+17,b.y+b.h)-Math.max(p[1],b.y));},0); }
+      choices.sort(function(a,b){return score(a)-score(b);});
+      var p=choices[0]; routedLabels[i]={x:p[0],y:p[1],w:tw,h:17}; occupiedLabels.push(routedLabels[i]);
+    });
+    var vx = 0, vy = 0;
+    if (opt.fit) { // bounding box of every drawn element + the same pad on all four sides (cf. Graphviz bb + pad)
+      var pad = opt.pad === undefined ? 24 : opt.pad, X = [], Y = [];
+      function addBox(x0, y0, x1, y1) { X.push(x0, x1); Y.push(y0, y1); }
+      ir.nodes.forEach(function (n) { var b = box(n); addBox(b.x, b.y, b.x + b.w, b.y + b.h);
+        if (n.desc || n.example) addBox(b.x, b.y + b.h, b.x + Math.max(b.w, 12 * String(n.desc || n.example).length), b.y + b.h + 22); });
+      (ir.groups || []).forEach(function (g) {
+        var bs = g.members.map(function (id) { return box(m[id]); }); if (!bs.length) return;
+        var gp = g.pad || 16;
+        addBox(Math.min.apply(null, bs.map(function (q) { return q.x; })) - gp, Math.min.apply(null, bs.map(function (q) { return q.y; })) - gp - 20,
+               Math.max.apply(null, bs.map(function (q) { return q.x + q.w; })) + gp, Math.max.apply(null, bs.map(function (q) { return q.y + q.h; })) + gp + (ir.regionExtra || 0));
+      });
+      ir.edges.forEach(function (e,i) { var r = edgeRoute(e,i); r.pts.forEach(function (q) { addBox(q[0] - 6, q[1] - 6, q[0] + 6, q[1] + 6); });
+        if (routedLabels[i]) { var lb=routedLabels[i]; addBox(lb.x,lb.y,lb.x+lb.w,lb.y+lb.h); }
+        else if (e.label) { var ls = longestSeg2(r.pts, e.labelAt), tw = e.label.length * 11 + 8; addBox(ls.x - tw / 2 - 10, ls.y - 24, ls.x + tw + 12, ls.y + 12); } });
+      vx = Math.min.apply(null, X) - pad; vy = Math.min.apply(null, Y) - pad;
+      W = Math.max.apply(null, X) + pad - vx; H = Math.max.apply(null, Y) + pad - vy;
+    }
+    out.push('<svg xmlns="' + NS + '" viewBox="' + vx + ' ' + vy + ' ' + W + ' ' + H + '" role="img" aria-label="' + esc(ir.title || 'diagram') + '" class="dds-svg">');
+    out.push('<defs>');
+    Object.keys(PALETTE).forEach(function (k) {
+      out.push('<marker id="ah-' + k + (opt.uid || '') + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="' + PALETTE[k] + '"/></marker>');
+    });
+    out.push('</defs>');
+    // regions (whole_part)
+    (ir.groups || []).forEach(function (g) {
+      var bs = g.members.map(function (id) { return box(m[id]); });
+      if (!bs.length) return;
+      var pad = g.pad || 16, extra = ir.regionExtra || 0;
+      var x0 = Math.min.apply(null, bs.map(function (b) { return b.x; })) - pad;
+      var y0 = Math.min.apply(null, bs.map(function (b) { return b.y; })) - pad - 20;
+      var x1 = Math.max.apply(null, bs.map(function (b) { return b.x + b.w; })) + pad;
+      var y1 = Math.max.apply(null, bs.map(function (b) { return b.y + b.h; })) + pad + extra;
+      out.push('<g class="dds-region" data-id="' + g.id + '"><rect x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) + '" height="' + (y1 - y0) + '" fill="none" stroke="#000" stroke-width="' + (g.regionWidth || 1) + '"' + (g.certainty && g.certainty !== 'solid' ? ' stroke-dasharray="' + (g.regionDash || '2 6') + '"' : '') + '/>' +
+        '<text x="' + (x0 + 10) + '" y="' + (y0 + 16) + '" class="dds-region-label">' + esc(g.label) + '</text></g>');
+    });
+    // edges
+    var FR = opt.focus ? reach(ir, opt.focus) : null; // R18: static emphasis (one flow per sheet)
+    function dimAttr(on) { return FR && !on ? ' opacity="0.16"' : ''; }
+    ir.edges.forEach(function (e, i) {
+      var r = edgeRoute(e,i), c = e.color || 'black';
+      var mk = e.arrow === false ? '' : ' marker-end="url(#ah-' + c + (opt.uid || '') + ')"';
+      out.push('<g class="dds-edge' + (e.loop ? ' is-loop' : '') + '" data-from="' + e.from + '" data-to="' + e.to + '" data-i="' + i + '"' + dimAttr(FR && FR.edges[i]) + '>' +
+        '<path d="' + pathD(r) + '" fill="none" stroke="' + col(c) + '" stroke-width="' + (e.width || 1.6) + '"' + dash(e.certainty) + mk + '/>');
+      if (ir.diagram_type) out.push('<path d="' + pathD(r) + '" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/>');
+      if (e.label) { // placed beside the line so certainty dashes stay visible
+        var ls = longestSeg2(r.pts, e.labelAt), tw = e.label.length * 11 + 8;
+        if (routedLabels[i]) { var lb=routedLabels[i]; out.push('<rect x="'+lb.x+'" y="'+lb.y+'" width="'+lb.w+'" height="17" fill="#fff"/><text x="'+(lb.x+4)+'" y="'+(lb.y+13)+'" class="dds-edge-label">'+esc(e.label)+'</text>'); }
+        else if (ls.h) out.push('<rect x="' + (ls.x - tw / 2) + '" y="' + (ls.y - 21) + '" width="' + tw + '" height="17" fill="#fff"/>' +
+          '<text x="' + ls.x + '" y="' + (ls.y - 8) + '" text-anchor="middle" class="dds-edge-label">' + esc(e.label) + '</text>');
+        else out.push('<rect x="' + (ls.x + 5) + '" y="' + (ls.y - 9) + '" width="' + tw + '" height="17" fill="#fff"/>' +
+          '<text x="' + (ls.x + 9) + '" y="' + (ls.y + 4) + '" class="dds-edge-label">' + esc(e.label) + '</text>');
+      }
+      out.push('</g>');
+    });
+    // nodes
+    ir.nodes.forEach(function (n) {
+      var b = box(n), stroke = col(n.color || (n.kind && ir.legend && ir.legend[n.kind] ? ir.legend[n.kind].color : 'black'));
+      var fill = n.fill ? col(n.fill) : '#FFFFFF';
+      var ink = n.fill && n.fill !== 'white' ? '#FFFFFF' : '#000000';
+      var rx = n.role === 'entity' ? b.h / 2 : (n.rounded ? 8 : 0);
+      var sw = n.role === 'process' && n.kind ? 2.2 : 1.6;
+      out.push('<g class="dds-node" data-id="' + n.id + '" tabindex="0"' + dimAttr(FR && FR.nodes[n.id]) + '>' +
+        '<rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h + '" rx="' + rx + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"/>' +
+        '<text x="' + (n.collapsed ? b.cx - 13 : b.cx) + '" y="' + (b.cy + 5) + '" text-anchor="middle" class="dds-label" fill="' + ink + '">' + esc(n.label) + (n.collapsed ? '' : '') + '</text>');
+      if (n.collapsed) {
+        var px = n.role === 'entity' ? b.x + b.w - b.h / 2 - 12 : b.x + b.w - 22, py = b.y + (b.h - 18) / 2; // keep [+] inside the shape
+        if (n.role !== 'entity') py = b.y + 4;
+        out.push('<g class="dds-plus" data-expand="' + n.id + '"><rect x="' + px + '" y="' + py + '" width="18" height="18" fill="#fff" stroke="#000"/>' +
+          '<path d="M' + (px + 5) + ',' + (py + 9) + ' h8 M' + (px + 9) + ',' + (py + 5) + ' v8" stroke="#000" stroke-width="1.6"/></g>');
+      }
+      if (n.desc) out.push('<text x="' + (b.x + 2) + '" y="' + (b.y + b.h + 17) + '" class="dds-desc m-explain">' + esc(n.desc) + '</text>');
+      if (n.example) out.push('<text x="' + (b.x + 2) + '" y="' + (b.y + b.h + 17) + '" class="dds-example m-example">' + esc(n.example) + '</text>');
+      out.push('</g>');
+    });
+    out.push('</svg>');
+    return { svg: out.join(''), ir: ir };
+  }
+
+  /* ---------- hover: Input→Output related flow (ARG-023/024) ---------- */
+  function reach(ir, id) {
+    var fwd = {}, back = {}, on = {}, edges = {};
+    ir.edges.forEach(function (e, i) { if (e.loop) return; (fwd[e.from] = fwd[e.from] || []).push([e.to, i]); (back[e.to] = back[e.to] || []).push([e.from, i]); });
+    function walk(g, start) { var st = [start]; while (st.length) { var x = st.pop(); (g[x] || []).forEach(function (p) { edges[p[1]] = 1; if (!on[p[0]]) { on[p[0]] = 1; st.push(p[0]); } }); } }
+    on[id] = 1; walk(fwd, id); walk(back, id);
+    // DEC-029: co-inputs of an emphasized Process are part of Main
+    var role = {}; ir.nodes.forEach(function (n) { role[n.id] = n.role; });
+    var base = Object.assign({}, on); // one hop from the original flow only, independent of edge order
+    ir.edges.forEach(function (e, i) { if (e.loop) return; if (base[e.to] && role[e.to] === 'process' && !base[e.from]) { on[e.from] = 1; edges[i] = 1; } });
+    return { nodes: on, edges: edges };
+  }
+  function attachHover(host, ir) {
+    var svg = host.querySelector('svg');
+    function set(id) {
+      if (!id) { svg.classList.remove('is-focus'); host.querySelectorAll('.on').forEach(function (x) { x.classList.remove('on'); }); return; }
+      var r = reach(ir, id); svg.classList.add('is-focus');
+      svg.querySelectorAll('.dds-node').forEach(function (g) { g.classList.toggle('on', !!r.nodes[g.dataset.id]); });
+      svg.querySelectorAll('.dds-edge').forEach(function (g) { g.classList.toggle('on', !!r.edges[g.dataset.i]); });
+      svg.querySelectorAll('.dds-region').forEach(function (g) { g.classList.add('on'); });
+    }
+    svg.querySelectorAll('.dds-node').forEach(function (g) {
+      g.addEventListener('mouseenter', function () { set(g.dataset.id); });
+      g.addEventListener('focus', function () { set(g.dataset.id); });
+      g.addEventListener('mouseleave', function () { set(null); });
+      g.addEventListener('blur', function () { set(null); });
+    });
+    return set;
+  }
+
+  /* ---------- animation: what is carried, finite (ARG-010) ---------- */
+  function topoChain(ir) {
+    var indeg = {}, out = {};
+    ir.nodes.forEach(function (n) { indeg[n.id] = 0; });
+    ir.edges.forEach(function (e, i) { if (e.loop) return; indeg[e.to]++; (out[e.from] = out[e.from] || []).push(i); });
+    var q = ir.nodes.filter(function (n) { return !indeg[n.id]; }).map(function (n) { return n.id; }), order = [];
+    while (q.length) { var x = q.shift(); (out[x] || []).forEach(function (i) { order.push(i); var t = ir.edges[i].to; if (--indeg[t] === 0) q.push(t); }); }
+    return order;
+  }
+  function animate(host, ir, done) {
+    var svg = host.querySelector('svg'), m = byId(ir);
+    var reduce = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var order = topoChain(ir), paths = svg.querySelectorAll('.dds-edge path');
+    var tok = document.createElementNS(NS, 'g'); tok.setAttribute('class', 'dds-token');
+    tok.innerHTML = '<rect rx="10" height="20" fill="#0969DA"/><text y="14" fill="#fff" class="dds-token-text"></text>';
+    svg.appendChild(tok);
+    var rect = tok.querySelector('rect'), txt = tok.querySelector('text'), k = 0, carry = '';
+    function label(i) { var f = m[ir.edges[i].from]; if (f.role === 'entity') carry = f.label; return carry || f.label; }
+    function place(p, s) { txt.textContent = s; var w = s.length * 12 + 16; rect.setAttribute('width', w); rect.setAttribute('x', p.x - w / 2); rect.setAttribute('y', p.y - 10); txt.setAttribute('x', p.x - w / 2 + 8); txt.setAttribute('y', p.y + 4.5); }
+    if (reduce) { // static step-through: highlight edges one by one without motion
+      var j = 0; var iv = setInterval(function () {
+        svg.querySelectorAll('.dds-edge').forEach(function (g) { g.classList.toggle('on', +g.dataset.i === order[j]); });
+        svg.classList.add('is-focus'); j++; if (j > order.length) { clearInterval(iv); svg.classList.remove('is-focus'); tok.remove(); done && done(); }
+      }, 700); return;
+    }
+    function step() {
+      if (k >= order.length) { tok.remove(); done && done(); return; }
+      var i = order[k], p = paths[i], L = p.getTotalLength(), t0 = null, s = label(i);
+      function frame(ts) { if (!t0) t0 = ts; var u = Math.min(1, (ts - t0) / 650); place(p.getPointAtLength(L * u), s); if (u < 1) requestAnimationFrame(frame); else { k++; step(); } }
+      requestAnimationFrame(frame);
+    }
+    step();
+  }
+
+  /* ---------- validation gate (archify-style receipts, ARG-066) ---------- */
+  function validate(ir, irIn) {
+    irIn = irIn || ir;
+    var m = byId(ir), res = [];
+    function add(code, ok, subject, evidence, fix, level) { res.push({ code: code, ok: ok, level: level || 'error', subject: subject, evidence: evidence, fix: fix }); }
+    var bad;
+    bad = ir.nodes.filter(function (n) { return n.shape && ((n.role === 'process' && n.shape !== 'rect') || (n.role === 'entity' && n.shape !== 'stadium')); });
+    add('VB-ROLE-SHAPE', !bad.length, bad.map(function (n) { return n.id; }).join(', ') || '전체 node', bad.length ? bad.map(function (n) { return n.id + ': role=' + n.role + ', shape=' + n.shape; }).join('; ') : 'process→rect, entity→stadium', 'shape를 role에 맞춘다');
+    var isa = ir.edges.filter(function (e) { return e.meaning === 'is_a'; });
+    bad = isa.filter(function (e) { var a = m[e.from], b = m[e.to]; return a.role !== 'entity' || b.role !== 'entity'; });
+    add('VB-ISA-SHAPE', !bad.length, bad.map(function (e) { return e.from + '—' + e.to; }).join(', ') || 'is_a edge', bad.length ? 'is_a chain에 rect node 포함' : 'is_a chain은 stadium만 사용', 'is_a node를 stadium으로 바꾼다');
+    bad = isa.filter(function (e) { return e.certainty && e.certainty !== 'solid'; });
+    add('VB-ISA-CERT', !bad.length, bad.map(function (e) { return e.from + '—' + e.to; }).join(', ') || 'is_a edge', bad.length ? 'is_a edge에 certainty=' + bad[0].certainty : 'is_a edge 모두 solid', 'is_a edge를 solid로 바꾼다');
+    var g = {}; ir.edges.forEach(function (e) { if (e.meaning === 'goal_means') (g[e.from] = g[e.from] || []).push(e.to); });
+    var cyc = false, st = {}; function dfs(x) { st[x] = 1; (g[x] || []).forEach(function (y) { if (st[y] === 1) cyc = true; else if (!st[y]) dfs(y); }); st[x] = 2; }
+    Object.keys(g).forEach(function (x) { if (!st[x]) dfs(x); });
+    add('VB-GOAL-DAG', !cyc, 'goal_means edge', cyc ? 'goal_means에 cycle 존재' : 'goal_means는 DAG', 'cycle을 끊는다');
+    bad = ir.edges.filter(function (e) { var a = m[e.from], b = m[e.to]; return e.route === 'curve' && a && b && (Math.abs(a.x - b.x) < 1 || Math.abs(a.y - b.y) < 1); });
+    add('VB-CURVE', !bad.length, bad.map(function (e) { return e.from + '→' + e.to; }).join(', ') || '곡선 edge', bad.length ? '정렬된 두 node 사이 곡선' : '정렬 구간은 모두 직선', '직선 또는 직교 꺾은선으로 바꾼다', 'warn');
+    var used = [];
+    ir.nodes.forEach(function (n) { if (n.color) used.push(n.color); if (n.fill) used.push(n.fill); });
+    ir.edges.forEach(function (e) { if (e.color) used.push(e.color); });
+    Object.keys(ir.legend || {}).forEach(function (k) { used.push(ir.legend[k].color); });
+    bad = used.filter(function (c) { return !PALETTE[c]; });
+    add('VB-PALETTE', !bad.length, bad.join(', ') || '사용 색', bad.length ? '5색 외 색: ' + bad.join(', ') : '흑/백/빨/초/파 안에서 사용', '5색 중 하나로 바꾼다');
+    var byColor = {}, miss = [];
+    Object.keys(ir.legend || {}).forEach(function (k) { var c = ir.legend[k].color; (byColor[c] = byColor[c] || []).push(k); });
+    ir.nodes.forEach(function (n) { if (n.kind && !(ir.legend || {})[n.kind]) miss.push(n.id + '.kind=' + n.kind); });
+    var dup = Object.keys(byColor).filter(function (c) { return byColor[c].length > 1; });
+    add('VB-LEGEND', !dup.length && !miss.length, (dup.concat(miss)).join(', ') || 'legend', dup.length ? '한 색이 여러 종류: ' + dup.map(function (c) { return c + '=' + byColor[c].join('/'); }).join('; ') : (miss.length ? 'Legend에 없는 종류: ' + miss.join(', ') : '색 하나에 종류 하나'), 'Legend에 종류를 추가하거나 색을 분리한다');
+    bad = ir.nodes.filter(function (n) { return n.drawRegion && n.certainty && n.certainty !== 'solid' && (n.regionDash || '2 6') !== '2 6'; })
+      .concat((ir.groups || []).filter(function (g) { return g.certainty && g.certainty !== 'solid' && (g.regionDash || '2 6') !== '2 6'; }));
+    add('VB-REGION-DASH', !bad.length, bad.map(function (n) { return n.id; }).join(', ') || 'whole_part 영역', bad.length ? '영역 점선 ' + bad.map(function (n) { return n.id + '=' + n.regionDash; }).join(', ') : '영역은 실선 또는 짧은 점 2 6', '영역 점선을 2 6으로 바꾼다');
+    var main = ir.nodes.filter(function (n) { return !(n.drawRegion && n.expandAt !== undefined && !n.collapsed); }).length;
+    add('VB-MAIN-COUNT', main <= 9, 'Main node', 'Main node ' + main + '개' + (main > 9 ? ' (9개 초과)' : ' (9개 이하)'), '접기 → hover 강조 → 분할 순서로 조정한다', 'warn');
+    bad = ir.nodes.filter(function (n) { return n.collapsed && (n.autoPos || n.x === undefined || isNaN(n.x)); });
+    add('VB-GROUP-POS', !bad.length, bad.map(function (n) { return n.id; }).join(', ') || '접힌 전체 node', bad.length ? '접힌 전체 node에 좌표가 없어 부분 node들의 중심에 자동 배치함: ' + bad.map(function (n) { return n.id; }).join(', ') : '접힌 전체 node에 좌표 있음', '접힐 수 있는 전체 node에는 x, y를 직접 준다', 'warn');
+    var cw = ir.w || 780, chh = ir.h || 400;
+    bad = ir.nodes.filter(function (n) { var b = box(n); return b.x < 0 || b.y < 0 || b.x + b.w > cw || b.y + b.h > chh; });
+    add('VB-BOUNDS', !bad.length, bad.map(function (n) { return n.id; }).join(', ') || 'node 위치', bad.length ? 'IR의 w×h 밖으로 나간 node: ' + bad.map(function (n) { return n.id; }).join(', ') + ' (render_svg.mjs는 자동으로 맞추지만, 다른 렌더러는 잘릴 수 있음)' : '모든 node가 w×h 안', 'w, h를 늘리거나 node를 안으로 옮긴다', 'warn');
+    bad = (irIn.nodes || []).filter(function (n) { return (n.drawRegion || n.expandAt !== undefined) && n.source !== 'request' && n.source !== 'human'; });
+    add('VB-GROUP-SOURCE', !bad.length, bad.map(function (n) { return n.id; }).join(', ') || '묶음 출처', bad.length ? '출처가 요청·Human이 아닌 묶음: ' + bad.map(function (n) { return n.id + '=' + (n.source || '미기록'); }).join(', ') : '모든 묶음의 출처가 요청 또는 Human', '묶음이 요청에 명시됐으면 source:"request", Human이 골랐으면 "human". Agent가 만든 묶음이면 Human에게 기준을 묻는다', 'warn');
+    bad = ir.edges.filter(function (e) { return !m[e.from] || !m[e.to]; });
+    add('VB-EDGE-ENDPOINT', !bad.length, bad.map(function (e) { return e.from + '->' + e.to; }).join(', ') || 'edge 끝점', bad.length ? '이 단계에서 보이지 않는 끝점(펼친 전체 node 등): ' + bad.map(function (e) { return (!m[e.from] ? e.from : e.to); }).join(', ') : '모든 edge 끝점이 보이는 node', '영역 안의 부분 node를 가리키거나 그 전체를 접는다');
+    bad = ir.nodes.filter(function (n) { return n.w && (textW(n.label) + 2 * 18 + (n.collapsed ? 26 : 0) + (n.role === 'entity' ? (n.h || NH) / 2 : 0)) > n.w; });
+    add('VB-LABEL-FIT', !bad.length, bad.map(function (n) { return n.id; }).join(', ') || '라벨', bad.length ? '지정한 폭보다 라벨이 긴 node: ' + bad.map(function (n) { return n.id; }).join(', ') : '라벨이 node 안에 들어감', 'w를 넓히거나 w를 지워 자동 폭을 쓴다', 'warn');
+    var GAP = 16, close = [], linked = {};
+    ir.edges.forEach(function (e) { linked[e.from + '|' + e.to] = linked[e.to + '|' + e.from] = true; });
+    ir.nodes.forEach(function (a, i) { var A = box(a); ir.nodes.slice(i + 1).forEach(function (b) { var B = box(b);
+      var gx = Math.max(B.x - (A.x + A.w), A.x - (B.x + B.w)), gy = Math.max(B.y - (A.y + A.h), A.y - (B.y + B.h)), gap = Math.max(gx, gy);
+      if (gap < 0 || (linked[a.id + '|' + b.id] && gap < GAP)) close.push(a.id + '|' + b.id + ' (간격 ' + Math.round(gap) + 'px)'); }); });
+    add('VB-NODE-GAP', !close.length, close.join(', ') || 'node 간격', close.length ? '겹치거나 화살표 자리가 없는 node 쌍: ' + close.join(', ') : 'node가 겹치지 않고, 연결된 node 사이 간격 ' + GAP + 'px 이상', '두 node의 x 또는 y 간격을 넓혀 사이 화살표가 보이게 한다', 'warn');
+    var pass = res.every(function (r) { return r.ok || r.level === 'warn'; });
+    return { pass: pass, results: res };
+  }
+
+  function focusStats(v, id) {
+    var r = reach(v, id), on = Object.keys(r.nodes).length;
+    return { main: on, dimmed: v.nodes.length - on, total: v.nodes.length };
+  }
+  global.DDS = { PALETTE: PALETTE, layoutSignature:layoutSignature, box:box, routingKey:routingKey, render: render, view: view, withAutoFolds: withAutoFolds, reach: reach, focusStats: focusStats, attachHover: attachHover, animate: animate, validate: validate };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script><script>/* Prebuilt interaction for typed diagrams. No agent-authored HTML or animation. */
+(function (global) {
+  'use strict';
+  function walk(ir, starts, reverse) {
+    var found = new Set(starts), pending = starts.slice();
+    while (pending.length) { var id = pending.pop(); ir.edges.forEach(function (e) {
+      if (e.loop || e.meaning !== 'execution_flow') return;
+      var from = reverse ? e.to : e.from, to = reverse ? e.from : e.to;
+      if (from === id && !found.has(to)) { found.add(to); pending.push(to); }
+    }); }
+    return found;
+  }
+  function scope(ir, kind, id) {
+    var ns = new Set(), es = new Set();
+    var edgeIds = Array.isArray(id) ? id : [id];
+    var represented = new Set([id]);
+    if (kind === 'node') ir.nodes.forEach(function (n) { var parent = n.parent; while (parent) { if (parent === id) { represented.add(n.id); break; } var p = ir.nodes.find(function (x) { return x.id === parent; }); parent = p && p.parent; } });
+    var candidates = (ir.partials || []).filter(function (p) { return kind === 'node' ? p.nodes.some(function (n) { return represented.has(n); }) : edgeIds.some(function (edge) { return p.edges.includes(edge); }); });
+    var hovered = kind === 'node' && ir.nodes.find(function(n){return n.id === id;});
+    // A root fold represents the whole parent Core. A detailed target/leaf uses
+    // its child memberships, suppressing only their own ancestor (not peers).
+    if (!(hovered && hovered.autoFold)) {
+      var ancestors = new Set(candidates.map(function(p){return p.parent_partial_id;}).filter(Boolean));
+      candidates = candidates.filter(function(p){return !ancestors.has(p.id);});
+    }
+    candidates.forEach(function (p) {
+      p.nodes.forEach(function (x) { ns.add(x); }); p.edges.forEach(function (x) { es.add(x); });
+    });
+    if (!ns.size) { if (kind === 'node') ns.add(id); else edgeIds.forEach(function (id) { var edge = ir.edges.find(function (e) { return e.id === id; }); if (edge) { ns.add(edge.from); ns.add(edge.to); es.add(id); } }); }
+    // Extend only from the selected partial's boundary. Walking from every member
+    // (especially a shared initial input) would incorrectly activate sibling parts.
+    var selected = ir.edges.filter(function (e) { return es.has(e.id) && !e.loop; });
+    var sources = Array.from(ns).filter(function (id) { return !selected.some(function (e) { return e.to === id; }); });
+    var sinks = Array.from(ns).filter(function (id) { return !selected.some(function (e) { return e.from === id; }); });
+    var up = walk(ir, sources, true), down = walk(ir, sinks, false);
+    // Reachability chooses relevant E2E endpoints; it must not promote every
+    // intermediate Task from other partials into the active membership.
+    ir.e2e.inputs.filter(function (id) { return up.has(id); }).forEach(function (id) { ns.add(id); });
+    ir.e2e.outputs.filter(function (id) { return down.has(id); }).forEach(function (id) { ns.add(id); });
+    ir.edges.forEach(function (e) { if (!e.loop && ns.has(e.from) && ns.has(e.to)) es.add(e.id); });
+    return { nodes:ns, edges:es };
+  }
+  function flowPlan(ir, input) {
+    var reachable = walk(ir, [input], false), toOutput = walk(ir,ir.e2e.outputs,true), degree = {}, queue = [], plan = [];
+    ir.nodes.forEach(function (n) { if (reachable.has(n.id) && toOutput.has(n.id)) degree[n.id] = 0; });
+    var edges = ir.edges.filter(function (e) { return !e.loop && e.meaning === 'execution_flow' && reachable.has(e.from) && reachable.has(e.to) && toOutput.has(e.to); });
+      edges.forEach(function (e) { degree[e.to]++; });
+    Object.keys(degree).forEach(function (id) { if (!degree[id]) queue.push(id); });
+    while (queue.length) { var id = queue.shift(); edges.filter(function (e) { return e.from === id; }).forEach(function (e) { plan.push({edge:e.id,label:ir.animation_states && ir.animation_states[e.id] || ir.flow[e.id]}); if (--degree[e.to] === 0) queue.push(e.to); }); }
+    return plan;
+  }
+  function attach(host, ir, options) {
+    if (ir.diagram_type === 'l0_summary') return { stop:function(){}, dispose:function(){} };
+    ir = global.DDS.withAutoFolds(ir);
+    var animationEnabled = ir.diagram_type === 'l1_full';
+    options = options || {}; var svg, rendered, cancel = null, listeners = [], foldLabels = [], collapsed = (options.collapse || []).slice(), expanded = (options.expand || []).slice();
+    var level = options.level == null ? (ir.diagram_type === 'l0_summary' ? 0 : 1) : options.level;
+    var status = document.createElement('span'), controls = document.createElement('div');
+    controls.className = 'dds-controls'; status.setAttribute('aria-live','polite'); host.before(controls);
+    function listen(el, event, fn) { el.addEventListener(event,fn); listeners.push(function () { el.removeEventListener(event,fn); }); }
+    function stop() { if (cancel) cancel(); cancel = null; status.textContent = ''; }
+    function clear() { svg.classList.remove('is-focus'); svg.querySelectorAll('.on').forEach(function (el) { el.classList.remove('on'); }); }
+    function project(id) { var n = ir.nodes.find(function (x) { return x.id === id; }); while (n && !rendered.nodes.some(function (x) { return x.id === n.id; })) n = ir.nodes.find(function (x) { return x.id === n.parent; }); return n && n.id; }
+    function focus(kind,id) {
+      clear(); if (ir.diagram_type === 'l0_summary') return;
+      var s = scope(ir,kind,id), visible = new Set(Array.from(s.nodes).map(project)); svg.classList.add('is-focus');
+      svg.querySelectorAll('.dds-node').forEach(function (el) { el.classList.toggle('on',visible.has(el.dataset.id)); });
+      svg.querySelectorAll('.dds-edge').forEach(function (el) { var e = rendered.edges[Number(el.dataset.i)]; el.classList.toggle('on',s.edges.has(e.id) || ir.edges.some(function (original) { return s.edges.has(original.id) && project(original.from) === e.from && project(original.to) === e.to; })); });
+      svg.querySelectorAll('.dds-region').forEach(function (el) { var group = (rendered.groups || []).find(function (g) { return g.id === el.dataset.id; }); el.classList.toggle('on',!!group && group.members.some(function (id) { return visible.has(id); })); });
+    }
+    function play(input) {
+      if (!animationEnabled) return;
+      stop(); focus('node',input);
+      var plan = flowPlan(ir,input).map(function (p) {
+        var original = ir.edges.find(function (e) { return e.id === p.edge; }), from = project(original.from), to = project(original.to);
+        if (from === to) return null;
+        var shown = rendered.edges.find(function (e) { return e.id === p.edge; }) || rendered.edges.find(function (e) { return e.from === from && e.to === to; });
+        return shown ? {edge:shown.id,label:p.label} : null;
+      }).filter(Boolean), at = 0, frame = null, stopped = false;
+      var ns = 'http://www.w3.org/2000/svg', token = document.createElementNS(ns,'g'), rect = document.createElementNS(ns,'rect'), text = document.createElementNS(ns,'text');
+      token.setAttribute('class','dds-token'); token.style.pointerEvents = 'none'; rect.setAttribute('height','24'); rect.setAttribute('rx','8'); rect.setAttribute('fill','#0969DA'); text.setAttribute('fill','white'); text.setAttribute('text-anchor','middle'); token.append(rect,text); svg.append(token);
+      cancel = function () { stopped = true; if (frame !== null) global.cancelAnimationFrame(frame); token.remove(); };
+      function step() {
+        if (stopped) return;
+        if (at === plan.length) { stop(); return; }
+        var p = plan[at++], index = rendered.edges.findIndex(function (e) { return e.id === p.edge; });
+        var path = svg.querySelector('.dds-edge[data-i="'+index+'"] path'), len = path.getTotalLength(), start;
+        text.textContent = p.label; status.textContent = p.label;
+        var width = Math.max(64, Array.from(p.label).length * 14 + 24); rect.setAttribute('width',width); rect.setAttribute('x',-width/2); rect.setAttribute('y',-16); text.setAttribute('y',1);
+        var reduced = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function tick(now) { if (stopped) return; if (start === undefined) start = now; var t = Math.min(1,(now-start)/1800), pos = path.getPointAtLength(len * (reduced ? 0.5 : t)); token.setAttribute('transform','translate('+pos.x+','+pos.y+')'); if (t < 1) frame = global.requestAnimationFrame(tick); else step(); }
+        frame = global.requestAnimationFrame(tick);
+      }
+      step();
+    }
+    function bind() {
+      svg = host.querySelector('svg'); rendered = global.DDS.view(ir,level,{expand:expanded,collapse:collapsed});
+      svg.querySelectorAll('.dds-node,.dds-edge').forEach(function (el) {
+        var node = el.classList.contains('dds-node'), edge = node ? null : rendered.edges[Number(el.dataset.i)];
+        var id = node ? el.dataset.id : ir.edges.filter(function (e) { return project(e.from) === edge.from && project(e.to) === edge.to; }).map(function (e) { return e.id; });
+        el.setAttribute('tabindex','0');
+        var enter = function () { stop(); focus(node ? 'node':'edge',id); if (animationEnabled && node && ir.e2e.inputs.includes(id)) play(id); };
+        var leave = function () { stop(); clear(); };
+        listen(el,'mouseenter',enter); listen(el,'mouseleave',leave); listen(el,'focus',enter); listen(el,'blur',leave);
+      });
+      svg.querySelectorAll('.dds-plus').forEach(function (el) {
+        el.setAttribute('role','button'); el.setAttribute('tabindex','0'); el.setAttribute('aria-label','펼치기: '+el.dataset.expand);
+        var expand = function (event) { event.stopPropagation(); toggle(el.dataset.expand); };
+        listen(el,'click',expand); listen(el,'keydown',function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); expand(event); } });
+      });
+    }
+    function toggle(id) {
+      var n = ir.nodes.find(function (n) { return n.id === id; });
+      var closed = collapsed.includes(id) || (!expanded.includes(id) && level < n.expandAt);
+      collapsed = collapsed.filter(function (x) { return x !== id; }); expanded = expanded.filter(function (x) { return x !== id; });
+      (closed ? expanded : collapsed).push(id); foldLabels.forEach(function (label) { label(); }); redraw();
+    }
+    function redraw() {
+      stop(); listeners.splice(0).forEach(function (off) { off(); });
+      host.innerHTML = global.DDS.render(ir,{level:level,expand:expanded,collapse:collapsed,fit:true,pad:24}).svg; bind();
+    }
+    var foldNodes = ir.nodes.filter(function (n) { return n.expandAt !== undefined; });
+    if (foldNodes.length > 1 || (foldNodes.length && ir.diagram_type === 'l1_full')) {
+      var expandAll = document.createElement('button'); expandAll.textContent = '모두 펼치기';
+      expandAll.onclick = function () {
+        var ids = foldNodes.map(function(n){return n.id;});
+        collapsed = collapsed.filter(function(id){return !ids.includes(id);});
+        expanded = Array.from(new Set(expanded.concat(ids))); redraw();
+      }; controls.append(expandAll);
+      var collapseAll = document.createElement('button'); collapseAll.textContent = '모두 접기';
+      collapseAll.onclick = function () {
+        var ids = foldNodes.map(function (n) { return n.id; });
+        expanded = expanded.filter(function (id) { return !ids.includes(id); });
+        collapsed = Array.from(new Set(collapsed.concat(ids))); redraw();
+      }; controls.append(collapseAll);
+    } else foldNodes.forEach(function (n) {
+      var button = document.createElement('button');
+      function isClosed() { return collapsed.includes(n.id) || (!expanded.includes(n.id) && level < n.expandAt); }
+      function label() { button.textContent = (isClosed() ? '펼치기: ' : '접기: ')+n.label; }
+      label(); foldLabels.push(label); button.onclick = function () { toggle(n.id); }; controls.append(button);
+    });
+    controls.append(status); bind();
+    return { stop:stop, dispose:function () { stop(); listeners.splice(0).forEach(function (off) { off(); }); controls.remove(); } };
+  }
+  global.DDSWorkflow = { scope:scope, flowPlan:flowPlan, attach:attach };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script><script>var IR={"id":"pair-diamond-then-cycle-full","version":"1","diagram_type":"l1_full","simulation":true,"summary_ref":{"path":"summary.json","id":"pair-diamond-then-cycle-summary","version":"1","sha256":"8ad126f7529175ef3caf1ed0bb6623889fcaee5d3159a535ffcb2a1a6764c8ee"},"approved_partials":[{"path":"core-0.json","id":"pair-diamond-then-cycle-core-a","version":"1","sha256":"3348c01a5a1d17774ca1d7c7de08ed872af7a9ade65fbf0d594a53abafb81431","decision_ref":"approve-0"},{"path":"core-1.json","id":"pair-diamond-then-cycle-core-b","version":"1","sha256":"960a363f81aa7af62638c7b3807ad1153ac98474753538642437a337d6446e80","decision_ref":"approve-1"}],"assembly_decision_ref":"assemble","nodes":[{"id":"pair-diamond-then-cycle-a-in","role":"entity","label":"입력"},{"id":"pair-diamond-then-cycle-a-split","role":"process","label":"분기"},{"id":"pair-diamond-then-cycle-a-left","role":"process","label":"경로 A"},{"id":"pair-diamond-then-cycle-a-right","role":"process","label":"경로 B"},{"id":"pair-diamond-then-cycle-a-join","role":"process","label":"병합"},{"id":"pair-diamond-then-cycle-boundary","role":"entity","label":"Core 간 산출물"},{"id":"pair-diamond-then-cycle-b-generate","role":"process","label":"생성"},{"id":"pair-diamond-then-cycle-b-candidate","role":"entity","label":"후보"},{"id":"pair-diamond-then-cycle-b-evaluate","role":"process","label":"평가"},{"id":"pair-diamond-then-cycle-b-evidence","role":"entity","label":"평가 근거"},{"id":"pair-diamond-then-cycle-b-judge","role":"process","label":"반복 판정"},{"id":"pair-diamond-then-cycle-b-out","role":"entity","label":"최종 상태"}],"edges":[{"id":"pair-diamond-then-cycle-a-a","from":"pair-diamond-then-cycle-a-in","to":"pair-diamond-then-cycle-a-split","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-a-b","from":"pair-diamond-then-cycle-a-split","to":"pair-diamond-then-cycle-a-left","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-a-c","from":"pair-diamond-then-cycle-a-split","to":"pair-diamond-then-cycle-a-right","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-a-d","from":"pair-diamond-then-cycle-a-left","to":"pair-diamond-then-cycle-a-join","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-a-e","from":"pair-diamond-then-cycle-a-right","to":"pair-diamond-then-cycle-a-join","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-a-f","from":"pair-diamond-then-cycle-a-join","to":"pair-diamond-then-cycle-boundary","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-b-a","from":"pair-diamond-then-cycle-boundary","to":"pair-diamond-then-cycle-b-generate","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-b-b","from":"pair-diamond-then-cycle-b-generate","to":"pair-diamond-then-cycle-b-candidate","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-b-c","from":"pair-diamond-then-cycle-b-candidate","to":"pair-diamond-then-cycle-b-evaluate","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-b-d","from":"pair-diamond-then-cycle-b-evaluate","to":"pair-diamond-then-cycle-b-evidence","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-b-e","from":"pair-diamond-then-cycle-b-evidence","to":"pair-diamond-then-cycle-b-judge","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-b-f","from":"pair-diamond-then-cycle-b-judge","to":"pair-diamond-then-cycle-b-out","meaning":"execution_flow"},{"id":"pair-diamond-then-cycle-b-loop","from":"pair-diamond-then-cycle-b-judge","to":"pair-diamond-then-cycle-b-generate","meaning":"execution_flow","loop":true}],"flow":{"pair-diamond-then-cycle-a-a":"전달 상태","pair-diamond-then-cycle-a-b":"전달 상태","pair-diamond-then-cycle-a-c":"전달 상태","pair-diamond-then-cycle-a-d":"전달 상태","pair-diamond-then-cycle-a-e":"전달 상태","pair-diamond-then-cycle-a-f":"전달 상태","pair-diamond-then-cycle-b-a":"전달 상태","pair-diamond-then-cycle-b-b":"전달 상태","pair-diamond-then-cycle-b-c":"전달 상태","pair-diamond-then-cycle-b-d":"전달 상태","pair-diamond-then-cycle-b-e":"전달 상태","pair-diamond-then-cycle-b-f":"전달 상태","pair-diamond-then-cycle-b-loop":"재시도"},"e2e":{"inputs":["pair-diamond-then-cycle-a-in"],"outputs":["pair-diamond-then-cycle-b-out"]},"partials":[{"id":"pair-diamond-then-cycle-core-a-membership","nodes":["pair-diamond-then-cycle-a-in","pair-diamond-then-cycle-a-split","pair-diamond-then-cycle-a-left","pair-diamond-then-cycle-a-right","pair-diamond-then-cycle-a-join","pair-diamond-then-cycle-boundary"],"edges":["pair-diamond-then-cycle-a-a","pair-diamond-then-cycle-a-b","pair-diamond-then-cycle-a-c","pair-diamond-then-cycle-a-d","pair-diamond-then-cycle-a-e","pair-diamond-then-cycle-a-f"]},{"id":"pair-diamond-then-cycle-core-b-membership","nodes":["pair-diamond-then-cycle-boundary","pair-diamond-then-cycle-b-generate","pair-diamond-then-cycle-b-candidate","pair-diamond-then-cycle-b-evaluate","pair-diamond-then-cycle-b-evidence","pair-diamond-then-cycle-b-judge","pair-diamond-then-cycle-b-out"],"edges":["pair-diamond-then-cycle-b-a","pair-diamond-then-cycle-b-b","pair-diamond-then-cycle-b-c","pair-diamond-then-cycle-b-d","pair-diamond-then-cycle-b-e","pair-diamond-then-cycle-b-f","pair-diamond-then-cycle-b-loop"]}],"connections":[],"h":400,"w":780,"l0_refs":[{"path":"summary.json","id":"pair-diamond-then-cycle-summary","version":"1","sha256":"8ad126f7529175ef3caf1ed0bb6623889fcaee5d3159a535ffcb2a1a6764c8ee","node_id":"task-a","partial_id":"pair-diamond-then-cycle-core-a","partial":{"id":"pair-diamond-then-cycle-core-a-membership","nodes":["pair-diamond-then-cycle-a-in","pair-diamond-then-cycle-a-split","pair-diamond-then-cycle-a-left","pair-diamond-then-cycle-a-right","pair-diamond-then-cycle-a-join","pair-diamond-then-cycle-boundary"],"edges":["pair-diamond-then-cycle-a-a","pair-diamond-then-cycle-a-b","pair-diamond-then-cycle-a-c","pair-diamond-then-cycle-a-d","pair-diamond-then-cycle-a-e","pair-diamond-then-cycle-a-f"],"e2e":{"inputs":["pair-diamond-then-cycle-a-in"],"outputs":["pair-diamond-then-cycle-boundary"]}},"snapshot":{"id":"pair-diamond-then-cycle-summary","version":"1","diagram_type":"l0_summary","simulation":true,"definition_ref":{"path":"function.json","id":"pair-diamond-then-cycle-function","version":"1","sha256":"5ebf914e58974a2550a5b743283f11de676678ca9654fa36f7554f9415ed9389","node_id":"function"},"nodes":[{"id":"pair-diamond-then-cycle-a-in","role":"entity","label":"입력"},{"id":"task-a","role":"process","label":"Core A"},{"id":"task-b","role":"process","label":"Core B"},{"id":"pair-diamond-then-cycle-b-out","role":"entity","label":"최종 상태"}],"edges":[{"id":"sin","from":"pair-diamond-then-cycle-a-in","to":"task-a","meaning":"execution_flow"},{"id":"sab","from":"task-a","to":"task-b","meaning":"execution_flow"},{"id":"sout","from":"task-b","to":"pair-diamond-then-cycle-b-out","meaning":"execution_flow"}],"flow":{"sin":"입력","sab":"Core 간 산출물","sout":"결과"},"e2e":{"inputs":["pair-diamond-then-cycle-a-in"],"outputs":["pair-diamond-then-cycle-b-out"]}}},{"path":"summary.json","id":"pair-diamond-then-cycle-summary","version":"1","sha256":"8ad126f7529175ef3caf1ed0bb6623889fcaee5d3159a535ffcb2a1a6764c8ee","node_id":"task-b","partial_id":"pair-diamond-then-cycle-core-b","partial":{"id":"pair-diamond-then-cycle-core-b-membership","nodes":["pair-diamond-then-cycle-boundary","pair-diamond-then-cycle-b-generate","pair-diamond-then-cycle-b-candidate","pair-diamond-then-cycle-b-evaluate","pair-diamond-then-cycle-b-evidence","pair-diamond-then-cycle-b-judge","pair-diamond-then-cycle-b-out"],"edges":["pair-diamond-then-cycle-b-a","pair-diamond-then-cycle-b-b","pair-diamond-then-cycle-b-c","pair-diamond-then-cycle-b-d","pair-diamond-then-cycle-b-e","pair-diamond-then-cycle-b-f","pair-diamond-then-cycle-b-loop"],"e2e":{"inputs":["pair-diamond-then-cycle-boundary"],"outputs":["pair-diamond-then-cycle-b-out"]}},"snapshot":{"id":"pair-diamond-then-cycle-summary","version":"1","diagram_type":"l0_summary","simulation":true,"definition_ref":{"path":"function.json","id":"pair-diamond-then-cycle-function","version":"1","sha256":"5ebf914e58974a2550a5b743283f11de676678ca9654fa36f7554f9415ed9389","node_id":"function"},"nodes":[{"id":"pair-diamond-then-cycle-a-in","role":"entity","label":"입력"},{"id":"task-a","role":"process","label":"Core A"},{"id":"task-b","role":"process","label":"Core B"},{"id":"pair-diamond-then-cycle-b-out","role":"entity","label":"최종 상태"}],"edges":[{"id":"sin","from":"pair-diamond-then-cycle-a-in","to":"task-a","meaning":"execution_flow"},{"id":"sab","from":"task-a","to":"task-b","meaning":"execution_flow"},{"id":"sout","from":"task-b","to":"pair-diamond-then-cycle-b-out","meaning":"execution_flow"}],"flow":{"sin":"입력","sab":"Core 간 산출물","sout":"결과"},"e2e":{"inputs":["pair-diamond-then-cycle-a-in"],"outputs":["pair-diamond-then-cycle-b-out"]}}}],"boundary_projection":{"schema":"dds-full-boundary-projection/v1","aliases":{"pair-diamond-then-cycle-boundary-consumer":"pair-diamond-then-cycle-boundary"},"removed_connection_edges":["boundary-identity"],"removed_connection_metadata":{"boundary-identity":{"edge":{"id":"boundary-identity","from":"pair-diamond-then-cycle-boundary","to":"pair-diamond-then-cycle-boundary-consumer","meaning":"execution_flow"},"flow":"Core 간 산출물"}}},"edge_routing":"libavoid","visible_layout_signature":"[\"visible-layout-v1\",{\"approved_partials\":[{\"decision_ref\":\"approve-0\",\"id\":\"pair-diamond-then-cycle-core-a\",\"path\":\"core-0.json\",\"sha256\":\"3348c01a5a1d17774ca1d7c7de08ed872af7a9ade65fbf0d594a53abafb81431\",\"version\":\"1\"},{\"decision_ref\":\"approve-1\",\"id\":\"pair-diamond-then-cycle-core-b\",\"path\":\"core-1.json\",\"sha256\":\"960a363f81aa7af62638c7b3807ad1153ac98474753538642437a337d6446e80\",\"version\":\"1\"}],\"assembly_decision_ref\":\"assemble\",\"boundary_projection\":{\"aliases\":{\"pair-diamond-then-cycle-boundary-consumer\":\"pair-diamond-then-cycle-boundary\"},\"removed_connection_edges\":[\"boundary-identity\"],\"removed_connection_metadata\":{\"boundary-identity\":{\"edge\":{\"from\":\"pair-diamond-then-cycle-boundary\",\"id\":\"boundary-identity\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-boundary-consumer\"},\"flow\":\"Core 간 산출물\"}},\"schema\":\"dds-full-boundary-projection/v1\"},\"connections\":[],\"diagram_type\":\"l1_full\",\"e2e\":{\"inputs\":[\"pair-diamond-then-cycle-a-in\"],\"outputs\":[\"pair-diamond-then-cycle-b-out\"]},\"edge_routing\":\"libavoid\",\"edges\":[{\"from\":\"pair-diamond-then-cycle-a-in\",\"id\":\"pair-diamond-then-cycle-a-a\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-a-split\"},{\"from\":\"pair-diamond-then-cycle-a-split\",\"id\":\"pair-diamond-then-cycle-a-b\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-a-left\"},{\"from\":\"pair-diamond-then-cycle-a-split\",\"id\":\"pair-diamond-then-cycle-a-c\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-a-right\"},{\"from\":\"pair-diamond-then-cycle-a-left\",\"id\":\"pair-diamond-then-cycle-a-d\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-a-join\"},{\"from\":\"pair-diamond-then-cycle-a-right\",\"id\":\"pair-diamond-then-cycle-a-e\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-a-join\"},{\"from\":\"pair-diamond-then-cycle-a-join\",\"id\":\"pair-diamond-then-cycle-a-f\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-boundary\"},{\"from\":\"pair-diamond-then-cycle-boundary\",\"id\":\"pair-diamond-then-cycle-b-a\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-generate\"},{\"from\":\"pair-diamond-then-cycle-b-generate\",\"id\":\"pair-diamond-then-cycle-b-b\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-candidate\"},{\"from\":\"pair-diamond-then-cycle-b-candidate\",\"id\":\"pair-diamond-then-cycle-b-c\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-evaluate\"},{\"from\":\"pair-diamond-then-cycle-b-evaluate\",\"id\":\"pair-diamond-then-cycle-b-d\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-evidence\"},{\"from\":\"pair-diamond-then-cycle-b-evidence\",\"id\":\"pair-diamond-then-cycle-b-e\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-judge\"},{\"from\":\"pair-diamond-then-cycle-b-judge\",\"id\":\"pair-diamond-then-cycle-b-f\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-out\"},{\"from\":\"pair-diamond-then-cycle-b-judge\",\"id\":\"pair-diamond-then-cycle-b-loop\",\"loop\":true,\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-generate\"}],\"flow\":{\"pair-diamond-then-cycle-a-a\":\"전달 상태\",\"pair-diamond-then-cycle-a-b\":\"전달 상태\",\"pair-diamond-then-cycle-a-c\":\"전달 상태\",\"pair-diamond-then-cycle-a-d\":\"전달 상태\",\"pair-diamond-then-cycle-a-e\":\"전달 상태\",\"pair-diamond-then-cycle-a-f\":\"전달 상태\",\"pair-diamond-then-cycle-b-a\":\"전달 상태\",\"pair-diamond-then-cycle-b-b\":\"전달 상태\",\"pair-diamond-then-cycle-b-c\":\"전달 상태\",\"pair-diamond-then-cycle-b-d\":\"전달 상태\",\"pair-diamond-then-cycle-b-e\":\"전달 상태\",\"pair-diamond-then-cycle-b-f\":\"전달 상태\",\"pair-diamond-then-cycle-b-loop\":\"재시도\"},\"h\":400,\"id\":\"pair-diamond-then-cycle-full\",\"l0_refs\":[{\"id\":\"pair-diamond-then-cycle-summary\",\"node_id\":\"task-a\",\"partial\":{\"e2e\":{\"inputs\":[\"pair-diamond-then-cycle-a-in\"],\"outputs\":[\"pair-diamond-then-cycle-boundary\"]},\"edges\":[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-b\",\"pair-diamond-then-cycle-a-c\",\"pair-diamond-then-cycle-a-d\",\"pair-diamond-then-cycle-a-e\",\"pair-diamond-then-cycle-a-f\"],\"id\":\"pair-diamond-then-cycle-core-a-membership\",\"nodes\":[\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-boundary\"]},\"partial_id\":\"pair-diamond-then-cycle-core-a\",\"path\":\"summary.json\",\"sha256\":\"8ad126f7529175ef3caf1ed0bb6623889fcaee5d3159a535ffcb2a1a6764c8ee\",\"snapshot\":{\"definition_ref\":{\"id\":\"pair-diamond-then-cycle-function\",\"node_id\":\"function\",\"path\":\"function.json\",\"sha256\":\"5ebf914e58974a2550a5b743283f11de676678ca9654fa36f7554f9415ed9389\",\"version\":\"1\"},\"diagram_type\":\"l0_summary\",\"e2e\":{\"inputs\":[\"pair-diamond-then-cycle-a-in\"],\"outputs\":[\"pair-diamond-then-cycle-b-out\"]},\"edges\":[{\"from\":\"pair-diamond-then-cycle-a-in\",\"id\":\"sin\",\"meaning\":\"execution_flow\",\"to\":\"task-a\"},{\"from\":\"task-a\",\"id\":\"sab\",\"meaning\":\"execution_flow\",\"to\":\"task-b\"},{\"from\":\"task-b\",\"id\":\"sout\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-out\"}],\"flow\":{\"sab\":\"Core 간 산출물\",\"sin\":\"입력\",\"sout\":\"결과\"},\"id\":\"pair-diamond-then-cycle-summary\",\"nodes\":[{\"id\":\"pair-diamond-then-cycle-a-in\",\"label\":\"입력\",\"role\":\"entity\"},{\"id\":\"task-a\",\"label\":\"Core A\",\"role\":\"process\"},{\"id\":\"task-b\",\"label\":\"Core B\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-b-out\",\"label\":\"최종 상태\",\"role\":\"entity\"}],\"simulation\":true,\"version\":\"1\"},\"version\":\"1\"},{\"id\":\"pair-diamond-then-cycle-summary\",\"node_id\":\"task-b\",\"partial\":{\"e2e\":{\"inputs\":[\"pair-diamond-then-cycle-boundary\"],\"outputs\":[\"pair-diamond-then-cycle-b-out\"]},\"edges\":[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-b-b\",\"pair-diamond-then-cycle-b-c\",\"pair-diamond-then-cycle-b-d\",\"pair-diamond-then-cycle-b-e\",\"pair-diamond-then-cycle-b-f\",\"pair-diamond-then-cycle-b-loop\"],\"id\":\"pair-diamond-then-cycle-core-b-membership\",\"nodes\":[\"pair-diamond-then-cycle-boundary\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\"]},\"partial_id\":\"pair-diamond-then-cycle-core-b\",\"path\":\"summary.json\",\"sha256\":\"8ad126f7529175ef3caf1ed0bb6623889fcaee5d3159a535ffcb2a1a6764c8ee\",\"snapshot\":{\"definition_ref\":{\"id\":\"pair-diamond-then-cycle-function\",\"node_id\":\"function\",\"path\":\"function.json\",\"sha256\":\"5ebf914e58974a2550a5b743283f11de676678ca9654fa36f7554f9415ed9389\",\"version\":\"1\"},\"diagram_type\":\"l0_summary\",\"e2e\":{\"inputs\":[\"pair-diamond-then-cycle-a-in\"],\"outputs\":[\"pair-diamond-then-cycle-b-out\"]},\"edges\":[{\"from\":\"pair-diamond-then-cycle-a-in\",\"id\":\"sin\",\"meaning\":\"execution_flow\",\"to\":\"task-a\"},{\"from\":\"task-a\",\"id\":\"sab\",\"meaning\":\"execution_flow\",\"to\":\"task-b\"},{\"from\":\"task-b\",\"id\":\"sout\",\"meaning\":\"execution_flow\",\"to\":\"pair-diamond-then-cycle-b-out\"}],\"flow\":{\"sab\":\"Core 간 산출물\",\"sin\":\"입력\",\"sout\":\"결과\"},\"id\":\"pair-diamond-then-cycle-summary\",\"nodes\":[{\"id\":\"pair-diamond-then-cycle-a-in\",\"label\":\"입력\",\"role\":\"entity\"},{\"id\":\"task-a\",\"label\":\"Core A\",\"role\":\"process\"},{\"id\":\"task-b\",\"label\":\"Core B\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-b-out\",\"label\":\"최종 상태\",\"role\":\"entity\"}],\"simulation\":true,\"version\":\"1\"},\"version\":\"1\"}],\"nodes\":[{\"id\":\"pair-diamond-then-cycle-a-in\",\"label\":\"입력\",\"role\":\"entity\"},{\"id\":\"pair-diamond-then-cycle-a-split\",\"label\":\"분기\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-a-left\",\"label\":\"경로 A\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-a-right\",\"label\":\"경로 B\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-a-join\",\"label\":\"병합\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-boundary\",\"label\":\"Core 간 산출물\",\"role\":\"entity\"},{\"id\":\"pair-diamond-then-cycle-b-generate\",\"label\":\"생성\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-b-candidate\",\"label\":\"후보\",\"role\":\"entity\"},{\"id\":\"pair-diamond-then-cycle-b-evaluate\",\"label\":\"평가\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-b-evidence\",\"label\":\"평가 근거\",\"role\":\"entity\"},{\"id\":\"pair-diamond-then-cycle-b-judge\",\"label\":\"반복 판정\",\"role\":\"process\"},{\"id\":\"pair-diamond-then-cycle-b-out\",\"label\":\"최종 상태\",\"role\":\"entity\"}],\"partials\":[{\"edges\":[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-b\",\"pair-diamond-then-cycle-a-c\",\"pair-diamond-then-cycle-a-d\",\"pair-diamond-then-cycle-a-e\",\"pair-diamond-then-cycle-a-f\"],\"id\":\"pair-diamond-then-cycle-core-a-membership\",\"nodes\":[\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-boundary\"]},{\"edges\":[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-b-b\",\"pair-diamond-then-cycle-b-c\",\"pair-diamond-then-cycle-b-d\",\"pair-diamond-then-cycle-b-e\",\"pair-diamond-then-cycle-b-f\",\"pair-diamond-then-cycle-b-loop\"],\"id\":\"pair-diamond-then-cycle-core-b-membership\",\"nodes\":[\"pair-diamond-then-cycle-boundary\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\"]}],\"simulation\":true,\"summary_ref\":{\"id\":\"pair-diamond-then-cycle-summary\",\"path\":\"summary.json\",\"sha256\":\"8ad126f7529175ef3caf1ed0bb6623889fcaee5d3159a535ffcb2a1a6764c8ee\",\"version\":\"1\"},\"version\":\"1\",\"w\":780}]","visible_layout_cache":{"[[\"__l0fold:6:task-a\",\"__l0fold:6:task-b\",\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-b-out\",\"pair-diamond-then-cycle-boundary\"],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"__l0fold:6:task-a\"],[\"pair-diamond-then-cycle-a-f\",\"__l0fold:6:task-a\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"__l0fold:6:task-b\"],[\"pair-diamond-then-cycle-b-f\",\"__l0fold:6:task-b\",\"pair-diamond-then-cycle-b-out\"]]]":{"positions":{"pair-diamond-then-cycle-a-in":[112,46],"pair-diamond-then-cycle-boundary":[112,278],"pair-diamond-then-cycle-b-out":[112,510],"__l0fold:6:task-a":[112,162],"__l0fold:6:task-b":[112,394]}},"[[\"__l0fold:6:task-b\",\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-b-out\",\"pair-diamond-then-cycle-boundary\"],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-split\"],[\"pair-diamond-then-cycle-a-b\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-left\"],[\"pair-diamond-then-cycle-a-c\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-right\"],[\"pair-diamond-then-cycle-a-d\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-e\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-f\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"__l0fold:6:task-b\"],[\"pair-diamond-then-cycle-b-f\",\"__l0fold:6:task-b\",\"pair-diamond-then-cycle-b-out\"]]]":{"positions":{"pair-diamond-then-cycle-a-in":[218,46],"pair-diamond-then-cycle-a-split":[218,162],"pair-diamond-then-cycle-a-left":[346,278],"pair-diamond-then-cycle-a-right":[90,278],"pair-diamond-then-cycle-a-join":[218,394],"pair-diamond-then-cycle-boundary":[218,510],"pair-diamond-then-cycle-b-out":[218,742],"__l0fold:6:task-b":[218,626]}},"[[\"__l0fold:6:task-a\",\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\",\"pair-diamond-then-cycle-boundary\"],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"__l0fold:6:task-a\"],[\"pair-diamond-then-cycle-a-f\",\"__l0fold:6:task-a\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"pair-diamond-then-cycle-b-generate\"],[\"pair-diamond-then-cycle-b-b\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-candidate\"],[\"pair-diamond-then-cycle-b-c\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\"],[\"pair-diamond-then-cycle-b-d\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\"],[\"pair-diamond-then-cycle-b-e\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-judge\"],[\"pair-diamond-then-cycle-b-f\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\"],[\"pair-diamond-then-cycle-b-loop\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-generate\"]]]":{"positions":{"pair-diamond-then-cycle-a-in":[112,46],"pair-diamond-then-cycle-boundary":[112,278],"pair-diamond-then-cycle-b-generate":[112,394],"pair-diamond-then-cycle-b-candidate":[112,510],"pair-diamond-then-cycle-b-evaluate":[112,626],"pair-diamond-then-cycle-b-evidence":[112,742],"pair-diamond-then-cycle-b-judge":[112,858],"pair-diamond-then-cycle-b-out":[112,974],"__l0fold:6:task-a":[112,162]}},"[[\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\",\"pair-diamond-then-cycle-boundary\"],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-split\"],[\"pair-diamond-then-cycle-a-b\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-left\"],[\"pair-diamond-then-cycle-a-c\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-right\"],[\"pair-diamond-then-cycle-a-d\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-e\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-f\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"pair-diamond-then-cycle-b-generate\"],[\"pair-diamond-then-cycle-b-b\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-candidate\"],[\"pair-diamond-then-cycle-b-c\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\"],[\"pair-diamond-then-cycle-b-d\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\"],[\"pair-diamond-then-cycle-b-e\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-judge\"],[\"pair-diamond-then-cycle-b-f\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\"],[\"pair-diamond-then-cycle-b-loop\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-generate\"]]]":{"positions":{"pair-diamond-then-cycle-a-in":[218,46],"pair-diamond-then-cycle-a-split":[218,162],"pair-diamond-then-cycle-a-left":[346,278],"pair-diamond-then-cycle-a-right":[90,278],"pair-diamond-then-cycle-a-join":[218,394],"pair-diamond-then-cycle-boundary":[218,510],"pair-diamond-then-cycle-b-generate":[218,626],"pair-diamond-then-cycle-b-candidate":[218,742],"pair-diamond-then-cycle-b-evaluate":[218,858],"pair-diamond-then-cycle-b-evidence":[218,974],"pair-diamond-then-cycle-b-judge":[218,1090],"pair-diamond-then-cycle-b-out":[218,1206]}}},"routing_cache":{"[[[\"pair-diamond-then-cycle-a-in\",24,24,176,44],[\"pair-diamond-then-cycle-boundary\",24,256,176,44],[\"pair-diamond-then-cycle-b-out\",24,488,176,44],[\"__l0fold:6:task-a\",24,140,176,44],[\"__l0fold:6:task-b\",24,372,176,44]],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"__l0fold:6:task-a\"],[\"pair-diamond-then-cycle-a-f\",\"__l0fold:6:task-a\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"__l0fold:6:task-b\"],[\"pair-diamond-then-cycle-b-f\",\"__l0fold:6:task-b\",\"pair-diamond-then-cycle-b-out\"]]]":[{"pts":[[112,68],[112,140]]},{"pts":[[112,184],[112,256]]},{"pts":[[112,300],[112,372]]},{"pts":[[112,416],[112,488]]}],"[[[\"pair-diamond-then-cycle-a-in\",130,24,176,44],[\"pair-diamond-then-cycle-a-split\",130,140,176,44],[\"pair-diamond-then-cycle-a-left\",258,256,176,44],[\"pair-diamond-then-cycle-a-right\",2,256,176,44],[\"pair-diamond-then-cycle-a-join\",130,372,176,44],[\"pair-diamond-then-cycle-boundary\",130,488,176,44],[\"pair-diamond-then-cycle-b-out\",130,720,176,44],[\"__l0fold:6:task-b\",130,604,176,44]],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-split\"],[\"pair-diamond-then-cycle-a-b\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-left\"],[\"pair-diamond-then-cycle-a-c\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-right\"],[\"pair-diamond-then-cycle-a-d\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-e\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-f\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"__l0fold:6:task-b\"],[\"pair-diamond-then-cycle-b-f\",\"__l0fold:6:task-b\",\"pair-diamond-then-cycle-b-out\"]]]":[{"pts":[[218,68],[218,140]]},{"pts":[[306,162],[346,162],[346,256]]},{"pts":[[130,162],[90,162],[90,256]]},{"pts":[[346,300],[346,394],[306,394]]},{"pts":[[90,300],[90,394],[130,394]]},{"pts":[[218,416],[218,488]]},{"pts":[[218,532],[218,604]]},{"pts":[[218,648],[218,720]]}],"[[[\"pair-diamond-then-cycle-a-in\",24,24,176,44],[\"pair-diamond-then-cycle-boundary\",24,256,176,44],[\"pair-diamond-then-cycle-b-generate\",24,372,176,44],[\"pair-diamond-then-cycle-b-candidate\",24,488,176,44],[\"pair-diamond-then-cycle-b-evaluate\",24,604,176,44],[\"pair-diamond-then-cycle-b-evidence\",24,720,176,44],[\"pair-diamond-then-cycle-b-judge\",24,836,176,44],[\"pair-diamond-then-cycle-b-out\",24,952,176,44],[\"__l0fold:6:task-a\",24,140,176,44]],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"__l0fold:6:task-a\"],[\"pair-diamond-then-cycle-a-f\",\"__l0fold:6:task-a\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"pair-diamond-then-cycle-b-generate\"],[\"pair-diamond-then-cycle-b-b\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-candidate\"],[\"pair-diamond-then-cycle-b-c\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\"],[\"pair-diamond-then-cycle-b-d\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\"],[\"pair-diamond-then-cycle-b-e\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-judge\"],[\"pair-diamond-then-cycle-b-f\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\"],[\"pair-diamond-then-cycle-b-loop\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-generate\"]]]":[{"pts":[[112,68],[112,140]]},{"pts":[[112,184],[112,256]]},{"pts":[[112,300],[112,372]]},{"pts":[[112,416],[112,488]]},{"pts":[[112,532],[112,604]]},{"pts":[[112,648],[112,720]]},{"pts":[[112,764],[112,836]]},{"pts":[[112,880],[112,952]]},{"pts":[[200,858],[232,858],[232,394],[200,394]]}],"[[[\"pair-diamond-then-cycle-a-in\",130,24,176,44],[\"pair-diamond-then-cycle-a-split\",130,140,176,44],[\"pair-diamond-then-cycle-a-left\",258,256,176,44],[\"pair-diamond-then-cycle-a-right\",2,256,176,44],[\"pair-diamond-then-cycle-a-join\",130,372,176,44],[\"pair-diamond-then-cycle-boundary\",130,488,176,44],[\"pair-diamond-then-cycle-b-generate\",130,604,176,44],[\"pair-diamond-then-cycle-b-candidate\",130,720,176,44],[\"pair-diamond-then-cycle-b-evaluate\",130,836,176,44],[\"pair-diamond-then-cycle-b-evidence\",130,952,176,44],[\"pair-diamond-then-cycle-b-judge\",130,1068,176,44],[\"pair-diamond-then-cycle-b-out\",130,1184,176,44]],[[\"pair-diamond-then-cycle-a-a\",\"pair-diamond-then-cycle-a-in\",\"pair-diamond-then-cycle-a-split\"],[\"pair-diamond-then-cycle-a-b\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-left\"],[\"pair-diamond-then-cycle-a-c\",\"pair-diamond-then-cycle-a-split\",\"pair-diamond-then-cycle-a-right\"],[\"pair-diamond-then-cycle-a-d\",\"pair-diamond-then-cycle-a-left\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-e\",\"pair-diamond-then-cycle-a-right\",\"pair-diamond-then-cycle-a-join\"],[\"pair-diamond-then-cycle-a-f\",\"pair-diamond-then-cycle-a-join\",\"pair-diamond-then-cycle-boundary\"],[\"pair-diamond-then-cycle-b-a\",\"pair-diamond-then-cycle-boundary\",\"pair-diamond-then-cycle-b-generate\"],[\"pair-diamond-then-cycle-b-b\",\"pair-diamond-then-cycle-b-generate\",\"pair-diamond-then-cycle-b-candidate\"],[\"pair-diamond-then-cycle-b-c\",\"pair-diamond-then-cycle-b-candidate\",\"pair-diamond-then-cycle-b-evaluate\"],[\"pair-diamond-then-cycle-b-d\",\"pair-diamond-then-cycle-b-evaluate\",\"pair-diamond-then-cycle-b-evidence\"],[\"pair-diamond-then-cycle-b-e\",\"pair-diamond-then-cycle-b-evidence\",\"pair-diamond-then-cycle-b-judge\"],[\"pair-diamond-then-cycle-b-f\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-out\"],[\"pair-diamond-then-cycle-b-loop\",\"pair-diamond-then-cycle-b-judge\",\"pair-diamond-then-cycle-b-generate\"]]]":[{"pts":[[218,68],[218,140]]},{"pts":[[306,162],[346,162],[346,256]]},{"pts":[[130,162],[90,162],[90,256]]},{"pts":[[346,300],[346,394],[306,394]]},{"pts":[[90,300],[90,394],[130,394]]},{"pts":[[218,416],[218,488]]},{"pts":[[218,532],[218,604]]},{"pts":[[218,648],[218,720]]},{"pts":[[218,764],[218,836]]},{"pts":[[218,880],[218,952]]},{"pts":[[218,996],[218,1068]]},{"pts":[[218,1112],[218,1184]]},{"pts":[[306,1090],[338,1090],[338,626],[306,626]]}]}};if(IR.diagram_type){DDSWorkflow.attach(document.getElementById("host"),IR,{"pos":["C:\\Users\\INTEC\\Documents\\Codex\\2026-10-07\\path-cwd-window-pc-github-repo\\outputs\\dds-boundary-product-check-20261016\\topology\\pair-diamond-then-cycle\\full.json"],"level":1,"expand":[],"collapse":[],"focus":null,"pad":24});}else{DDS.attachHover(document.getElementById("host"),IR);}</script><script>// Author: chatgpt_gpt6. Presentation-only viewport controls for Human views.
+(function(){
+ const host=document.getElementById('host');if(!host)return;
+ let zoom=null;
+ const controls=document.createElement('div');controls.className='dds-view-controls';
+ controls.style.cssText='display:flex;gap:8px;padding:8px;flex:0 0 auto;background:white';
+ const style=document.createElement('style');style.textContent='#host{overflow:auto}#host>svg{max-width:none;max-height:none}';document.head.append(style);
+ function resize(){const svg=host.querySelector('svg');if(!svg)return;const box=svg.viewBox.baseVal;
+  svg.style.width=zoom===null?'100%':Math.max(host.clientWidth,box.width*zoom)+'px';
+  svg.style.height=zoom===null?'100%':box.height*zoom+'px';
+ }
+ function button(label,fn){const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;controls.append(b);}
+ button('전체 맞춤',()=>{zoom=null;host.scrollTop=0;host.scrollLeft=0;resize()});
+ button('100%',()=>{zoom=1;resize()});
+ host.before(controls);new MutationObserver(resize).observe(host,{childList:true});new ResizeObserver(resize).observe(host);resize();
+})();
+</script><script>window.addEventListener("load",()=>{const n=document.querySelector('.dds-plus[data-expand$="task-a"]');if(n)n.dispatchEvent(new MouseEvent("click",{bubbles:true}));});</script></body></html>

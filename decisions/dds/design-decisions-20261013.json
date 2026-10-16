@@ -1,0 +1,45 @@
+{
+  "author": "chatgpt_gpt6",
+  "recorded_on": "2026-10-13",
+  "purpose": "Product design decisions reconstructed from this conversation; not runtime artifact approval records.",
+  "decisions": [
+    {
+      "id": "DDS-LINK-001",
+      "status": "accepted",
+      "decision": "Reuse Function -> Summary -> Core -> Full for independent detailed diagrams and allow one external detail expansion level in a parent Full.",
+      "evidence": ["Process_Core_Internal 도 구현하지 않고 차라리 별개의 function으로 취급해서 full 병합 기능만 확장하는 것도 괜찮을 것 같기도 하고", "그 아래는 더 이상 내려가지 않는게 맞을 것 같아", "excute"],
+      "implementation_note": "The exact linked_diagrams JSON field contract is an implementation choice, not a verbatim Human specification."
+    },
+    {
+      "id": "DDS-HOVER-001",
+      "status": "accepted",
+      "decision": "Shared node/edge focus uses the union of associated Core memberships, not intersection.",
+      "evidence": ["중복되는 부분 위에 커서를 올리면 관련 부분 모두 활성화 하고, 중복되지 않는 고유 부분을 커서에 올렸을 때 관련된 부분 활성화 하면 될 것 같은데"]
+    },
+    {
+      "id": "DDS-HOVER-002",
+      "status": "accepted",
+      "decision": "Use fold-state-aware focus: collapsed detail represents child union; expanded detail selects its detailed memberships without promoting its own ancestor Core. Fold changes clear Hover and animation.",
+      "evidence": ["접힌 상태랑 펼친 상태를 구분해서 Dimming 처리를 하는 logic도 필요하겠네", "excute"]
+    },
+    {
+      "id": "DDS-TYPE-001",
+      "status": "superseded",
+      "decision": "Add Process_Core_Internal as a new type.",
+      "superseded_by": "DDS-LINK-001"
+    },
+    {
+      "id": "DDS-CYCLE-001",
+      "status": "accepted",
+      "decision": "Use existing Linear Summary and detail an internal cycle in Core; optionally add an iteration-exit Gate. Show the agreed guidance after Function execution.",
+      "evidence": ["반복이 하나의 Process 내부에서 완결되는 기능은 Linear Summary로 표현하고, Core에서 Cycle을 구체화한다. Summary에서는 반복 수행을 하나의 Process로 취급하고, 별도 Process에 반복 종료 여부를 판정하는 Gate를 둘 수 있다.", "patch 하고 push해"]
+    },
+    {
+      "id": "DDS-ROUTING-001",
+      "status": "accepted",
+      "decision": "Test automatic edge routing on the reported case and apply only after verification.",
+      "evidence": ["test 후 검증 되면 patch 적용해"],
+      "implementation_note": "libavoid opt-in and CLI precomputed route cache are implementation choices."
+    }
+  ]
+}

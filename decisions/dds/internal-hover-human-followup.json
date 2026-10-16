@@ -1,0 +1,15 @@
+{
+  "schema": "dds-context-review/v1",
+  "reviewer": "Human",
+  "source": "conversation:2026-10-16",
+  "cases": [
+    {
+      "id": "hover-pair-diamond-then-cycle-task-a",
+      "verdict": "PASS",
+      "criterion": "내부 노드 Hover에서 펼친 Diamond 영역의 강조 식별",
+      "comment": "내부 노드에 Hover 펼친 Diamond 쪽이 강조되는 실제 화면 강조가 잘 되는건 pass로 봐도 괜찮아",
+      "frames": ["hover-internal.png"],
+      "scope": "내부 노드 Hover 강조에 한정. 공유 경계 또는 전체 항목의 승인으로 확대하지 않음."
+    }
+  ]
+}

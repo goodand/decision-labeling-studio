@@ -1,0 +1,48 @@
+{
+  "kind": "capture",
+  "title": "이미지 후보 검수 · 합성 예제",
+  "question": "목표 영역의 내용과 연결이 빠짐없이 보이나요?",
+  "pages": [
+    "page.svg",
+    "page2.svg"
+  ],
+  "cases": [
+    {
+      "id": "sample-1",
+      "label": "흐름도 영역",
+      "page": 1,
+      "source_page_size": [
+        600,
+        800
+      ],
+      "source_bbox": [
+        90,
+        190,
+        510,
+        530
+      ],
+      "candidates": [
+        {
+          "raw": "candidate.svg",
+          "composite": "candidate.svg"
+        }
+      ]
+    },
+    {
+      "id": "sample-2",
+      "label": "후보 누락 사례",
+      "page": 2,
+      "source_page_size": [
+        600,
+        800
+      ],
+      "source_bbox": [
+        90,
+        190,
+        510,
+        530
+      ],
+      "candidates": []
+    }
+  ]
+}

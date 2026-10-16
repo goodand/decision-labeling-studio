@@ -1,0 +1,14 @@
+{
+  "schema": "dds-context-review/v1",
+  "reviewer": "Human",
+  "source": "conversation:2026-10-16",
+  "cases": [
+    {
+      "id": "hover-pair-diamond-then-cycle-task-a",
+      "verdict": "PASS",
+      "criterion": "공유 경계 Hover의 양쪽 Core 표시 및 Core B Hover의 식별성",
+      "comment": "`Core 간 산출물` 위에 포인터 표시 Hover 했을 때 둘 다 잘 보이냐고 하면 잘 보이고, 이건 강조는 아니지만 무제는 없고 Core B 위에 Hover 했을 때 잘 보이니까 충분해보여",
+      "scope": "공유 경계 Hover에서 기본 화면과 시각적 차이가 없어도 두 Core가 잘 보이면 이 사례에서는 문제없음. Core B Hover도 충분함."
+    }
+  ]
+}

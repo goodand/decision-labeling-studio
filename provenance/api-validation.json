@@ -1,0 +1,17 @@
+{
+  "author": "chatgpt_gpt6",
+  "date": "2026-10-16",
+  "command": "python -m unittest discover -s tests",
+  "exit_code": 0,
+  "output": ".......\n----------------------------------------------------------------------\nRan 7 tests in 3.275s\n\nOK\n",
+  "coverage": [
+    "dataset swap and arbitrary IDs/count",
+    "capture missing candidate and save/reload",
+    "record identity preservation and revision mismatch",
+    "reason/rank/origin validation",
+    "source asset mutation",
+    "unknown paths/cases",
+    "empty input and path containment"
+  ],
+  "fail_first": "Initial portable-server tests could not import the absent adapter. Save-hover contrast later reproduced an actual UI failure before repair."
+}
