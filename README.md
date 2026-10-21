@@ -37,6 +37,18 @@ python studio_server.py --dataset datasets/record-demo/dataset.json --votes .loc
 
 판정은 입력 JSON과 이미지들의 해시에 연결해 원자적으로 저장합니다. 입력이 달라지면 기존 판정 파일을 재사용하지 않으며, 새 `--votes` 경로를 사용해야 합니다. 초안과 확정 저장은 구분됩니다. 자동 실행 테스트에서 만든 판정은 테스트 디렉터리에만 보관합니다. 실행 중 변경된 파일은 재시작 후 새 판정 파일로 검수하세요.
 
+## HWP 원본 충돌 검수 (`kind: conflict`)
+
+교차검증 충돌 사례를 HWP 원본과 함께 검수합니다. 원본은 브라우저에서 rhwp(@rhwp/core, MIT)로 직접 그리고, 감사 카드를 누르면 카드의 XPath(`location`)와 인용이 **같은 위치를 가리킬 때만** 해당 쪽으로 이동·강조합니다. 어긋나면 `위치 확인 불가 — 이유`를 표시합니다.
+
+```powershell
+python conflict_server.py --dataset <human_conflicts.json> --votes .local/conflict-votes.json --rhwp <node_modules/@rhwp/core>
+```
+
+- 데이터: 사례 배열(`pair_id`, `new_business`, `comparison_business`, `evidence.sources[{path, sha256}]`, `audit_cards[{title, quote, location}]`). [계약](datasets/CONTRACT.md#conflict). 원본 HWP와 rhwp 바이너리는 repo에 넣지 않습니다.
+- 원본은 sha256이 맞을 때만 내보냅니다. 판정은 데이터셋 해시에 묶인 `studio-votes/v1` JSON에 원자적으로 저장합니다(`decided_by: human`, 원본 해시 포함).
+- 시험: `python -m unittest discover -s tests`, `node tests/hwp_locate.test.mjs`. 출처·비교·검증: [provenance/conflict-import-20261021.json](provenance/conflict-import-20261021.json).
+
 ## 의사결정 기록
 
 [decisions/dds](decisions/dds/)에는 회고적으로 정리한 제품 결정, 실험 결정, 채팅의 Human 답변을 기록한 후속 JSON을 보존합니다. 파일에 있는 상태·작성 방식·한계는 원문 그대로 유지합니다. Agent 검증과 Human 판정은 별개이며, 경로로 참조하는 모든 과거 산출물을 함께 올린 것은 아닙니다.

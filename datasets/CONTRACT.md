@@ -30,3 +30,13 @@
 API는 화면용 `GET /api/cases`, 페이지용 `GET /api/source-page`, capture 후보·crop API, record의 `GET /api/source-preview`를 제공합니다. 저장은 capture의 `POST /api/decision`, record의 `POST /api/vote`입니다. 데이터셋별 선택지는 기존 UI와 같습니다. 판정불가 사유와 record의 상이 사유는 필수입니다.
 
 저장 파일은 `schema: studio-votes/v1`, 입력·이미지 결합 해시인 `input_sha256`, `decisions` 또는 `votes`를 포함합니다. `submitted_via: local_review_ui`는 전달 경로이며 실제 Human 신원 인증을 의미하지 않습니다. 입력 변경 시 파일을 덮어 재활용하지 말고 새 `--votes`를 지정하세요. 이 계약은 협업 중 충돌 병합이나 사용자 인증을 제공하지 않습니다.
+
+<a id="conflict"></a>
+## conflict 데이터셋 (`conflict_server.py`)
+
+작성자: Claude. 입력은 사례 배열 또는 `{"kind":"conflict","cases":[...]}`.
+
+- `pair_id`: 중복 없는 문자열. `new_business`, `comparison_business`: 표시명.
+- `evidence.sources: [{"path": 절대경로, "sha256": 64자}]`: 원본 HWP/HWPX. 해시가 다르거나 파일이 없으면 열지 않습니다.
+- `evidence.quote`: 처음 열 때 검색할 인용. `audit_cards: [{"title","quote","location"}]`: `location`은 `/HwpDoc/BodyText/SectionDef[s]/…/Paragraph[p]/…/TableCell[..]/Paragraph[k]` 형식 XPath. 중첩 표는 미지원(`위치 확인 불가`).
+- 저장(`POST /api/votes`): `label`(유사중복 있음/없음/판단불가), `choice`(accurate/corrected/uncertain), `subject`·`comparison`·`scope` 필수, uncertain은 `note` 필수. 데이터셋 파일이 바뀌면 409, 기존 votes 파일은 재사용하지 않습니다.

@@ -1,0 +1,72 @@
+{
+  "recorded_on": "2026-10-21",
+  "author": "Claude (Opus 5.5)",
+  "purpose": "semi-golden 교차검증 충돌 검수: HWP 원본 직접 표시 + 감사 카드 XPath 근거 이동",
+  "files": {
+    "ui/conflict/index.html": {
+      "origin": "D:\\dev_eval_team\\jh_dev\\shared_and_deleted\\similarity_review_inventory_v1\\consent_audit\\uncertain_review_v1\\index.html",
+      "origin_sha256": "d4fd459c1f0f0325216e7a81f6d6a5e92d7f8a749d0861d1d72a3cf0ecd697ab",
+      "imported_sha256": "eb41458fedbc243711f0e398e2411e5a7303309d7cd2dab053a5d232fa50d7ed",
+      "modified": true
+    },
+    "ui/conflict/app.js": {
+      "origin": "D:\\dev_eval_team\\jh_dev\\shared_and_deleted\\similarity_review_inventory_v1\\consent_audit\\uncertain_review_v1\\app.js",
+      "origin_sha256": "11f73144b3692a090a66a67f90dd5dfe66ebb0d359032245846e226e3183e3af",
+      "imported_sha256": "453643365a94ae8184c9d0576a1dfcdb05205139203db789e3c2e6199463035a",
+      "modified": true
+    },
+    "ui/conflict/rhwp-viewer.js": {
+      "origin": "D:\\dev_eval_team\\jh_dev\\shared_and_deleted\\similarity_review_inventory_v1\\consent_audit\\uncertain_review_v1\\rhwp-viewer.js",
+      "origin_sha256": "3920e0cbbcc2574f13c721a5841f05a6e884add613f52713a3245b1eb2b3d6e1",
+      "imported_sha256": "b8b88719289f2354995cd2592d263b887dabaf8f231a59d8e31fe5d14e19f9df",
+      "modified": true
+    },
+    "ui/conflict/pdf-source-viewer.js": {
+      "origin": "D:\\dev_eval_team\\jh_dev\\shared_and_deleted\\similarity_review_inventory_v1\\consent_audit\\uncertain_review_v1\\pdf-source-viewer.js",
+      "origin_sha256": "656295d2bd7005bd0c6ce2efb97b152e88c6a9d92a5be6f1c79d4a161d026d91",
+      "imported_sha256": "656295d2bd7005bd0c6ce2efb97b152e88c6a9d92a5be6f1c79d4a161d026d91",
+      "modified": false
+    },
+    "ui/conflict/pdf-source-viewer.css": {
+      "origin": "D:\\dev_eval_team\\jh_dev\\shared_and_deleted\\similarity_review_inventory_v1\\consent_audit\\uncertain_review_v1\\pdf-source-viewer.css",
+      "origin_sha256": "60c7834008e79d0162fde2f68f23a5062d4c0372590cb83fc0dfd801d1f7309b",
+      "imported_sha256": "60c7834008e79d0162fde2f68f23a5062d4c0372590cb83fc0dfd801d1f7309b",
+      "modified": false
+    },
+    "ui/conflict/legacy.css": {
+      "origin": "D:\\dev_eval_team\\jh_dev\\shared_and_deleted\\similarity_review_inventory_v1\\consent_audit\\uncertain_review_v1\\legacy.css",
+      "origin_sha256": "1123e2e50d1ad001f7a2ccfcb550d28ca9e8a0ac12652e6afcb57293666d97cd",
+      "imported_sha256": "1123e2e50d1ad001f7a2ccfcb550d28ca9e8a0ac12652e6afcb57293666d97cd",
+      "modified": false
+    },
+    "ui/conflict/hwp_locate.js": {
+      "origin": "new (Claude, 2026-10-20/21)",
+      "imported_sha256": "6511b773843af51f7497bceb56bf9647258fcf2889cfade9d776338e075c0f89",
+      "modified": false
+    },
+    "conflict_server.py": {
+      "origin": "new; vote rules from D:\\dev_eval_team\\jh_dev\\shared_and_deleted\\similarity_review_inventory_v1\\consent_audit\\uncertain_review_v1\\server.py, persistence from studio_server.py",
+      "origin_sha256": "83b1f28408b247c4f7268b6657e6eaea6cdc7a57c82008279f448c4da6aeefd3"
+    }
+  },
+  "patches": [
+    "app.js: 감사 카드 클릭/Enter → source-locate 이벤트, 카드에 위치 결과 표시",
+    "rhwp-viewer.js: source-locate 처리(XPath·인용 일치 시에만 쪽 이동·강조, 아니면 위치 확인 불가 — 이유)",
+    "index.html: 카드 선택·상태 스타일"
+  ],
+  "comparison": {
+    "evidence_jump": "기존(인용 앞 24자 첫 결과) 8/9 vs XPath 판정 9/9 — RF002 근거 2는 같은 문장이 두 곳",
+    "page_of_multi_page_table": "getPageOfPosition은 표 시작 쪽을 반환 → RF002 근거 2를 2쪽으로 안내. run 스캔(pageOfMatch)으로 3쪽, 브라우저 확인",
+    "screen_choice": "사용자가 두 화면을 직접 보고 교차검증 충돌 검수 화면의 가독성이 좋다고 선택(2026-10-21)"
+  },
+  "validation": {
+    "unit": "python -m unittest discover -s tests: 11 OK",
+    "node": "node tests/hwp_locate.test.mjs OK",
+    "browser": "Claude 앱 내장 브라우저, 실데이터 2건 9개 근거 모두 XPath·인용 일치, 쪽 이동·강조 확인. 판정 저장은 브라우저에서 누르지 않음(API 테스트로만 확인)"
+  },
+  "not_included": [
+    "HWP 원본·human_conflicts.json 실데이터",
+    "rhwp 바이너리(@rhwp/core 0.8.6, MIT)",
+    "PDF 원본 표시 경로(/api/source-preview 등 미구현: 이번 데이터는 모두 HWP)"
+  ]
+}

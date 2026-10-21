@@ -1,0 +1,29 @@
+.preview-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.preview-head h3{margin:9px 0}
+.preview-controls{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.preview-controls button{padding:5px 7px;font-size:.83rem}
+.preview-controls span{font-size:.82rem;min-width:72px;text-align:center}
+.preview-controls[hidden]{display:none}
+.preview-viewport{background:#e8edf1;border:1px solid #d0dce5;border-radius:7px;min-height:430px;display:flex;align-items:flex-start;justify-content:center;overflow:auto;margin-top:8px}
+.preview-viewport.native-scroll{height:calc(100vh - 280px);max-height:850px;min-height:430px;overscroll-behavior:contain}
+.preview-viewport img{display:block;max-width:100%;height:auto}
+.preview-viewport img[hidden]{display:none}
+#native-page{position:relative;width:min(100%,800px);margin:auto}
+#native-page[hidden]{display:none}
+#native-page img{display:block;width:100%;height:auto}
+.object-hotspot{position:absolute;border:2px solid #e46736;background:#e467361a;cursor:pointer;padding:0;min-width:10px;min-height:10px}
+.object-hotspot:hover,.object-hotspot:focus{background:#e467364d;outline:2px solid #fff}
+#object-panel{padding:10px;background:#fff;border:1px solid #d5dfe7;border-radius:7px;margin-top:8px}
+#object-panel[hidden]{display:none}
+#object-panel dl{display:grid;grid-template-columns:110px 1fr;gap:5px;font-size:.85rem}
+#object-panel dt{color:#547083}
+#object-panel dd{margin:0;overflow-wrap:anywhere}
+
+#native-search{display:flex;align-items:center;gap:5px;margin:7px 0;flex-wrap:wrap;font-size:.83rem}
+#native-search[hidden]{display:none}
+#native-search input{flex:1;min-width:160px;padding:7px;border:1px solid #a8bac8;border-radius:6px;font:inherit}
+#native-search-count{color:#526a7b;min-width:65px}
+.search-highlight{position:absolute;background:#ffe24699;border:2px solid #f4a900;pointer-events:none;z-index:3}
+#native-search{margin-bottom:0}
+
+.native-text-run::selection{background:rgba(45,120,230,.4);color:transparent}
