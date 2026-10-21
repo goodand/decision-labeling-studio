@@ -35,3 +35,4 @@ body.layout-1 .meta{height:calc(6 * 1.55em);overflow:auto}
 body.layout-2 .meta .opt{display:none}
 .meta .cand{font-size:12px;padding:2px 8px;margin-top:3px;border-color:#0284c7;color:#0369a1}
 body.layout-2 .meta>.locwrap{order:-1}
+.pview{height:calc(100vh - 290px)} /* 짧은 쪽에서도 A·B 원본 영역 높이를 같게(최대 높이 → 고정 높이) */
