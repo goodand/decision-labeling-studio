@@ -15,6 +15,7 @@ const [dataset,saved]=await Promise.all([fetch('/api/cases').then(r=>r.json()),f
 $('save-stay').onclick=event=>$('save').onclick(event);
 $('review-saved').onclick=()=>{document.body.classList.remove('collapsed');$('query').value='';$('filter').value='done';list();const saved=visible();if(saved.length)show(saved.find(r=>r===current)||saved[0]);else $('status').textContent='아직 저장된 판정이 없습니다.';};
 
-// 원본 파일/폴더 열기. 성공은 '열기 요청 보냄'까지만 확인할 수 있다.
-async function openSourceTarget(target){const st=$('open-status');st.className='';st.textContent='요청 중…';try{const res=await fetch('/api/open-source',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({row:current.pair_id+':'+$('source-select').value,target})});const out=await res.json();if(!res.ok)throw Error(out.error||'열기 실패');st.textContent=(target==='file'?'파일':'폴더')+' 열기 요청 보냄';st.title=out.path}catch(e){st.className='bad';st.textContent=e.message}}
+// 원본 열기: 파일을 먼저 연다. 열 수 없으면 이유를 보이고 '폴더 열기'를 대안으로 꺼낸다. 성공은 '열기 요청 보냄'까지만 확인 가능.
+async function openSourceTarget(target){const st=$('open-status');st.className='';st.textContent='요청 중…';try{const res=await fetch('/api/open-source',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({row:current.pair_id+':'+$('source-select').value,target})});const out=await res.json();if(!res.ok)throw Error(out.error||'열기 실패');st.textContent=(target==='file'?'원본':'폴더')+' 열기 요청 보냄';st.title=out.path}catch(e){st.className='bad';st.textContent=(target==='file'?'원본을 열 수 없음: ':'폴더를 열 수 없음: ')+e.message;if(target==='file')$('open-dir').hidden=false}}
 $('open-file').onclick=()=>openSourceTarget('file');$('open-dir').onclick=()=>openSourceTarget('directory');
+window.addEventListener('hashchange',()=>{$('open-dir').hidden=true;$('open-status').textContent=''});

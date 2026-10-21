@@ -81,10 +81,11 @@ class ConflictTests(unittest.TestCase):
         self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'C:/Windows'})[0], 400)
         self.assertEqual(self.req('/api/open-source', {'row': 'P2:0', 'target': 'file'})[0], 400)  # 파일 없음
         self.assertEqual(self.req('/api/open-source', {'row': 'X:0', 'target': 'file'})[0], 404)
+        self.assertEqual(self.req('/api/open-source', {'row': 'P2:0', 'target': 'directory'})[0], 200)  # 파일 없어도 폴더는 대안
         self.src.write_bytes(b'changed')
         self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'file'})[0], 400)  # sha 불일치
         self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'file'}, origin='http://evil.example')[0], 403)
-        self.assertEqual(len(self.opened), 2)
+        self.assertEqual(len(self.opened), 3)
 
 
 if __name__ == '__main__': unittest.main()

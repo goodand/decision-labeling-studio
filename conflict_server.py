@@ -102,8 +102,13 @@ def make_server(dataset, votes, rhwp, port=0, opener=None):
                     # 원본 파일 또는 폴더 열기(budget_name_eval_v1 source_preview.open_source_directory 방식 + 파일 열기).
                     # 경로는 데이터셋에서만 꺼내고 열기 직전에 sha256을 다시 확인한다.
                     if not isinstance(d, dict) or d.get('target') not in ('file', 'directory'): raise ValueError('target은 file 또는 directory')
-                    s = self.source('row=' + str(d.get('row', '')))
-                    target = s['path'] if d['target'] == 'file' else s['path'].parent
+                    if d['target'] == 'file':
+                        target = self.source('row=' + str(d.get('row', '')))['path']
+                    else:  # 파일이 없거나 바뀐 경우의 대안: 데이터셋에 적힌 경로의 폴더만 연다(파일 해시와 무관).
+                        key = str(d.get('row', '')); src = context['sources'].get(key if ':' in key else key + ':0')
+                        if not src: raise KeyError('Unknown source row')
+                        target = src['path'].parent
+                        if not target.is_dir(): raise ValueError('폴더 없음: ' + str(target))
                     try: opener(str(target))
                     except OSError as exc: return self.send(500, {'error': '열기 실패: ' + str(exc)})
                     return self.send(200, {'opened': d['target'], 'path': str(target)})
