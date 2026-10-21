@@ -17,3 +17,8 @@ button{font:inherit;padding:5px 10px;border:1px solid #bccbd7;border-radius:6px;
 #judge label.c{display:inline-block;margin:2px 8px 2px 0}#judge textarea{width:100%;height:60px;margin-top:6px;font:inherit}
 #judge .saved{font-size:12px;color:#315b41}#judge .err{font-size:12px;color:#b42318;font-weight:600}
 @media(max-width:1100px){main{grid-template-columns:1fr;height:auto}main>*{overflow:visible}#list{order:0}#a{order:1}#b{order:2}#judge{order:3}}
+body.collapsed main{grid-template-columns:minmax(320px,1fr) minmax(320px,1fr) 300px}body.collapsed #list{display:none}
+#query,#filter{width:100%;margin-bottom:6px;font:inherit;padding:5px;border:1px solid #bccbd7;border-radius:6px}#items .none{color:#647589;font-size:12px}
+.pane .pbar .zoom{margin-left:auto;display:flex;gap:4px;align-items:center}.pane .pbar .zl{font-size:12px;min-width:42px;text-align:center}
+.pview{overflow:auto;max-height:calc(100vh - 290px)}.ppage{margin:0 auto}
+.meta .ctx{font-size:12px;background:#fff8e1;border-left:3px solid #e08a00;padding:3px 6px;margin-top:2px}

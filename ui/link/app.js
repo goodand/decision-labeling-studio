@@ -15,7 +15,15 @@ const okCount = xs => xs.filter(x => x.locate.status === 'ok').length;
 function renderList() {
   const done = data.businesses.filter(b => votes[b.id]).length;
   $('progress').textContent = `사업 ${done} / ${data.businesses.length} 판정`;
-  $('list').replaceChildren(...data.businesses.map(b => el('button', { type: 'button', className: b.id === ui.b ? 'on' : '', onclick: () => open(b.id) },
+  const q = $('query').value.trim().toLowerCase(), f = $('filter').value;
+  const shown = data.businesses.filter(b => {
+    const hay = [b.id, b.search_name, ...b.mentions.flatMap(m => [m.original, m.row_id]), ...b.segments.flatMap(s => [s.사업명, String(s.회계연도), s.부처])].join(' ').toLowerCase();
+    if (q && !q.split(/\s+/).every(t => hay.includes(t))) return false;
+    if (f === 'todo') return !votes[b.id]; if (f === 'done') return !!votes[b.id];
+    if (f === 'unloc') return [...b.mentions, ...b.segments].some(x => x.locate.status !== 'ok');
+    return true;
+  });
+  $('items').replaceChildren(...(shown.length ? [] : [el('p', { className: 'none', textContent: '조건에 맞는 사업 없음' })]), ...shown.map(b => el('button', { type: 'button', className: b.id === ui.b ? 'on' : '', onclick: () => open(b.id) },
     `${b.id} ${b.search_name}`,
     el('small', { textContent: `표기 ${b.mentions.length} · 구획 ${b.segments.length} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length}${votes[b.id] ? ' · 판정: ' + votes[b.id].choice : ''}` }))));
 }
@@ -23,8 +31,11 @@ function renderList() {
 function locLine(L, shown) {
   if (L.status === 'unrendered') return el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + L.reason });
   if (L.status !== 'ok') return el('div', { className: 'loc bad', textContent: '위치 확인 불가 — ' + L.reason });
+  const norm = t => (t || '').replace(/\s+/g, '');
+  if (shown && shown.highlighted && norm(shown.context) !== norm(L.query)) return el('div', { className: 'loc bad', textContent: `위치 확인 불가 — 강조 위치 글자("${shown.context}")가 찾은 표기와 다름` });
   if (shown && !shown.highlighted) return el('div', { className: 'loc bad', textContent: '위치 확인 불가 — 화면 글꼴 기준으로 위치를 다시 찾지 못함' });
-  return el('div', { className: 'loc', textContent: `위치 확인: ${shown ? shown.page + 1 : '?'}쪽 · ${LOC_RULE[L.rule] || L.rule} ("${(L.query || '').slice(0, 30)}")` });
+  return el('div', {}, el('div', { className: 'loc', textContent: `위치 확인: ${shown ? shown.page + 1 : '?'}쪽 · ${LOC_RULE[L.rule] || L.rule}` }),
+    el('div', { className: 'ctx', title: '렌더링이 겹쳐 보여도 이 글자가 강조 위치의 실제 원문이다', textContent: '강조 위치 원문: ' + (shown && shown.context ? shown.context : '(없음)') }));
 }
 
 async function showA() {
@@ -96,6 +107,8 @@ async function openSource(side, target) {
     st.textContent = (target === 'file' ? '원본' : '폴더') + ' 열기 요청 보냄'; st.title = out.path;
   } catch (e) { st.className = 'st bad'; st.textContent = (target === 'file' ? '원본을 열 수 없음: ' : '폴더를 열 수 없음: ') + e.message; if (target === 'file') $(side + '-dir').hidden = false; }
 }
+$('query').oninput = renderList; $('filter').onchange = renderList;
+$('toggle').onclick = () => document.body.classList.toggle('collapsed');
 for (const side of ['a', 'b']) { $(side + '-open').onclick = () => openSource(side, 'file'); $(side + '-dir').onclick = () => openSource(side, 'directory'); }
 
 function open(id) { ui.b = id; ui.mention = 0; ui.seg = 0; history.replaceState(null, '', '#' + id); renderList(); renderJudge(); showA(); showB(); }
