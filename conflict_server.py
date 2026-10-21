@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
 import threading
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -49,7 +50,8 @@ def load_dataset(path):
             'cases': cases, 'index': index, 'sources': sources}
 
 
-def make_server(dataset, votes, rhwp, port=0):
+def make_server(dataset, votes, rhwp, port=0, opener=None):
+    opener = opener or os.startfile  # 기본 프로그램/탐색기에 열기 요청만 한다. 실행 중인 프로세스는 건드리지 않는다.
     context = load_dataset(dataset); votes = Path(votes).resolve(); rhwp = Path(rhwp).resolve() if rhwp else None
     if votes == context['path']: raise ValueError('votes must not overwrite the dataset')
     studio.read_votes(votes, context)
@@ -92,10 +94,19 @@ def make_server(dataset, votes, rhwp, port=0):
             try:
                 if self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}' or self.headers.get('Origin') not in (None, f'http://127.0.0.1:{self.server.server_port}'):
                     return self.send(403, {'error': 'Use this local server origin'})
-                if self.path != '/api/votes': return self.send(404, {'error': 'Unknown API endpoint'})
+                if self.path not in ('/api/votes', '/api/open-source'): return self.send(404, {'error': 'Unknown API endpoint'})
                 length = int(self.headers.get('Content-Length', '0'))
                 if not 0 < length <= 100000: raise ValueError('Invalid request size')
                 d = json.loads(self.rfile.read(length))
+                if self.path == '/api/open-source':
+                    # 원본 파일 또는 폴더 열기(budget_name_eval_v1 source_preview.open_source_directory 방식 + 파일 열기).
+                    # 경로는 데이터셋에서만 꺼내고 열기 직전에 sha256을 다시 확인한다.
+                    if not isinstance(d, dict) or d.get('target') not in ('file', 'directory'): raise ValueError('target은 file 또는 directory')
+                    s = self.source('row=' + str(d.get('row', '')))
+                    target = s['path'] if d['target'] == 'file' else s['path'].parent
+                    try: opener(str(target))
+                    except OSError as exc: return self.send(500, {'error': '열기 실패: ' + str(exc)})
+                    return self.send(200, {'opened': d['target'], 'path': str(target)})
                 if not isinstance(d, dict) or d.get('pair_id') not in context['index'] or d.get('choice') not in CHOICES: raise ValueError('잘못된 검수 항목')
                 if any(not isinstance(d.get(k), str) or not d[k].strip() for k in ('subject', 'comparison', 'label', 'scope')): raise ValueError('필수 입력 누락')
                 if d['label'] not in LABELS: raise ValueError('잘못된 라벨')
@@ -108,6 +119,7 @@ def make_server(dataset, votes, rhwp, port=0):
                 with lock:
                     saved = studio.read_votes(votes, context); saved['votes'][d['pair_id']] = record; studio.atomic_save(votes, saved)
                 self.send(200, record)
+            except KeyError as exc: self.send(404, {'error': str(exc)})
             except (OSError, ValueError, TypeError) as exc: self.send(400, {'error': str(exc)})
 
     return ThreadingHTTPServer(('127.0.0.1', port), Handler)

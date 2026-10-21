@@ -25,7 +25,8 @@ class ConflictTests(unittest.TestCase):
                  {'pair_id': 'P2', 'evidence': {'sources': [{'path': str(self.d / 'none.hwp'), 'sha256': '0' * 64}]}}]
         self.dataset = self.d / 'cases.json'; self.dataset.write_text(json.dumps(cases), encoding='utf-8')
         self.votes = self.d / 'votes.json'
-        self.http = cs.make_server(self.dataset, self.votes, None, 0)
+        self.opened = []
+        self.http = cs.make_server(self.dataset, self.votes, None, 0, opener=self.opened.append)
         threading.Thread(target=self.http.serve_forever, daemon=True).start()
         self.addCleanup(self.http.server_close); self.addCleanup(self.http.shutdown)
         self.url = f'http://127.0.0.1:{self.http.server_port}'
@@ -71,6 +72,19 @@ class ConflictTests(unittest.TestCase):
         self.vote()
         self.dataset.write_text('[{"pair_id":"P1"}]', encoding='utf-8')
         with self.assertRaises(ValueError): cs.make_server(self.dataset, self.votes, None, 0)
+
+
+    def test_open_source_file_and_directory(self):
+        self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'file'})[0], 200)
+        self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'directory'})[0], 200)
+        self.assertEqual(self.opened, [str(self.src), str(self.src.parent)])
+        self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'C:/Windows'})[0], 400)
+        self.assertEqual(self.req('/api/open-source', {'row': 'P2:0', 'target': 'file'})[0], 400)  # 파일 없음
+        self.assertEqual(self.req('/api/open-source', {'row': 'X:0', 'target': 'file'})[0], 404)
+        self.src.write_bytes(b'changed')
+        self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'file'})[0], 400)  # sha 불일치
+        self.assertEqual(self.req('/api/open-source', {'row': 'P1:0', 'target': 'file'}, origin='http://evil.example')[0], 403)
+        self.assertEqual(len(self.opened), 2)
 
 
 if __name__ == '__main__': unittest.main()
