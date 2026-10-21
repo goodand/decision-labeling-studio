@@ -22,3 +22,14 @@ body.collapsed main{grid-template-columns:minmax(320px,1fr) minmax(320px,1fr) 30
 .pane .pbar .zoom{margin-left:auto;display:flex;gap:4px;align-items:center}.pane .pbar .zl{font-size:12px;min-width:42px;text-align:center}
 .pview{overflow:auto;max-height:calc(100vh - 290px)}.ppage{margin:0 auto}
 .meta .ctx{font-size:12px;background:#fff8e1;border-left:3px solid #e08a00;padding:3px 6px;margin-top:2px}
+.psearch{display:flex;gap:4px;align-items:center;flex:1;min-width:0}.psearch input{flex:1;min-width:80px;font:inherit;padding:4px 6px;border:1px solid #bccbd7;border-radius:6px}.psearch .scount{font-size:12px;color:#647589;white-space:nowrap}
+.sh{position:absolute;background:#7dd3fc55;outline:1px solid #0284c7;pointer-events:none}.sh.cur{background:#38bdf888;outline:2px solid #0369a1}
+.actions{flex-wrap:nowrap}.actions .pbar{display:flex;gap:4px;align-items:center;margin:0;white-space:nowrap}.actions .pbar .zoom{margin-left:4px}.actions .pbar button{padding:3px 7px}
+/* 칸 머리: 버튼 2줄 고정, 탭 1줄 */
+.phead{flex-wrap:nowrap}.phead .tabs{flex-wrap:nowrap;overflow-x:auto;min-width:0}.phead .tab{white-space:nowrap}
+.actions{flex-wrap:wrap;row-gap:4px}.psearch{flex:0 1 auto;min-width:0}.psearch input{flex:0 1 150px;width:150px;min-width:120px} /* 입력칸을 줄여 쪽 이동·확대를 같은 줄에(넓으면 1줄, 좁으면 자연 줄바꿈) */
+/* 배치 1: A·B 설명 영역을 같은 줄 수(6줄) 높이로 고정 → 원본 시작선·높이 일치 */
+body.layout-1 .meta{height:calc(6 * 1.55em);overflow:auto}
+/* 배치 2: 위치·강조 원문을 위로, 설명은 3줄 높이 안에서 스크롤 */
+/* 배치 2: 높이를 고정하지 않고, 중복·보조 줄(.opt)을 빼서 줄인다. 뺀 정보는 원본 열기 버튼 툴팁. */
+body.layout-2 .meta .opt{display:none}

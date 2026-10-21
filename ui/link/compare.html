@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>배치 동시 비교</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px Pretendard,"Malgun Gothic",system-ui,sans-serif;background:#f5f7fa;color:#182b3b}
+header{display:flex;gap:12px;align-items:center;padding:8px 14px;background:#fff;border-bottom:1px solid #dae1e8}h1{font-size:16px;margin:0;flex:1}
+select,button{font:inherit;padding:4px 8px}main{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
+.col h2{font-size:14px;margin:0 0 6px}.frame{position:relative;overflow:hidden;border:1px solid #bccbd7;background:#fff}
+.frame iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0}
+</style>
+</head>
+<body>
+<header><h1>칸 머리 배치 동시 비교 (같은 사업·같은 데이터, 각 화면은 실제 크기를 축소해 표시)</h1>
+<label>화면 크기 <select id="size"><option>1585x900</option><option>1897x900</option><option>1920x1080</option></select></label>
+<label>사업 <input id="biz" value="B08" size="4"></label><button type="button" id="go">적용</button></header>
+<main><div class="col"><h2>배치 1 · 설명 6줄 고정 <a href="#" id="o1" target="_blank">따로 열기</a></h2><div class="frame" id="f1"></div></div>
+<div class="col"><h2>배치 2 · 중복 줄 빼기 <a href="#" id="o2" target="_blank">따로 열기</a></h2><div class="frame" id="f2"></div></div></main>
+<script>
+const $ = id => document.getElementById(id);
+function load() {
+  const [w, h] = $('size').value.split('x').map(Number), b = $('biz').value.trim() || 'B01';
+  for (const n of [1, 2]) {
+    const box = $('f' + n), url = `/?layout=${n}#${encodeURIComponent(b)}`, s = box.clientWidth / w;
+    box.style.height = Math.round(h * s) + 'px';
+    const f = Object.assign(document.createElement('iframe'), { src: url, title: '배치 ' + n });
+    Object.assign(f.style, { width: w + 'px', height: h + 'px', transform: `scale(${s})` });
+    box.replaceChildren(f); $('o' + n).href = url;
+  }
+}
+$('go').onclick = load; addEventListener('resize', load); load();
+</script>
+</body>
+</html>

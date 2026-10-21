@@ -21,7 +21,7 @@ UI = ROOT / 'ui' / 'link'
 _spec = importlib.util.spec_from_file_location('studio_server', ROOT / 'studio_server.py')
 studio = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(studio)
 STATIC = {'/': (UI, 'index.html'), '/index.html': (UI, 'index.html'), '/app.js': (UI, 'app.js'), '/hwp-pane.js': (UI, 'hwp-pane.js'),
-          '/styles.css': (UI, 'styles.css'), '/hwp_locate.js': (ROOT / 'ui' / 'conflict', 'hwp_locate.js')}
+          '/styles.css': (UI, 'styles.css'), '/compare.html': (UI, 'compare.html'), '/hwp_locate.js': (ROOT / 'ui' / 'conflict', 'hwp_locate.js')}
 MIME = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.wasm': 'application/wasm'}
 
 

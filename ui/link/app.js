@@ -6,6 +6,8 @@ const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.crea
 const [data, votes0] = await Promise.all([fetch('/api/dataset').then(r => r.json()), fetch('/api/votes').then(r => r.json())]);
 const votes = votes0 || {};
 const paneA = new HwpPane($('a-pane')), paneB = new HwpPane($('b-pane'));
+for (const side of ['a', 'b']) $(side + '-open').before($(side + '-pane').querySelector('.psearch')); // 기존 화면처럼 '원본 열기' 왼쪽에 원문 찾기
+for (const side of ['a', 'b']) $(side + '-open-st').after($(side + '-pane').querySelector('.pbar')); // 쪽 이동·확대도 같은 줄로(헤더 높이 줄이기)
 const ui = { b: null, mention: 0, seg: 0 };
 const LOC_RULE = { label_unique: "'사업명' 칸에서 유일", global_unique: '문서 전체에서 유일', title_unique: '파일 제목이 유일', raw_prefix_unique: 'DB 원문 앞부분이 유일' };
 
@@ -34,7 +36,7 @@ function locLine(L, shown) {
   const norm = t => (t || '').replace(/\s+/g, '');
   if (shown && shown.highlighted && norm(shown.context) !== norm(L.query)) return el('div', { className: 'loc bad', textContent: `위치 확인 불가 — 강조 위치 글자("${shown.context}")가 찾은 표기와 다름` });
   if (shown && !shown.highlighted) return el('div', { className: 'loc bad', textContent: '위치 확인 불가 — 화면 글꼴 기준으로 위치를 다시 찾지 못함' });
-  return el('div', {}, el('div', { className: 'loc', textContent: `위치 확인: ${shown ? shown.page + 1 : '?'}쪽 · ${LOC_RULE[L.rule] || L.rule}` }),
+  return el('div', { className: 'locwrap' }, el('div', { className: 'loc', textContent: `위치 확인: ${shown ? shown.page + 1 : '?'}쪽 · ${LOC_RULE[L.rule] || L.rule}` }),
     el('div', { className: 'ctx', title: '렌더링이 겹쳐 보여도 이 글자가 강조 위치의 실제 원문이다', textContent: '강조 위치 원문: ' + (shown && shown.context ? shown.context : '(없음)') }));
 }
 
@@ -43,9 +45,10 @@ async function showA() {
   $('a-tabs').replaceChildren(...b.mentions.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.mention ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
     textContent: `${x.row_id} · ${x.role}`, onclick: () => { ui.mention = i; showA(); } })));
   const meta = [el('div', {}, el('b', { textContent: '원래 표기: ' }), m.original),
-    el('div', {}, '정리된 이름: ', b.search_name, m.scope ? ' · 범위: ' + m.scope : ''),
+    el('div', { className: m.scope || m.original !== b.search_name ? '' : 'opt' }, '정리된 이름: ', b.search_name, m.scope ? ' · 범위: ' + m.scope : ''), // 배치 2: 원래 표기와 같으면 뺀다
     m.administrative_metadata.length ? el('div', {}, '행정 표기: ', m.administrative_metadata.map(s => s.trim()).join(' | ')) : null,
-    el('div', { className: 'muted', textContent: `${d.name} (${m.source_folder || ''} ${m.source_doc_year || ''})` })];
+    el('div', { className: 'muted opt', textContent: `${d.name} (${m.source_folder || ''} ${m.source_doc_year || ''})` })];
+  $('a-open').title = `${d.name} (${m.source_folder || ''} ${m.source_doc_year || ''})`; // 배치 2에서 뺀 파일명은 버튼 툴팁으로
   $('a-meta').replaceChildren(...meta.filter(Boolean), el('div', { textContent: '위치 확인 중…', className: 'muted' }));
   resetOpen('a');
   const shown = await paneA.show(m.doc, m.locate.status === 'ok' ? m.locate : null);
@@ -60,10 +63,12 @@ async function showB() {
     title: x.사업명, textContent: `${x.회계연도} ${x.레벨명}${votes[b.id + '/' + x.id] ? ' ✓' : ''}`, onclick: () => { ui.seg = i; showB(); renderJudge(); } })));
   const body = s.content.filter(c => c.목적 || c.내용);
   const meta = [el('div', {}, el('b', { textContent: `[${s.회계연도}] ${s.부처} · ${s.레벨명} · ` }), s.사업명),
-    el('div', {}, '상위 세부사업: ', s.세부사업명 || '-', ' · 구조_id ', String(s.구조_id), s.dup_rows ? ` (연결 결과에 같은 구획 ${s.dup_rows + 1}번 나옴, 한 번만 표시)` : ''),
-    el('div', { className: 'muted', textContent: d.name }),
+    el('div', { className: 'opt' }, '상위 세부사업: ', s.세부사업명 || '-', ' · 구조_id ', String(s.구조_id), s.dup_rows ? ` (연결 결과에 같은 구획 ${s.dup_rows + 1}번 나옴, 한 번만 표시)` : ''),
+    el('div', { className: 'muted opt', textContent: d.name }),
     body.length ? el('details', {}, el('summary', { textContent: '목적·내용 (DB)' }), body.map(c => el('pre', { textContent: [c.목적 && '목적: ' + c.목적, c.내용 && '내용: ' + c.내용].filter(Boolean).join('\n') })))
-      : el('div', { className: 'muted', textContent: '목적·내용 없음(DB). 세부사업은 같은 파일의 내역사업 구획에 본문이 있을 수 있음.' })];
+      : el('div', { className: 'muted opt', textContent: '목적·내용 없음(DB). 세부사업은 같은 파일의 내역사업 구획에 본문이 있을 수 있음.' })];
+  $('b-open').title = `${d.name}
+상위 세부사업: ${s.세부사업명 || '-'} · 구조_id ${s.구조_id}`; // 배치 2에서 뺀 줄은 버튼 툴팁으로
   $('b-meta').replaceChildren(...meta, el('div', { textContent: '위치 확인 중…', className: 'muted' }));
   resetOpen('b');
   const shown = await paneB.show(s.doc, s.locate.status === 'ok' ? s.locate : null);
@@ -109,6 +114,11 @@ async function openSource(side, target) {
 }
 $('query').oninput = renderList; $('filter').onchange = renderList;
 $('toggle').onclick = () => document.body.classList.toggle('collapsed');
+// 칸 머리 배치 A/B 비교(?layout=1|2). 데이터·판정은 같고 칸 머리 배치만 다르다.
+const setLayout = n => { document.body.classList.remove('layout-1', 'layout-2'); document.body.classList.add('layout-' + n); $('layout').textContent = '배치 ' + n;
+  const u = new URL(location.href); u.searchParams.set('layout', n); history.replaceState(null, '', u); };
+setLayout(new URLSearchParams(location.search).get('layout') === '2' ? 2 : 1);
+$('layout').onclick = () => setLayout(document.body.classList.contains('layout-1') ? 2 : 1);
 for (const side of ['a', 'b']) { $(side + '-open').onclick = () => openSource(side, 'file'); $(side + '-dir').onclick = () => openSource(side, 'directory'); }
 
 function open(id) { ui.b = id; ui.mention = 0; ui.seg = 0; history.replaceState(null, '', '#' + id); renderList(); renderJudge(); showA(); showB(); }

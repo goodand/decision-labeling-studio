@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<header><button type="button" id="toggle" title="목록 접기/펼치기">☰ 목록</button><h1>사업명 ↔ 예산서 구획 연결 검수</h1><span id="progress"></span><a href="/api/votes" target="_blank">저장 JSON</a></header>
+<header><button type="button" id="toggle" title="목록 접기/펼치기">☰ 목록</button><h1>사업명 ↔ 예산서 구획 연결 검수</h1><button type="button" id="layout" title="칸 머리 배치 전환(배치 1: 설명 6줄 고정 / 배치 2: 위치 우선 3줄)">배치 1</button><span id="progress"></span><a href="/api/votes" target="_blank">저장 JSON</a></header>
 <main>
   <aside id="list" aria-label="사업 목록"><input id="query" type="search" placeholder="사업명·번호·연도 검색"><select id="filter" aria-label="목록 필터"><option value="all">전체</option><option value="todo">미판정</option><option value="done">판정함</option><option value="unloc">위치 확인 불가 포함</option></select><div id="items"></div></aside>
   <section id="a" aria-label="A 결과서 원본">
