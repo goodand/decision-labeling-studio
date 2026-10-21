@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사업명 ↔ 예산서 구획 연결 검수</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header><h1>사업명 ↔ 예산서 구획 연결 검수</h1><span id="progress"></span><a href="/api/votes" target="_blank">저장 JSON</a></header>
+<main>
+  <aside id="list" aria-label="사업 목록"></aside>
+  <section id="a" aria-label="A 결과서 원본">
+    <div class="phead"><strong>A · 결과서/의견서</strong><span id="a-tabs" class="tabs"></span></div>
+    <div id="a-meta" class="meta"></div>
+    <div class="actions"><button type="button" id="a-open">원본 열기</button><button type="button" id="a-dir" hidden>폴더 열기</button><span id="a-open-st" class="st"></span></div>
+    <div id="a-pane" class="pane"></div>
+  </section>
+  <section id="b" aria-label="B 예산서 원본">
+    <div class="phead"><strong>B · 예산서 구획</strong><span id="b-tabs" class="tabs"></span></div>
+    <div id="b-meta" class="meta"></div>
+    <div class="actions"><button type="button" id="b-open">원본 열기</button><button type="button" id="b-dir" hidden>폴더 열기</button><span id="b-open-st" class="st"></span></div>
+    <div id="b-pane" class="pane"></div>
+  </section>
+  <aside id="judge" aria-label="Human 판정"></aside>
+</main>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

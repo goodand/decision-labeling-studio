@@ -1,0 +1,54 @@
+{
+  "_doc": "사업명 ↔ 예산서 구획 연결 검수 데이터셋 설정. 경로·규칙은 여기에만 둔다. 실제 값은 .local/에 복사해 쓴다.",
+  "inputs": {
+    "rows": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/step1/rows.json",
+    "links": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/run_007/v1b_endpoint_links.json",
+    "budget_db": "D:/dev_eval_team/전부처사업정보DB/build/budget_all.sqlite",
+    "budget_root": "D:/dev_eval_team/전부처사업정보DB/all",
+    "linker_module": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/linker_v1.py"
+  },
+  "row_ids": [
+    "AUD-0017",
+    "AUD-0137",
+    "AUD-0157",
+    "AUD-0158",
+    "AUD-0323",
+    "AUD-0483",
+    "AUD-0512",
+    "V2-SG500-B-D1-0008"
+  ],
+  "roles": {
+    "subject": "대상",
+    "comparison": "비교"
+  },
+  "question": "결과서가 말하는 이 사업이 오른쪽 예산서 구획(들)과 같은 사업인가?",
+  "choices": {
+    "일치": "일치",
+    "부분일치": "부분일치",
+    "불일치": "불일치",
+    "판단불가": "판단불가"
+  },
+  "note_required_for": [
+    "부분일치",
+    "판단불가"
+  ],
+  "segment_dedupe_keys": [
+    "구조_id",
+    "사업명",
+    "레벨명"
+  ],
+  "locate": {
+    "_doc": "확실한 위치만 '확인'. 아니면 '위치 확인 불가'와 이유. 추측 하이라이트 금지.",
+    "answer_name_labels": [
+      "^\\s*(\\d+\\.\\s*)?사업명\\s*$"
+    ],
+    "answer_rule": "label_unique_else_global_unique",
+    "budget_title_field": "제목원문",
+    "budget_raw_prefix_lengths": [
+      30,
+      60,
+      120
+    ],
+    "budget_rule": "세부사업=title_unique; 내역사업=raw_prefix_unique"
+  }
+}

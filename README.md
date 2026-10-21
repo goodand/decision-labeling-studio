@@ -49,6 +49,21 @@ python conflict_server.py --dataset <human_conflicts.json> --votes .local/confli
 - 원본은 sha256이 맞을 때만 내보냅니다. 판정은 데이터셋 해시에 묶인 `studio-votes/v1` JSON에 원자적으로 저장합니다(`decided_by: human`, 원본 해시 포함).
 - 시험: `python -m unittest discover -s tests`, `node tests/hwp_locate.test.mjs`. 출처·비교·검증: [provenance/conflict-import-20261021.json](provenance/conflict-import-20261021.json).
 
+## 사업명 ↔ 예산서 구획 연결 검수 (`kind: program_link`)
+
+결과서·의견서의 사업(A)과 자동 연결된 예산서 구획(B)을 HWP 원본으로 나란히 보고 "같은 사업인가"를 판정합니다(일치/부분일치/불일치/판단불가, 사업 단위 + 구획 단위). 유사·중복 라벨은 읽지도 표시하지도 않습니다.
+
+```powershell
+copy adapters\program_link\config.example.json .local\program-link\config.json   # 경로·대상 행·위치 규칙
+python -I adapters/program_link/build_dataset.py .local/program-link/config.json .local/program-link/dataset.unlocated.json
+node adapters/program_link/locate.mjs <@rhwp/core> .local/program-link/dataset.unlocated.json .local/program-link/dataset.json
+python link_server.py --dataset .local/program-link/dataset.json --votes .local/program-link/votes.json --rhwp <@rhwp/core>
+```
+
+- 사업 묶음 키는 `linker_v1.clean_answer_name(name)['search_name']`(설정의 `linker_module`). 원래 표기·행정 표기는 그대로 표시.
+- 위치는 설정 `locate` 규칙으로 코드가 정하고, 확실할 때만 강조합니다. A: '사업명' 칸에서 유일 → 문서 전체에서 유일. B: 세부사업은 파일 제목 유일, 내역사업은 DB 사업내용 원문 앞부분 유일. 그 외는 `위치 확인 불가 — 이유`.
+- 입력 파일 sha256은 dataset.json `inputs`/`docs`에 기록. 판정은 `--votes` 파일에만 저장(입력·연결 결과 수정 없음).
+
 ## 의사결정 기록
 
 [decisions/dds](decisions/dds/)에는 회고적으로 정리한 제품 결정, 실험 결정, 채팅의 Human 답변을 기록한 후속 JSON을 보존합니다. 파일에 있는 상태·작성 방식·한계는 원문 그대로 유지합니다. Agent 검증과 Human 판정은 별개이며, 경로로 참조하는 모든 과거 산출물을 함께 올린 것은 아닙니다.
