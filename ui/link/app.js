@@ -9,7 +9,8 @@ const paneA = new HwpPane($('a-pane')), paneB = new HwpPane($('b-pane'));
 for (const side of ['a', 'b']) $(side + '-open').before($(side + '-pane').querySelector('.psearch')); // 기존 화면처럼 '원본 열기' 왼쪽에 원문 찾기
 for (const side of ['a', 'b']) $(side + '-open-st').after($(side + '-pane').querySelector('.pbar')); // 쪽 이동·확대도 같은 줄로(헤더 높이 줄이기)
 const ui = { b: null, mention: 0, seg: 0 };
-const LOC_RULE = { label_unique: "'사업명' 칸에서 유일", global_unique: '문서 전체에서 유일', title_unique: '파일 제목이 유일', raw_prefix_unique: 'DB 원문 앞부분이 유일' };
+const LOC_RULE = { label_unique: "'사업명' 칸에서 유일", global_unique: '문서 전체에서 유일', title_unique: '파일 제목이 유일', raw_prefix_unique: 'DB 원문 앞부분이 유일',
+  label_unique_projection: "공백·가운뎃점 무시로 '사업명' 칸에서 유일", global_unique_projection: '공백·가운뎃점 무시로 문서 전체에서 유일', name_unique_projection: 'DB 원문 없음 · 구획 사업명이 공백·가운뎃점 무시로 유일' };
 
 const biz = () => data.businesses.find(b => b.id === ui.b);
 const okCount = xs => xs.filter(x => x.locate.status === 'ok').length;
@@ -30,9 +31,10 @@ function renderList() {
     el('small', { textContent: `표기 ${b.mentions.length} · 구획 ${b.segments.length} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length}${votes[b.id] ? ' · 판정: ' + votes[b.id].choice : ''}` }))));
 }
 
-function locLine(L, shown) {
+function locLine(L, shown, pane) {
   if (L.status === 'unrendered') return el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + L.reason });
-  if (L.status !== 'ok') return el('div', { className: 'loc bad', textContent: '위치 확인 불가 — ' + L.reason });
+  if (L.status !== 'ok') return el('div', { className: 'locwrap' }, el('div', { className: 'loc bad', textContent: '위치 확인 불가 — ' + L.reason }),
+    L.candidates && L.candidates.length && pane ? el('button', { type: 'button', className: 'cand', title: '확정 위치가 아니다. 파란 표시로 출현 위치를 차례로 보여 준다(↑↓).', textContent: `출현 ${L.candidates.length}곳 넘겨 보기 (확정 아님)`, onclick: () => pane.showCandidates(L.candidates, '출현 ' + L.candidates.length + '곳') }) : null);
   const norm = t => (t || '').replace(/\s+/g, '');
   if (shown && shown.highlighted && norm(shown.context) !== norm(L.query)) return el('div', { className: 'loc bad', textContent: `위치 확인 불가 — 강조 위치 글자("${shown.context}")가 찾은 표기와 다름` });
   if (shown && !shown.highlighted) return el('div', { className: 'loc bad', textContent: '위치 확인 불가 — 화면 글꼴 기준으로 위치를 다시 찾지 못함' });
@@ -43,7 +45,8 @@ function locLine(L, shown) {
 async function showA() {
   const b = biz(), m = b.mentions[ui.mention], d = data.docs[m.doc];
   $('a-tabs').replaceChildren(...b.mentions.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.mention ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
-    textContent: `${x.row_id} · ${x.role}`, onclick: () => { ui.mention = i; showA(); } })));
+    title: '눌러서 이 행의 결과서/의견서 원본으로 전환', textContent: `${x.row_id} · ${x.role}`, onclick: () => { ui.mention = i; showA(); } })),
+    b.mentions.length > 1 ? el('span', { className: 'muted', textContent: `← 이 사업을 쓰는 행 ${b.mentions.length}개, 눌러서 원본 전환` }) : null);
   const meta = [el('div', {}, el('b', { textContent: '원래 표기: ' }), m.original),
     el('div', { className: m.scope || m.original !== b.search_name ? '' : 'opt' }, '정리된 이름: ', b.search_name, m.scope ? ' · 범위: ' + m.scope : ''), // 배치 2: 원래 표기와 같으면 뺀다
     m.administrative_metadata.length ? el('div', {}, '행정 표기: ', m.administrative_metadata.map(s => s.trim()).join(' | ')) : null,
@@ -52,7 +55,7 @@ async function showA() {
   $('a-meta').replaceChildren(...meta.filter(Boolean), el('div', { textContent: '위치 확인 중…', className: 'muted' }));
   resetOpen('a');
   const shown = await paneA.show(m.doc, m.locate.status === 'ok' ? m.locate : null);
-  $('a-meta').replaceChildren(...meta.filter(Boolean), shown && shown.rendered === false ? el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + shown.error }) : locLine(m.locate, shown));
+  $('a-meta').replaceChildren(...meta.filter(Boolean), shown && shown.rendered === false ? el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + shown.error }) : locLine(m.locate, shown, paneA));
 }
 
 async function showB() {
@@ -60,19 +63,20 @@ async function showB() {
   if (!b.segments.length) { $('b-meta').textContent = '연결된 예산서 구획 없음'; return; }
   const s = b.segments[ui.seg], d = data.docs[s.doc];
   $('b-tabs').replaceChildren(...b.segments.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.seg ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
-    title: x.사업명, textContent: `${x.회계연도} ${x.레벨명}${votes[b.id + '/' + x.id] ? ' ✓' : ''}`, onclick: () => { ui.seg = i; showB(); renderJudge(); } })));
+    title: x.사업명, textContent: `${x.회계연도} ${x.레벨명}${votes[b.id + '/' + x.id] ? ' ✓' : ''}`, onclick: () => { ui.seg = i; showB(); renderJudge(); } })),
+    b.segments.length > 1 ? el('span', { className: 'muted', textContent: '← 눌러서 구획 전환' }) : null);
   const body = s.content.filter(c => c.목적 || c.내용);
   const meta = [el('div', {}, el('b', { textContent: `[${s.회계연도}] ${s.부처} · ${s.레벨명} · ` }), s.사업명),
-    el('div', { className: 'opt' }, '상위 세부사업: ', s.세부사업명 || '-', ' · 구조_id ', String(s.구조_id), s.dup_rows ? ` (연결 결과에 같은 구획 ${s.dup_rows + 1}번 나옴, 한 번만 표시)` : ''),
+    el('div', { className: 'opt' }, '상위 세부사업: ', s.세부사업명 || '-', ' · 구조_id ', s.merged_구조_ids.join(', '), s.merged_구조_ids.length > 1 ? ` (같은 파일·이름·레벨 노드 ${s.merged_구조_ids.length}개를 한 탭으로 합침)` : ''),
     el('div', { className: 'muted opt', textContent: d.name }),
     body.length ? el('details', {}, el('summary', { textContent: '목적·내용 (DB)' }), body.map(c => el('pre', { textContent: [c.목적 && '목적: ' + c.목적, c.내용 && '내용: ' + c.내용].filter(Boolean).join('\n') })))
-      : el('div', { className: 'muted opt', textContent: '목적·내용 없음(DB). 세부사업은 같은 파일의 내역사업 구획에 본문이 있을 수 있음.' })];
+      : el('div', { className: 'muted opt', textContent: s.레벨명 === '세부사업' ? '목적·내용 없음(DB). 세부사업은 같은 파일의 내역사업 구획에 본문이 있을 수 있음.' : '목적·내용 없음(DB). 이 구획의 본문은 원본에서 직접 확인.' })];
   $('b-open').title = `${d.name}
 상위 세부사업: ${s.세부사업명 || '-'} · 구조_id ${s.구조_id}`; // 배치 2에서 뺀 줄은 버튼 툴팁으로
   $('b-meta').replaceChildren(...meta, el('div', { textContent: '위치 확인 중…', className: 'muted' }));
   resetOpen('b');
   const shown = await paneB.show(s.doc, s.locate.status === 'ok' ? s.locate : null);
-  $('b-meta').replaceChildren(...meta, shown && shown.rendered === false ? el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + shown.error }) : locLine(s.locate, shown));
+  $('b-meta').replaceChildren(...meta, shown && shown.rendered === false ? el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + shown.error }) : locLine(s.locate, shown, paneB));
 }
 
 function choiceSet(key, title) {
@@ -97,8 +101,9 @@ function showBTabsOnly() { const b = biz(); document.querySelectorAll('#b-tabs .
 function renderJudge() {
   const b = biz(), s = b.segments[ui.seg];
   $('judge').replaceChildren(el('h2', { textContent: b.id + ' ' + b.search_name }), el('div', { className: 'q', textContent: data.question }),
-    choiceSet(b.id, '사업 전체 판정'),
-    s ? choiceSet(b.id + '/' + s.id, `이 구획만 판정 (선택): ${s.회계연도} ${s.레벨명} ${s.사업명}`) : null,
+    choiceSet(b.id, '사업 전체 판정 — 결과서의 이 사업이 오른쪽 구획 전체와 같은 사업인가'),
+    s ? choiceSet(b.id + '/' + s.id, `선택한 탭의 구획만 따로 판정 (선택): [${s.회계연도} ${s.레벨명}] ${s.사업명}`) : null,
+    s ? el('p', { className: 'muted', textContent: '구획마다 결론이 다를 때만 쓴다. 예: 연도별로 일부 구획만 같은 사업이면 사업 전체는 부분일치, 구획별로 일치/불일치. 다른 구획은 B의 탭을 눌러 바꾼 뒤 판정한다.' }) : null,
     el('p', { className: 'muted', textContent: '판정은 연결 결과 파일과 별도의 votes 파일에만 저장된다.' }));
 }
 

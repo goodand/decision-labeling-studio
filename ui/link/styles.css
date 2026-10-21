@@ -33,3 +33,5 @@ body.layout-1 .meta{height:calc(6 * 1.55em);overflow:auto}
 /* 배치 2: 위치·강조 원문을 위로, 설명은 3줄 높이 안에서 스크롤 */
 /* 배치 2: 높이를 고정하지 않고, 중복·보조 줄(.opt)을 빼서 줄인다. 뺀 정보는 원본 열기 버튼 툴팁. */
 body.layout-2 .meta .opt{display:none}
+.meta .cand{font-size:12px;padding:2px 8px;margin-top:3px;border-color:#0284c7;color:#0369a1}
+body.layout-2 .meta>.locwrap{order:-1}

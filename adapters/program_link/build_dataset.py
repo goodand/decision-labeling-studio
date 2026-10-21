@@ -52,13 +52,18 @@ def main(config_path, out_path):
             e = links.get(name) or {}
             for h in e.get('hits', []):
                 k = tuple(h[x] for x in cfg['segment_dedupe_keys'])
-                if k in b['segments']:
-                    b['segments'][k]['dup_rows'] += 1; continue
+                if k in b['segments']:  # 같은 키(설정 segment_dedupe_keys)의 구획은 한 탭으로 합치고 구조_id 목록과 본문을 모은다
+                    seg = b['segments'][k]; seg['dup_rows'] += 1
+                    if h['구조_id'] not in seg['merged_구조_ids']:
+                        seg['merged_구조_ids'].append(h['구조_id'])
+                        seg['content'] += [{'목적': (a or '').strip(), '내용': (bb or '').strip(), '원문': (raw or '').strip()}
+                                           for a, bb, raw in db.execute('select 목적, 내용, 원문 from 사업내용 where 구조_id=?', (h['구조_id'],))]
+                    continue
                 f = db.execute(f'select 파일명, {title_field} from 사업 where 사업_id=?', (h['사업_id'],)).fetchone()
                 content = [{'목적': (a or '').strip(), '내용': (bb or '').strip(), '원문': (raw or '').strip()}
                            for a, bb, raw in db.execute('select 목적, 내용, 원문 from 사업내용 where 구조_id=?', (h['구조_id'],))]
                 fpath = Path(I['budget_root']) / str(h['회계연도']) / f[0] if f else None
-                b['segments'][k] = {'구조_id': h['구조_id'], 'dup_rows': 0, '사업_id': h['사업_id'], '회계연도': h['회계연도'],
+                b['segments'][k] = {'구조_id': h['구조_id'], 'merged_구조_ids': [h['구조_id']], 'dup_rows': 0, '사업_id': h['사업_id'], '회계연도': h['회계연도'],
                                     '부처': h['부처'], '레벨명': h['레벨명'], '사업명': h['사업명'], '세부사업명': h['세부사업명'],
                                     'title': f[1] if f else None, 'content': content, 'link_reason': e.get('reason'),
                                     'doc': doc(fpath, None, 'budget') if fpath else None}
@@ -72,7 +77,9 @@ def main(config_path, out_path):
     data = {'kind': 'program_link', 'question': cfg['question'], 'choices': cfg['choices'], 'note_required_for': cfg['note_required_for'],
             'inputs': {k: {'path': v, 'sha256': sha(v) if Path(v).is_file() else None} for k, v in I.items() if k != 'budget_root'},
             'config': {'path': str(Path(config_path).resolve()), 'sha256': sha(config_path)},
-            'locate_rules': cfg['locate'], 'docs': docs, 'businesses': out}
+            'locate_rules': cfg['locate'], 'docs': docs, 'businesses': out,
+            # JS 위치 판정이 search_rules.projection을 그대로 옮겼는지 확인할 대조표(linker가 sha256 검증 후 로드한 원 함수의 결과)
+            'projection_check': {n: linker.projection(n) for n in sorted({x for b in out for x in [b['search_name']] + [m['original'] for m in b['mentions']] + [s['사업명'] for s in b['segments']] + [s['title'] or '' for s in b['segments']]})}}
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     Path(out_path).write_text(json.dumps(data, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     print(json.dumps({'businesses': len(out), 'segments': sum(len(b['segments']) for b in out), 'docs': len(docs),

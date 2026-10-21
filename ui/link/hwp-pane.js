@@ -78,6 +78,15 @@ export class HwpPane {
     this.hitIndex = (this.hitIndex + step + this.hits.length) % this.hits.length; this.page = this.hits[this.hitIndex].page;
     this.updateCount(); this.render('search');
   }
+  // 확정되지 않은 출현 위치들을 검색 결과처럼(파란 표시) 넘겨 보게 한다. 확정 하이라이트(주황)와 구분된다.
+  showCandidates(list, label) {
+    if (!this.doc) return;
+    this.hits = list.map(m => ({ page: pageOfMatch(this.doc, m), match: m })).filter(h => h.page != null);
+    this.hitIndex = this.hits.length ? 0 : -1; this.query = label || '출현 위치';
+    this.sbox.querySelector('input').value = ''; this.sbox.querySelector('input').placeholder = (label || '출현 위치') + ' 넘겨 보기';
+    if (this.hits.length) this.page = this.hits[0].page;
+    this.updateCount(); this.render('search');
+  }
   updateCount() {
     const n = this.hits.length;
     this.sbox.querySelector('.scount').textContent = n ? `${this.hitIndex + 1} / ${n}건` : this.query ? '결과 없음' : '';

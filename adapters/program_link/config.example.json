@@ -33,9 +33,9 @@
     "판단불가"
   ],
   "segment_dedupe_keys": [
-    "구조_id",
-    "사업명",
-    "레벨명"
+    "사업_id",
+    "레벨명",
+    "사업명"
   ],
   "locate": {
     "_doc": "확실한 위치만 '확인'. 아니면 '위치 확인 불가'와 이유. 추측 하이라이트 금지.",
@@ -49,6 +49,10 @@
       60,
       120
     ],
-    "budget_rule": "세부사업=title_unique; 내역사업=raw_prefix_unique"
-  }
+    "budget_rule": "세부사업=title_unique; 내역사업=raw_prefix_unique",
+    "projection_source": "D:/dev_eval_team/jh_dev/govparse-mvp-windows/govparse-mvp/docs/experiments/a1-a7/all_body_name_occurrences_v2/search_rules.py",
+    "projection_source_sha256": "4b53d6ad9cb15bd30dab16d6bed23b1b45f5c020baf16c767255cef97fa599b4",
+    "max_candidates": 40
+  },
+  "_doc_segment_dedupe": "2026-10-21 사용자 피드백(연결 검수 세션 경유): 같은 파일 안 같은 이름·레벨 노드가 다른 구조_id로 중복 저장 → (사업_id, 레벨명, 사업명)으로 한 탭. 이전 기준(구조_id·사업명·레벨명)은 25구획."
 }
