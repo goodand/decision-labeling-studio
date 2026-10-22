@@ -66,7 +66,7 @@ def main(config_path, out_path):
                 fpath = Path(I['budget_root']) / str(h['회계연도']) / f[0] if f else None
                 b['segments'][k] = {'구조_id': h['구조_id'], 'merged_구조_ids': [h['구조_id']], 'dup_rows': 0, '사업_id': h['사업_id'], '회계연도': h['회계연도'],
                                     '부처': h['부처'], '레벨명': h['레벨명'], '사업명': h['사업명'], '세부사업명': h['세부사업명'],
-                                    'title': f[1] if f else None, 'content': content, 'link_reason': e.get('reason'),
+                                    'title': f[1] if f else None, 'content': content, 'link_reason': e.get('reason'), 'via_former_name': bool(h.get('via_former_name')),
                                     'doc': doc(fpath, None, 'budget') if fpath else None}
     out = []
     for n, b in enumerate(sorted(businesses.values(), key=lambda x: x['search_name']), 1):

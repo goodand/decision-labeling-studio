@@ -2,11 +2,11 @@
   "_doc": "사업명 ↔ 예산서 구획 연결 검수 데이터셋 설정. 경로·규칙은 여기에만 둔다. 실제 값은 .local/에 복사해 쓴다.",
   "inputs": {
     "rows": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/step1/rows.json",
-    "links": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/run_007/v1b_endpoint_links.json",
+    "links": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/run_008/v1b_endpoint_links.json",
     "budget_db": "D:/dev_eval_team/전부처사업정보DB/build/budget_all.sqlite",
     "budget_root": "D:/dev_eval_team/전부처사업정보DB/all",
     "linker_module": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/linker_v1.py",
-    "segments": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/segments_run_007/segments.json"
+    "segments": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/segments_run_008/segments.json"
   },
   "row_ids": [
     "AUD-0017",

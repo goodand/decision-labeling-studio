@@ -75,6 +75,7 @@ async function showB() {
   const body = s.content.filter(c => c.목적 || c.내용);
   const tb = tabOfSeg(b, s.id);
   const meta = [el('div', {}, el('b', { textContent: `[${s.회계연도}] ${s.부처} · ${s.레벨명} · ` }), s.사업명),
+    s.via_former_name ? el('div', { className: 'merged-note', textContent: '옛 이름 표기로 연결된 구획(' + ((s.사업명.match(/[(（](舊[^)）]*)[)）]/) || [])[1] || '舊 명칭') + ') — 결과서 표기와 예산서 현재 이름이 다름' }) : null,
     tb.members.length > 1 ? el('div', { className: 'merged-note', title: '내부 번호 ' + tb.members.map(id => b.segments.find(x => x.id === id).merged_구조_ids.join(',')).join(' / '),
       textContent: `합친 구획: 같은 이름 세부·내역 병합${tb.scope_same ? ' · 범위 같음' : ''}${tb.admin_siblings.length ? ' (나머지 내역 = ' + tb.admin_siblings.join(', ') + ' 등 운영경비)' : ''}` }) : null,
     el('div', { className: 'opt' }, s.레벨명 === '세부사업' ? '예산서 파일의 세부사업(최상위 사업)' : '소속 세부사업: ' + (s.세부사업명 || '-')),
@@ -111,7 +112,7 @@ function renderBTabs() {
   const tabBtns = tabsOf(b).map(t => { const segs = t.members.map(id => b.segments.find(x => x.id === id)), x = segs[0], st = tabState(b, t.id);
     return el('button', { type: 'button', className: 'tab' + (t === cur ? ' on' : '') + (segs.some(y => y.locate.status === 'ok') ? '' : ' bad'),
       title: `${x.사업명}${t.members.length > 1 ? '\n같은 이름 세부·내역을 한 구획으로 합침' : ''}\n(내부 번호 ${segs.flatMap(y => y.merged_구조_ids).join(', ')})`,
-      textContent: `${x.회계연도} ${t.members.length > 1 ? '세부·내역' : x.레벨명}${st.status === 'conflict' ? ' ⚠' : st.choice ? ' ✓' : ''}`,
+      textContent: `${x.회계연도} ${t.members.length > 1 ? '세부·내역' : x.레벨명}${segs.some(y => y.via_former_name) ? ' (옛 이름)' : ''}${st.status === 'conflict' ? ' ⚠' : st.choice ? ' ✓' : ''}`,
       onclick: () => { ui.seg = b.segments.indexOf(x); showB(); renderJudge(); } }); });
   // 합친 탭 안에서 원본 위치를 세부/내역 중 골라 본다(판정은 탭 하나)
   const sub = cur.members.length > 1 ? cur.members.map(id => { const y = b.segments.find(z => z.id === id), i = b.segments.indexOf(y);
