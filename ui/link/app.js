@@ -53,9 +53,9 @@ function locLine(L, shown, pane) {
 
 async function showA() {
   const b = biz(), m = b.mentions[ui.mention], d = data.docs[m.doc];
-  $('a-tabs').replaceChildren(...b.mentions.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.mention ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
+  $('a-tabs').replaceChildren(...[...b.mentions.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.mention ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
     title: '눌러서 이 행의 결과서/의견서 원본으로 전환', textContent: `${x.row_id} · ${x.role}`, onclick: () => { ui.mention = i; showA(); } })),
-    b.mentions.length > 1 ? el('span', { className: 'muted', title: '탭(칩)을 누르면 원본이 바뀐다', textContent: `← 이 사업을 쓰는 행 ${b.mentions.length}개, 눌러서 원본 전환` }) : null);
+    b.mentions.length > 1 ? el('span', { className: 'muted', title: '탭(칩)을 누르면 원본이 바뀐다', textContent: `← 이 사업을 쓰는 행 ${b.mentions.length}개, 눌러서 원본 전환` }) : null].filter(Boolean));
   const meta = [el('div', {}, el('b', { textContent: '원래 표기: ' }), m.original),
     el('div', { className: m.scope || m.original !== b.search_name ? '' : 'opt' }, '정리된 이름: ', b.search_name, m.scope ? ' · 범위: ' + m.scope : ''), // 배치 2: 원래 표기와 같으면 뺀다
     m.administrative_metadata.length ? el('div', {}, '행정 표기: ', m.administrative_metadata.map(s => s.trim()).join(' | ')) : null,
