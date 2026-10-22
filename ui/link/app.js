@@ -63,16 +63,18 @@ async function showB() {
   if (!b.segments.length) { $('b-meta').textContent = '연결된 예산서 구획 없음'; return; }
   const s = b.segments[ui.seg], d = data.docs[s.doc];
   $('b-tabs').replaceChildren(...b.segments.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.seg ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
-    title: x.사업명, textContent: `${x.회계연도} ${x.레벨명}${votes[b.id + '/' + x.id] ? ' ✓' : ''}`, onclick: () => { ui.seg = i; showB(); renderJudge(); } })),
+    title: `${x.사업명}${x.merged_구조_ids.length > 1 ? `
+DB에 같은 구획이 ${x.merged_구조_ids.length}번 저장돼 있어 하나로 보여 줌` : ''}
+(내부 번호 ${x.merged_구조_ids.join(', ')})`, textContent: `${x.회계연도} ${x.레벨명}${votes[b.id + '/' + x.id] ? ' ✓' : ''}`, onclick: () => { ui.seg = i; showB(); renderJudge(); } })),
     b.segments.length > 1 ? el('span', { className: 'muted', title: '탭(칩)을 누르면 원본이 바뀐다', textContent: '← 눌러서 구획 전환' }) : null);
   const body = s.content.filter(c => c.목적 || c.내용);
   const meta = [el('div', {}, el('b', { textContent: `[${s.회계연도}] ${s.부처} · ${s.레벨명} · ` }), s.사업명),
-    el('div', { className: 'opt' }, '상위 세부사업: ', s.세부사업명 || '-', ' · 구조_id ', s.merged_구조_ids.join(', '), s.merged_구조_ids.length > 1 ? ` (같은 파일·이름·레벨 노드 ${s.merged_구조_ids.length}개를 한 탭으로 합침)` : ''),
+    el('div', { className: 'opt' }, s.레벨명 === '세부사업' ? '예산서 파일의 세부사업(최상위 사업)' : '소속 세부사업: ' + (s.세부사업명 || '-')),
     el('div', { className: 'muted opt', textContent: d.name }),
     body.length ? el('details', {}, el('summary', { textContent: '목적·내용 (DB)' }), body.map(c => el('pre', { textContent: [c.목적 && '목적: ' + c.목적, c.내용 && '내용: ' + c.내용].filter(Boolean).join('\n') })))
       : el('div', { className: 'muted opt', textContent: s.레벨명 === '세부사업' ? '목적·내용 없음(DB). 세부사업은 같은 파일의 내역사업 구획에 본문이 있을 수 있음.' : '목적·내용 없음(DB). 이 구획의 본문은 원본에서 직접 확인.' })];
   $('b-open').title = `${d.name}
-상위 세부사업: ${s.세부사업명 || '-'} · 구조_id ${s.구조_id}`; // 배치 2에서 뺀 줄은 버튼 툴팁으로
+${s.레벨명 === '세부사업' ? '세부사업(최상위)' : '소속 세부사업: ' + (s.세부사업명 || '-')}`; // 배치 2에서 뺀 줄은 버튼 툴팁으로
   $('b-meta').replaceChildren(...meta, el('div', { textContent: '위치 확인 중…', className: 'muted' }));
   resetOpen('b');
   const shown = await paneB.show(s.doc, s.locate.status === 'ok' ? s.locate : null);
@@ -122,7 +124,7 @@ $('toggle').onclick = () => document.body.classList.toggle('collapsed');
 // 칸 머리 배치 A/B 비교(?layout=1|2). 데이터·판정은 같고 칸 머리 배치만 다르다.
 const setLayout = n => { document.body.classList.remove('layout-1', 'layout-2'); document.body.classList.add('layout-' + n); $('layout').textContent = '배치 ' + n;
   const u = new URL(location.href); u.searchParams.set('layout', n); history.replaceState(null, '', u); };
-setLayout(new URLSearchParams(location.search).get('layout') === '2' ? 2 : 1);
+setLayout(new URLSearchParams(location.search).get('layout') === '1' ? 1 : 2); // 2026-10-22 사용자: 둘 다 통과, 가독성으로 배치 2 기본
 $('layout').onclick = () => setLayout(document.body.classList.contains('layout-1') ? 2 : 1);
 for (const side of ['a', 'b']) { $(side + '-open').onclick = () => openSource(side, 'file'); $(side + '-dir').onclick = () => openSource(side, 'directory'); }
 
