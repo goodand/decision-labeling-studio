@@ -42,21 +42,38 @@ def aggregate(choices, seg_ids, rules):
     return None, 'undefined', {'판정_조합': sorted(set(labels))}
 
 
+def tab_states(b, votes):
+    """병합 탭(세부·내역 같은 이름) 판정 = 구성 구획 판정에서 이어받기. 형식 불변 votes를 읽기만 한다.
+    none: 판정 없음 / own: 탭 자신의 판정만 / inherited: 구성 구획 판정이 모두 같음 / resolved: 탭에서 새로 저장해 이전 충돌을 덮음 / conflict: 구성 구획 판정이 다름(지우지 않음)."""
+    out = {}
+    for t in b.get('tabs') or [{'id': s['id'], 'members': [s['id']]} for s in b['segments']]:
+        mv = {m: votes[f"{b['id']}/{m}"] for m in t['members'] if f"{b['id']}/{m}" in votes}
+        members = {m: v['choice'] for m, v in mv.items()}
+        if not mv: st, ch = 'none', None
+        elif len(set(members.values())) == 1: st, ch = ('own' if list(mv) == [t['id']] else 'inherited'), next(iter(members.values()))
+        elif t['id'] in mv and mv[t['id']]['saved_at'] >= max(v['saved_at'] for v in mv.values()): st, ch = 'resolved', members[t['id']]
+        else: st, ch = 'conflict', None
+        out[t['id']] = {'choice': ch, 'status': st, 'members': members}
+    return out
+
+
 def derive(bid, ctx, saved):
-    b = ctx['businesses'][bid]; ids = [s['id'] for s in b['segments']]
-    ch = {k.split('/', 1)[1]: v['choice'] for k, v in saved['votes'].items() if '/' in k and k.split('/', 1)[0] == bid}
-    res, rule, detail = aggregate(ch, ids, ctx['data']['aggregate_rules'])
+    b = ctx['businesses'][bid]; tabs = tab_states(b, saved['votes']); ids = list(tabs)
+    ch = {k: t['choice'] for k, t in tabs.items() if t['choice']}
+    conflicts = [k for k, t in tabs.items() if t['status'] == 'conflict']
+    res, rule, detail = (None, 'conflict', {'충돌_탭': conflicts}) if conflicts else aggregate(ch, ids, ctx['data']['aggregate_rules'])
     legacy = saved['votes'].get(bid)  # 이전 방식(사람이 직접 입력한 사업 전체 판정)은 지우지 않고 대조만 한다
     return {'result': res, 'rule': rule, 'status': 'complete' if res else rule, 'detail': detail, 'judged': len(ch), 'segments': len(ids),
             'rules_version': ctx['data']['aggregate_rules']['version'], 'derived_by': 'code',
-            'legacy_human_choice': legacy['choice'] if legacy else None, 'legacy_differs': bool(legacy and res and legacy['choice'] != res)}
+            'tabs': tabs, 'legacy_human_choice': legacy['choice'] if legacy else None, 'legacy_differs': bool(legacy and res and legacy['choice'] != res)}
 
 
 def load_dataset(path):
     path = Path(path).resolve(); raw = path.read_bytes(); data = json.loads(raw.decode('utf-8'))
     if data.get('kind') != 'program_link' or not data.get('businesses'): raise ValueError('kind must be program_link with businesses')
     digest = hashlib.sha256(raw).hexdigest()
-    segs = {s['id']: b['id'] for b in data['businesses'] for s in b['segments']}
+    # 판정 대상은 탭(병합 구획이면 대표 구획 ID). 탭 정보가 없으면 구획마다 한 탭.
+    segs = {t['id']: b['id'] for b in data['businesses'] for t in (b.get('tabs') or [{'id': s['id']} for s in b['segments']])}
     return {'path': path, 'dataset_sha256': digest, 'input_sha256': digest, 'data': data,
             'businesses': {b['id']: b for b in data['businesses']}, 'segments': segs}
 

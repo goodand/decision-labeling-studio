@@ -48,3 +48,4 @@ body.layout-2 #a .meta,body.layout-2 #b .meta{display:flex;flex-direction:column
 .derived{background:#eef5ff;border:1px solid #c9dcf5;border-radius:6px;padding:8px;margin:8px 0;font-size:13px;line-height:1.5}
 .native-text-run::selection{background:rgba(45,120,230,.4);color:transparent} /* legacy.css 그대로 */
 @media(max-width:1100px){.pview{height:75vh;flex:none}} /* 좁은 화면(1열)에서도 원본은 고정 높이 안에서 스크롤 */
+.merged-note{font-size:12px;color:#1d4f91;background:#eef5ff;border-radius:4px;padding:2px 6px;margin:2px 0}.tab.sub{font-size:11px;padding:2px 6px;border-style:dashed}

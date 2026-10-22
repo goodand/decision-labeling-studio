@@ -25,6 +25,7 @@ def main(config_path, out_path):
     sys.path.insert(0, str(Path(I['linker_module']).parent))
     spec.loader.exec_module(linker)
     rows = {r['candidate_id']: r for r in json.loads(Path(I['rows']).read_text(encoding='utf-8'))}
+    seg_groups = {e['endpoint_name']: e.get('segments', []) for e in json.loads(Path(I['segments']).read_text(encoding='utf-8'))} if I.get('segments') else {}
     links = {e['endpoint_name']: e for e in json.loads(Path(I['links']).read_text(encoding='utf-8'))}
     db = sqlite3.connect(f"file:{Path(I['budget_db']).as_posix()}?mode=ro", uri=True)
     title_field = cfg['locate']['budget_title_field']
@@ -73,6 +74,18 @@ def main(config_path, out_path):
         segs = sorted(b['segments'].values(), key=lambda s: (s['회계연도'], s['레벨명'] != '세부사업', s['구조_id']))
         for i, s in enumerate(segs, 1): s['id'] = f"{b['id']}-S{i:02d}"
         b['segments'] = segs
+        # 탭 = 판정 단위. segments.json(segments.py merge_segments 결과)의 한 구획에 구조_id가 모두 들어가는 구획들을 한 탭으로 묶는다.
+        groups = [g for m in b['mentions'] for g in seg_groups.get(m['original'], [])]
+        tabs, used = [], set()
+        for s in segs:
+            if s['id'] in used: continue
+            g = next((g for g in groups if set(s['merged_구조_ids']) <= set(g['구조_ids'])), None)
+            members = [x['id'] for x in segs if g and set(x['merged_구조_ids']) <= set(g['구조_ids'])] or [s['id']]
+            used.update(members)
+            tabs.append({'id': members[0], 'members': members, 'merged_same_name': bool(g and g.get('merged_same_name')),
+                         'scope_same': g.get('scope_same') if g else None, 'admin_siblings': g.get('admin_siblings', []) if g else [],
+                         'other_siblings': g.get('other_siblings', []) if g else []})
+        b['tabs'] = tabs
         out.append(b)
     data = {'kind': 'program_link', 'question': cfg['question'], 'choices': cfg['choices'], 'note_required_for': cfg['note_required_for'],
             'inputs': {k: {'path': v, 'sha256': sha(v) if Path(v).is_file() else None} for k, v in I.items() if k != 'budget_root'},
@@ -82,7 +95,7 @@ def main(config_path, out_path):
             'projection_check': {n: linker.projection(n) for n in sorted({x for b in out for x in [b['search_name']] + [m['original'] for m in b['mentions']] + [s['사업명'] for s in b['segments']] + [s['title'] or '' for s in b['segments']]})}}
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     Path(out_path).write_text(json.dumps(data, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
-    print(json.dumps({'businesses': len(out), 'segments': sum(len(b['segments']) for b in out), 'docs': len(docs),
+    print(json.dumps({'businesses': len(out), 'segments': sum(len(b['segments']) for b in out), 'tabs': sum(len(b['tabs']) for b in out), 'docs': len(docs),
                       'budget_docs': sum(d['kind'] == 'budget' for d in docs.values()), 'doc_problems': [d['name'] for d in docs.values() if d['status'] != 'ok']}, ensure_ascii=False))
 
 

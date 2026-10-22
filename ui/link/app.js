@@ -8,8 +8,12 @@ const votes = votes0 || {};
 // 사업 전체 판정은 사람이 입력하지 않는다: 구획 판정에서 서버가 설정 규칙(aggregate_rules)으로 계산한 표시용 값(저장 안 함)
 let derived = await fetch('/api/derived').then(r => r.json());
 const refreshDerived = async () => { derived = await fetch('/api/derived').then(r => r.json()); };
-const segDone = b => b.segments.filter(s => votes[b.id + '/' + s.id]).length;
-const complete = b => b.segments.length > 0 && segDone(b) === b.segments.length;
+// 판정 단위 = 탭. 같은 이름 세부·내역 병합(segments_run_007)이면 여러 구획이 한 탭. 탭 판정 상태(이어받기·충돌)는 서버 계산값.
+const tabsOf = b => b.tabs || b.segments.map(s => ({ id: s.id, members: [s.id] }));
+const tabOfSeg = (b, sid) => tabsOf(b).find(t => t.members.includes(sid));
+const tabState = (b, tid) => ((derived[b.id] || {}).tabs || {})[tid] || { status: 'none', members: {} };
+const segDone = b => tabsOf(b).filter(t => tabState(b, t.id).choice).length;
+const complete = b => tabsOf(b).length > 0 && segDone(b) === tabsOf(b).length;
 const paneA = new HwpPane($('a-pane')), paneB = new HwpPane($('b-pane'));
 for (const side of ['a', 'b']) $(side + '-open').before($(side + '-pane').querySelector('.psearch')); // 기존 화면처럼 '원본 열기' 왼쪽에 원문 찾기
 for (const side of ['a', 'b']) $(side + '-open-st').after($(side + '-pane').querySelector('.pbar')); // 쪽 이동·확대도 같은 줄로(헤더 높이 줄이기)
@@ -33,7 +37,7 @@ function renderList() {
   });
   $('items').replaceChildren(...(shown.length ? [] : [el('p', { className: 'none', textContent: '조건에 맞는 사업 없음' })]), ...shown.map(b => el('button', { type: 'button', className: b.id === ui.b ? 'on' : '', onclick: () => open(b.id) },
     `${b.id} ${b.search_name}`,
-    el('small', { textContent: `표기 ${b.mentions.length} · 구획 ${b.segments.length} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length} · 판정 ${segDone(b)}/${b.segments.length}구획${derived[b.id] && derived[b.id].result ? ' → ' + derived[b.id].result : ''}` }))));
+    el('small', { textContent: `표기 ${b.mentions.length} · 구획 ${b.segments.length} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length} · 판정 ${segDone(b)}/${tabsOf(b).length}탭${derived[b.id] && derived[b.id].result ? ' → ' + derived[b.id].result : ''}` }))));
 }
 
 function locLine(L, shown, pane) {
@@ -67,23 +71,22 @@ async function showB() {
   const b = biz();
   if (!b.segments.length) { $('b-meta').textContent = '연결된 예산서 구획 없음'; return; }
   const s = b.segments[ui.seg], d = data.docs[s.doc];
-  $('b-tabs').replaceChildren(...b.segments.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.seg ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
-    title: `${x.사업명}${x.merged_구조_ids.length > 1 ? `
-DB에 같은 구획이 ${x.merged_구조_ids.length}번 저장돼 있어 하나로 보여 줌` : ''}
-(내부 번호 ${x.merged_구조_ids.join(', ')})`, textContent: `${x.회계연도} ${x.레벨명}${votes[b.id + '/' + x.id] ? ' ✓' : ''}`, onclick: () => { ui.seg = i; showB(); renderJudge(); } })),
-    b.segments.length > 1 ? el('span', { className: 'muted', title: '탭(칩)을 누르면 원본이 바뀐다', textContent: '← 눌러서 구획 전환' }) : null);
+  renderBTabs();
   const body = s.content.filter(c => c.목적 || c.내용);
+  const tb = tabOfSeg(b, s.id);
   const meta = [el('div', {}, el('b', { textContent: `[${s.회계연도}] ${s.부처} · ${s.레벨명} · ` }), s.사업명),
+    tb.members.length > 1 ? el('div', { className: 'merged-note', title: '내부 번호 ' + tb.members.map(id => b.segments.find(x => x.id === id).merged_구조_ids.join(',')).join(' / '),
+      textContent: `합친 구획: 같은 이름 세부·내역 병합${tb.scope_same ? ' · 범위 같음' : ''}${tb.admin_siblings.length ? ' (나머지 내역 = ' + tb.admin_siblings.join(', ') + ' 등 운영경비)' : ''}` }) : null,
     el('div', { className: 'opt' }, s.레벨명 === '세부사업' ? '예산서 파일의 세부사업(최상위 사업)' : '소속 세부사업: ' + (s.세부사업명 || '-')),
     el('div', { className: 'muted opt', textContent: d.name }),
     body.length ? el('details', {}, el('summary', { textContent: '목적·내용 (DB)' }), body.map(c => el('pre', { textContent: [c.목적 && '목적: ' + c.목적, c.내용 && '내용: ' + c.내용].filter(Boolean).join('\n') })))
       : el('div', { className: 'muted opt', textContent: s.레벨명 === '세부사업' ? '목적·내용 없음(DB). 세부사업은 같은 파일의 내역사업 구획에 본문이 있을 수 있음.' : '목적·내용 없음(DB). 이 구획의 본문은 원본에서 직접 확인.' })];
   $('b-open').title = `${d.name}
 ${s.레벨명 === '세부사업' ? '세부사업(최상위)' : '소속 세부사업: ' + (s.세부사업명 || '-')}`; // 배치 2에서 뺀 줄은 버튼 툴팁으로
-  $('b-meta').replaceChildren(...meta, el('div', { textContent: '위치 확인 중…', className: 'muted' }));
+  $('b-meta').replaceChildren(...meta.filter(Boolean), el('div', { textContent: '위치 확인 중…', className: 'muted' }));
   resetOpen('b');
   const shown = await paneB.show(s.doc, s.locate.status === 'ok' ? s.locate : null);
-  $('b-meta').replaceChildren(...meta, shown && shown.rendered === false ? el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + shown.error }) : locLine(s.locate, shown, paneB));
+  $('b-meta').replaceChildren(...meta.filter(Boolean), shown && shown.rendered === false ? el('div', { className: 'loc bad', textContent: '원본 표시 불가 — ' + shown.error }) : locLine(s.locate, shown, paneB));
 }
 
 function choiceSet(key, title) {
@@ -103,7 +106,20 @@ function choiceSet(key, title) {
   } });
   return el('fieldset', {}, el('legend', { textContent: title }), radios, note, el('div', {}, save), msg);
 }
-function showBTabsOnly() { const b = biz(); document.querySelectorAll('#b-tabs .tab').forEach((t, i) => { t.textContent = `${b.segments[i].회계연도} ${b.segments[i].레벨명}${votes[b.id + '/' + b.segments[i].id] ? ' ✓' : ''}`; }); }
+function renderBTabs() {
+  const b = biz(), cur = tabOfSeg(b, b.segments[ui.seg].id);
+  const tabBtns = tabsOf(b).map(t => { const segs = t.members.map(id => b.segments.find(x => x.id === id)), x = segs[0], st = tabState(b, t.id);
+    return el('button', { type: 'button', className: 'tab' + (t === cur ? ' on' : '') + (segs.some(y => y.locate.status === 'ok') ? '' : ' bad'),
+      title: `${x.사업명}${t.members.length > 1 ? '\n같은 이름 세부·내역을 한 구획으로 합침' : ''}\n(내부 번호 ${segs.flatMap(y => y.merged_구조_ids).join(', ')})`,
+      textContent: `${x.회계연도} ${t.members.length > 1 ? '세부·내역' : x.레벨명}${st.status === 'conflict' ? ' ⚠' : st.choice ? ' ✓' : ''}`,
+      onclick: () => { ui.seg = b.segments.indexOf(x); showB(); renderJudge(); } }); });
+  // 합친 탭 안에서 원본 위치를 세부/내역 중 골라 본다(판정은 탭 하나)
+  const sub = cur.members.length > 1 ? cur.members.map(id => { const y = b.segments.find(z => z.id === id), i = b.segments.indexOf(y);
+    return el('button', { type: 'button', className: 'tab sub' + (i === ui.seg ? ' on' : ''), title: y.레벨명 + ' 위치로 원본 이동', textContent: y.레벨명 + ' 위치', onclick: () => { ui.seg = i; showB(); } }); }) : [];
+  $('b-tabs').replaceChildren(...[...tabBtns, ...sub, tabsOf(b).length > 1 ? el('span', { className: 'muted', title: '탭(칩)을 누르면 원본이 바뀐다', textContent: '← 눌러서 구획 전환' }) : null].filter(Boolean));
+}
+function showBTabsOnly() { renderBTabs(); }
+function _oldShowBTabsOnly() { const b = biz(); document.querySelectorAll('#b-tabs .tab').forEach((t, i) => { t.textContent = `${b.segments[i].회계연도} ${b.segments[i].레벨명}${votes[b.id + '/' + b.segments[i].id] ? ' ✓' : ''}`; }); }
 
 function derivedBox(b) {
   const d = derived[b.id] || {}, R = (data.aggregate_rules || { rules: [] }).rules.find(r => r.id === d.rule);
@@ -114,10 +130,12 @@ function derivedBox(b) {
     el('div', { className: 'muted', textContent: `규칙 ${d.rules_version || '-'} · 저장되지 않는 표시용 값` }));
 }
 function renderJudge() {
-  const b = biz(), s = b.segments[ui.seg];
+  const b = biz(), s = b.segments[ui.seg], t = s && tabOfSeg(b, s.id), st = t ? tabState(b, t.id) : null;
   $('judge').replaceChildren(...[el('h2', { textContent: b.id + ' ' + b.search_name }), el('div', { className: 'q', textContent: data.question }),
-    s ? choiceSet(b.id + '/' + s.id, `[${s.회계연도} ${s.레벨명}] ${s.사업명} — 결과서의 사업과 같은 사업인가?`) : null,
-    el('p', { className: 'muted', textContent: `모든 탭(구획)을 판정해야 사업이 완료된다. 지금 ${segDone(b)}/${b.segments.length}구획 판정. 다른 구획은 B의 탭을 눌러 바꾼다.` }),
+    s ? choiceSet(b.id + '/' + t.id, `[${s.회계연도} ${t.members.length > 1 ? '세부·내역' : s.레벨명}] ${s.사업명} — 결과서의 사업과 같은 사업인가?`) : null,
+    st && st.status === 'inherited' ? el('p', { className: 'muted', textContent: '합친 구획의 이전 판정을 이어받음: ' + Object.entries(st.members).map(([k, v]) => k + ' ' + v).join(', ') }) : null,
+    st && (st.status === 'conflict' || st.status === 'resolved') ? el('p', { className: st.status === 'conflict' ? 'err' : 'muted', textContent: (st.status === 'conflict' ? '판정 충돌 — 합치기 전 구획 판정이 다름(지우지 않음): ' : '이전 충돌을 새 판정으로 정리함. 이전 기록: ') + Object.entries(st.members).map(([k, v]) => k + ' ' + v).join(', ') + (st.status === 'conflict' ? '. 위에서 다시 판정해 저장하면 정리된다.' : '') }) : null,
+    el('p', { className: 'muted', textContent: `모든 탭(구획)을 판정해야 사업이 완료된다. 지금 ${segDone(b)}/${tabsOf(b).length}탭 판정. 다른 구획은 B의 탭을 눌러 바꾼다.` }),
     derivedBox(b),
     votes[b.id] ? el('p', { className: 'muted', textContent: `이전 방식 기록(사람이 직접 입력한 사업 전체 판정, 보존만 함): ${votes[b.id].choice} · ${votes[b.id].saved_at}` }) : null,
     el('p', { className: 'muted', textContent: '판정은 연결 결과 파일과 별도의 votes 파일에만 저장된다.' })].filter(Boolean)); // 빈 줄(null)이 'null' 글자로 보이지 않게

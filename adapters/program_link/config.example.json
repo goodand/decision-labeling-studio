@@ -5,7 +5,8 @@
     "links": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/run_007/v1b_endpoint_links.json",
     "budget_db": "D:/dev_eval_team/전부처사업정보DB/build/budget_all.sqlite",
     "budget_root": "D:/dev_eval_team/전부처사업정보DB/all",
-    "linker_module": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/linker_v1.py"
+    "linker_module": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/linker_v1.py",
+    "segments": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/segments_run_007/segments.json"
   },
   "row_ids": [
     "AUD-0017",
@@ -107,5 +108,6 @@
         }
       }
     ]
-  }
+  },
+  "_doc_tabs": "2026-10-22 사용자 결정(연결 검수 세션 경유): 같은 예산서 파일의 같은 이름 세부·내역은 한 구획. 병합은 program_mapping_nlp_v1/segments.py(merge_segments) 결과 segments.json을 읽기만 함(규칙 재구현 없음)."
 }

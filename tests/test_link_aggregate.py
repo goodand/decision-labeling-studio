@@ -75,4 +75,30 @@ class SegmentVotes(unittest.TestCase):
         self.assertEqual((d['result'], d['rule'], d['rules_version']), ('부분일치', 'R3', RULES['version']))
         self.assertNotIn('B01', json.loads(self.votes.read_text(encoding='utf-8'))['votes'])
 
+class MergedTabs(unittest.TestCase):
+    """같은 이름 세부·내역 병합 탭(segments_run_007): 판정 이어받기·충돌·해소. votes 형식 불변."""
+    def v(self, choice, t): return {'choice': choice, 'saved_at': t}
+    def setUp(self):
+        self.b = {'id': 'B08', 'segments': [{'id': 'B08-S01'}, {'id': 'B08-S02'}, {'id': 'B08-S03'}],
+                  'tabs': [{'id': 'B08-S01', 'members': ['B08-S01', 'B08-S02']}, {'id': 'B08-S03', 'members': ['B08-S03']}]}
+    def test_inherit_same(self):
+        t = ls.tab_states(self.b, {'B08/B08-S01': self.v('일치', '1'), 'B08/B08-S02': self.v('일치', '2')})
+        self.assertEqual((t['B08-S01']['choice'], t['B08-S01']['status']), ('일치', 'inherited'))
+        self.assertEqual(t['B08-S03']['status'], 'none')
+    def test_conflict_kept(self):
+        t = ls.tab_states(self.b, {'B08/B08-S01': self.v('일치', '1'), 'B08/B08-S02': self.v('불일치', '2')})
+        self.assertEqual((t['B08-S01']['choice'], t['B08-S01']['status']), (None, 'conflict'))
+        self.assertEqual(t['B08-S01']['members'], {'B08-S01': '일치', 'B08-S02': '불일치'})
+    def test_resolved_by_newer_tab_save(self):
+        t = ls.tab_states(self.b, {'B08/B08-S02': self.v('불일치', '1'), 'B08/B08-S01': self.v('일치', '3')})
+        self.assertEqual((t['B08-S01']['choice'], t['B08-S01']['status']), ('일치', 'resolved'))
+    def test_single_member_partial_inherit(self):
+        t = ls.tab_states(self.b, {'B08/B08-S01': self.v('일치', '1')})
+        self.assertEqual((t['B08-S01']['choice'], t['B08-S01']['status']), ('일치', 'own'))
+    def test_business_over_tabs(self):
+        t = ls.tab_states(self.b, {'B08/B08-S01': self.v('일치', '1'), 'B08/B08-S03': self.v('일치', '2')})
+        ch = {k: x['choice'] for k, x in t.items() if x['choice']}
+        self.assertEqual(ls.aggregate(ch, [x['id'] for x in self.b['tabs']], RULES)[:2], ('일치', 'R1'))
+
+
 if __name__ == '__main__': unittest.main()
