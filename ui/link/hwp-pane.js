@@ -4,7 +4,18 @@ import init, { HwpDocument } from '/rhwp/rhwp.js';
 import { pageOfMatch } from '/hwp_locate.js';
 
 const J = s => { try { return JSON.parse(s); } catch { return null; } };
-let ready = null, activePane = null;
+let ready = null, activePane = null, selectingText = false;
+// 원본에서 복사(rhwp-viewer.js L230-240 그대로, 단 두 패널의 텍스트 레이어 중 선택이 들어 있는 쪽을 찾는다)
+document.addEventListener('pointerup', () => { selectingText = false });
+document.addEventListener('pointercancel', () => { selectingText = false });
+document.addEventListener('copy', event => {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || !selection.rangeCount) return;
+  const layer = [...document.querySelectorAll('.native-text-layer')].find(l => l.contains(selection.anchorNode));
+  if (!layer || !layer.contains(selection.anchorNode) || !layer.contains(selection.focusNode)) return;
+  const fragment = selection.getRangeAt(0).cloneContents();
+  if (event.clipboardData) { event.clipboardData.setData('text/plain', fragment.textContent); event.preventDefault() }
+});
 const docs = new Map(); // doc id → Promise<HwpDocument>
 function engine() {
   return ready ??= (globalThis.measureTextWidth = (font, text) => { const c = document.createElement('canvas').getContext('2d'); c.font = font; return c.measureText(text).width; },
@@ -51,6 +62,56 @@ export class HwpPane {
     this.sbox.querySelector('[data-a=sprev]').onclick = () => this.moveHit(-1);
     this.sbox.querySelector('[data-a=snext]').onclick = () => this.moveHit(1);
     this.updateCount();
+    // 휠: 쪽 안에서는 스크롤, 위/아래 끝에서 굴리면 앞/뒤 쪽(rhwp-viewer.js L212-229 그대로, 대상만 이 패널)
+    const view = host.querySelector('.pview'); let wheelBusy = false;
+    view.addEventListener('wheel', event => {
+      if (!this.doc) return;
+      event.stopPropagation();
+      if (wheelBusy) { event.preventDefault(); return; }
+      if (selectingText) return;
+      const viewport = event.currentTarget;
+      const atBottom = viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 3;
+      const atTop = viewport.scrollTop <= 3;
+      const forward = event.deltaY > 0 && atBottom && this.page < this.doc.pageCount() - 1;
+      const backward = event.deltaY < 0 && atTop && this.page > 0;
+      if (!forward && !backward) return;
+      event.preventDefault(); wheelBusy = true; this.page += forward ? 1 : -1; this.render('wheel');
+      const image = host.querySelector('.ppage img');
+      const position = () => { viewport.scrollTop = forward ? 0 : viewport.scrollHeight - viewport.clientHeight };
+      image.addEventListener('load', position, { once: true });
+      if (image.complete) position();
+      setTimeout(() => { wheelBusy = false }, 450);
+    }, { passive: false });
+    host.querySelector('.ppage').addEventListener('pointerdown', event => { selectingText = !!event.target.closest('.native-text-layer') });
+  }
+  // Author: chatgpt_gpt6 (rhwp-viewer.js L15-42). Copy native text, never OCR or normalized text. doc/page/textObserver만 패널 소속으로 바꿈.
+  renderSelectableText(holder, info) {
+    if (!info.width || !info.height) return;
+    const runs = (J(this.doc.getPageTextLayout(this.page))?.runs || []).filter(r => r.text);
+    const layer = document.createElement('div'); layer.className = 'native-text-layer';
+    Object.assign(layer.style, { position: 'absolute', left: '0', top: '0', width: `${info.width}px`, height: `${info.height}px`, transformOrigin: 'top left', pointerEvents: 'none', zIndex: '4', userSelect: 'text' });
+    const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
+    let previous = null;
+    for (const run of runs) {
+      if (![run.x, run.y, run.w, run.h].every(Number.isFinite)) continue;
+      if (previous) {
+        const sameLine = Math.abs(run.y - previous.y) < Math.min(run.h, previous.h) * 0.4;
+        const sameCell = JSON.stringify(run.cellPath) === JSON.stringify(previous.cellPath) && run.parentParaIdx === previous.parentParaIdx;
+        const separator = document.createElement('span');
+        separator.textContent = sameLine && sameCell ? '' : '\n';
+        Object.assign(separator.style, { position: 'absolute', whiteSpace: 'pre', color: 'transparent', fontSize: '1px' }); layer.append(separator);
+      }
+      const span = document.createElement('span'); span.className = 'native-text-run'; span.textContent = run.text;
+      const size = run.fontSize || run.h;
+      Object.assign(span.style, { position: 'absolute', left: `${run.x}px`, top: `${run.y}px`, height: `${run.h}px`, fontFamily: run.fontFamily || 'serif', fontSize: `${size}px`, fontWeight: run.bold ? 'bold' : 'normal', fontStyle: run.italic ? 'italic' : 'normal', lineHeight: `${run.h}px`, whiteSpace: 'pre', color: 'transparent', cursor: 'text', pointerEvents: 'auto', userSelect: 'text', transformOrigin: 'left top' });
+      ctx.font = `${run.italic ? 'italic ' : ''}${run.bold ? 'bold ' : ''}${size}px "${run.fontFamily || 'serif'}"`;
+      const measured = ctx.measureText(run.text).width;
+      if (measured > 0 && run.w > 0) span.style.transform = `scaleX(${run.w / measured})`;
+      layer.append(span); previous = run;
+    }
+    holder.append(layer);
+    const resize = () => { layer.style.transform = `scale(${holder.clientWidth / info.width})` };
+    this.textObserver = new ResizeObserver(resize); this.textObserver.observe(holder); resize();
   }
   // located: {match} 이면 그 위치의 쪽으로 가서 강조. 아니면 1쪽을 보여 주고 강조하지 않는다.
   async show(docId, located) {
@@ -120,7 +181,7 @@ export class HwpPane {
     const count = doc.pageCount(); this.page = Math.min(Math.max(this.page, 0), count - 1);
     this.bar.querySelector('.pg').textContent = (this.page + 1) + ' / ' + count + '쪽';
     this.bar.querySelector('[data-a=prev]').disabled = this.page <= 0; this.bar.querySelector('[data-a=next]').disabled = this.page >= count - 1;
-    const holder = this.host.querySelector('.ppage'); holder.replaceChildren();
+    const holder = this.host.querySelector('.ppage'); holder.replaceChildren(); this.textObserver?.disconnect();
     if (this.url) URL.revokeObjectURL(this.url);
     this.url = URL.createObjectURL(new Blob([doc.renderPageSvg(this.page)], { type: 'image/svg+xml' }));
     const img = document.createElement('img'); img.src = this.url; img.alt = 'HWP 원본 ' + (this.page + 1) + '쪽'; img.draggable = false; holder.append(img);
@@ -129,6 +190,7 @@ export class HwpPane {
     const runs = (J(doc.getPageTextLayout(this.page)) || {}).runs || [];
     if (this.mark) { const t = this.draw(holder, info, runs, this.mark, 'hl'); if (focus === 'show') this.context = t; }
     this.hits.forEach((h, i) => { if (h.page === this.page) this.draw(holder, info, runs, h.match, 'sh' + (i === this.hitIndex ? ' cur' : '')); });
+    this.renderSelectableText(holder, info); // 글자 드래그 → Ctrl+C 복사
     this.applyZoom(focus);
   }
 }

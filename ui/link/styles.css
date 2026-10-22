@@ -46,3 +46,5 @@ body.layout-2 #a .meta,body.layout-2 #b .meta{display:flex;flex-direction:column
 .phead .tabs{flex-shrink:0;overflow:visible} /* 탭은 줄이지 않고(잘림·숨은 스크롤바 방지) 안내 문구만 … 로 줄인다 */
 .phead>strong{flex-shrink:0;white-space:nowrap} /* 칸 제목도 줄이지 않는다 */
 .derived{background:#eef5ff;border:1px solid #c9dcf5;border-radius:6px;padding:8px;margin:8px 0;font-size:13px;line-height:1.5}
+.native-text-run::selection{background:rgba(45,120,230,.4);color:transparent} /* legacy.css 그대로 */
+@media(max-width:1100px){.pview{height:75vh;flex:none}} /* 좁은 화면(1열)에서도 원본은 고정 높이 안에서 스크롤 */
