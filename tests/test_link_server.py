@@ -51,11 +51,12 @@ class LinkTests(unittest.TestCase):
         self.assertEqual(v(choice='유사중복 있음'), 400)
         self.assertEqual(v(choice='부분일치'), 400)            # 설명 필요
         self.assertEqual(v(segment_id='B02-S01'), 400)          # 다른 사업의 구획
-        self.assertEqual(v(), 200)
+        self.assertEqual(v(), 400)                               # 사업 전체는 사람이 입력하지 않는다(구획 판정에서 계산)
+        self.assertEqual(v(segment_id='B01-S01'), 200)
         self.assertEqual(v(segment_id='B01-S01', choice='판단불가', note='2025 구획 범위 불명'), 200)
         saved = json.loads(self.votes.read_text(encoding='utf-8'))['votes']
-        self.assertEqual(set(saved), {'B01', 'B01/B01-S01'})
-        self.assertEqual(saved['B01']['decided_by'], 'human')
+        self.assertEqual(set(saved), {'B01/B01-S01'})
+        self.assertEqual(saved['B01/B01-S01']['decided_by'], 'human')
         self.assertNotEqual(self.votes, self.dataset)
 
     def test_open_and_origin(self):

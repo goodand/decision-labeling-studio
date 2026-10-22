@@ -25,6 +25,33 @@ STATIC = {'/': (UI, 'index.html'), '/index.html': (UI, 'index.html'), '/app.js':
 MIME = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.wasm': 'application/wasm'}
 
 
+def _cond(count, n, spec):
+    if spec == 'all': return count == n
+    op, v = spec[:2], int(spec[2:])
+    return {'>=': count >= v, '==': count == v, '<=': count <= v}[op]
+
+
+def aggregate(choices, seg_ids, rules):
+    """사업 전체 판정 = 구획별 Human 판정에서 계산(설정 aggregate_rules, 위에서부터 첫 일치). 반환 (결과|None, 규칙 id|'incomplete'|'undefined', 상세)."""
+    missing = [s for s in seg_ids if s not in choices]
+    if missing: return None, 'incomplete', {'미판정_구획': missing}
+    labels = [choices[s] for s in seg_ids]; n = len(labels)
+    for r in rules['rules']:
+        if all(_cond(sum(labels.count(x) for x in k.split('+')), n, v) for k, v in r['require'].items()):
+            return r['result'], r['id'], ({r['record'] + '_구획': [s for s in seg_ids if choices[s] == r['record']]} if r.get('record') else {})
+    return None, 'undefined', {'판정_조합': sorted(set(labels))}
+
+
+def derive(bid, ctx, saved):
+    b = ctx['businesses'][bid]; ids = [s['id'] for s in b['segments']]
+    ch = {k.split('/', 1)[1]: v['choice'] for k, v in saved['votes'].items() if '/' in k and k.split('/', 1)[0] == bid}
+    res, rule, detail = aggregate(ch, ids, ctx['data']['aggregate_rules'])
+    legacy = saved['votes'].get(bid)  # 이전 방식(사람이 직접 입력한 사업 전체 판정)은 지우지 않고 대조만 한다
+    return {'result': res, 'rule': rule, 'status': 'complete' if res else rule, 'detail': detail, 'judged': len(ch), 'segments': len(ids),
+            'rules_version': ctx['data']['aggregate_rules']['version'], 'derived_by': 'code',
+            'legacy_human_choice': legacy['choice'] if legacy else None, 'legacy_differs': bool(legacy and res and legacy['choice'] != res)}
+
+
 def load_dataset(path):
     path = Path(path).resolve(); raw = path.read_bytes(); data = json.loads(raw.decode('utf-8'))
     if data.get('kind') != 'program_link' or not data.get('businesses'): raise ValueError('kind must be program_link with businesses')
@@ -61,6 +88,8 @@ def make_server(dataset, votes, rhwp, port=0, opener=None):
                 u = urlsplit(self.path); path = u.path
                 if path == '/api/dataset': return self.send(200, ctx['data'])
                 if path == '/api/votes': return self.send(200, studio.read_votes(votes, ctx)['votes'])
+                if path == '/api/derived':
+                    saved = studio.read_votes(votes, ctx); return self.send(200, {bid: derive(bid, ctx, saved) for bid in ctx['businesses']})
                 if path == '/api/doc': return self.send(200, self.doc(parse_qs(u.query).get('id', [''])[0]).read_bytes(), 'application/octet-stream')
                 if path in ('/rhwp/rhwp.js', '/rhwp/rhwp_bg.wasm'):
                     if not rhwp: return self.send(404, {'error': 'Start with --rhwp <@rhwp/core directory>'})
@@ -89,17 +118,17 @@ def make_server(dataset, votes, rhwp, port=0, opener=None):
                     except OSError as e: return self.send(500, {'error': '열기 실패: ' + str(e)})
                     return self.send(200, {'opened': d['target'], 'path': str(target)})
                 bid, sid = d.get('business_id'), d.get('segment_id')
-                if bid not in ctx['businesses'] or (sid is not None and ctx['segments'].get(sid) != bid): raise ValueError('잘못된 검수 항목')
+                if bid not in ctx['businesses'] or ctx['segments'].get(sid) != bid: raise ValueError('구획(탭) 단위로만 판정한다. 사업 전체는 구획 판정에서 계산된다')
                 choice, note = d.get('choice'), d.get('note', '')
                 if choice not in ctx['data']['choices'] or not isinstance(note, str) or len(note) > 4000: raise ValueError('잘못된 선택지')
                 if choice in ctx['data']['note_required_for'] and not note.strip(): raise ValueError(choice + '는 설명(연도·범위·구획) 필요')
                 if studio.digest(ctx['path']) != ctx['dataset_sha256']: return self.send(409, {'error': 'Dataset changed; restart with a new --votes'})
-                key = bid if sid is None else f'{bid}/{sid}'
+                key = f'{bid}/{sid}'
                 rec = {'business_id': bid, 'segment_id': sid, 'choice': choice, 'note': note.strip(), 'decided_by': 'human',
                        'submitted_via': 'local_review_ui', 'saved_at': datetime.now(timezone.utc).isoformat(),
-                       'dataset_sha256': ctx['dataset_sha256']}
+                       'dataset_sha256': ctx['dataset_sha256']}  # 형식은 기존 그대로(2026-10-22 사용자 정정: 스키마 변경 금지)
                 with lock:
-                    saved = studio.read_votes(votes, ctx); saved['votes'][key] = rec; studio.atomic_save(votes, saved)
+                    saved = studio.read_votes(votes, ctx); saved['votes'][key] = rec; studio.atomic_save(votes, saved)  # 사업 전체는 저장하지 않고 /api/derived 에서 표시용으로만 계산
                 self.send(200, rec)
             except KeyError as e: self.send(404, {'error': str(e)})
             except (OSError, ValueError, TypeError) as e: self.send(400, {'error': str(e)})

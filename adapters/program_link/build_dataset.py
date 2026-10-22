@@ -77,7 +77,7 @@ def main(config_path, out_path):
     data = {'kind': 'program_link', 'question': cfg['question'], 'choices': cfg['choices'], 'note_required_for': cfg['note_required_for'],
             'inputs': {k: {'path': v, 'sha256': sha(v) if Path(v).is_file() else None} for k, v in I.items() if k != 'budget_root'},
             'config': {'path': str(Path(config_path).resolve()), 'sha256': sha(config_path)},
-            'locate_rules': cfg['locate'], 'docs': docs, 'businesses': out,
+            'locate_rules': cfg['locate'], 'aggregate_rules': cfg['aggregate_rules'], 'docs': docs, 'businesses': out,
             # JS 위치 판정이 search_rules.projection을 그대로 옮겼는지 확인할 대조표(linker가 sha256 검증 후 로드한 원 함수의 결과)
             'projection_check': {n: linker.projection(n) for n in sorted({x for b in out for x in [b['search_name']] + [m['original'] for m in b['mentions']] + [s['사업명'] for s in b['segments']] + [s['title'] or '' for s in b['segments']]})}}
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)

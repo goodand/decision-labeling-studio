@@ -45,3 +45,4 @@ body.layout-1{--meta-h:calc(6 * 1.55em)}body.layout-2{--meta-h:calc(3 * 1.55em +
 body.layout-2 #a .meta,body.layout-2 #b .meta{display:flex;flex-direction:column}
 .phead .tabs{flex-shrink:0;overflow:visible} /* 탭은 줄이지 않고(잘림·숨은 스크롤바 방지) 안내 문구만 … 로 줄인다 */
 .phead>strong{flex-shrink:0;white-space:nowrap} /* 칸 제목도 줄이지 않는다 */
+.derived{background:#eef5ff;border:1px solid #c9dcf5;border-radius:6px;padding:8px;margin:8px 0;font-size:13px;line-height:1.5}

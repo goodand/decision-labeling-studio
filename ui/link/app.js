@@ -5,6 +5,11 @@ const $ = id => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids.flat().filter(k => k != null)); return e; };
 const [data, votes0] = await Promise.all([fetch('/api/dataset').then(r => r.json()), fetch('/api/votes').then(r => r.json())]);
 const votes = votes0 || {};
+// 사업 전체 판정은 사람이 입력하지 않는다: 구획 판정에서 서버가 설정 규칙(aggregate_rules)으로 계산한 표시용 값(저장 안 함)
+let derived = await fetch('/api/derived').then(r => r.json());
+const refreshDerived = async () => { derived = await fetch('/api/derived').then(r => r.json()); };
+const segDone = b => b.segments.filter(s => votes[b.id + '/' + s.id]).length;
+const complete = b => b.segments.length > 0 && segDone(b) === b.segments.length;
 const paneA = new HwpPane($('a-pane')), paneB = new HwpPane($('b-pane'));
 for (const side of ['a', 'b']) $(side + '-open').before($(side + '-pane').querySelector('.psearch')); // 기존 화면처럼 '원본 열기' 왼쪽에 원문 찾기
 for (const side of ['a', 'b']) $(side + '-open-st').after($(side + '-pane').querySelector('.pbar')); // 쪽 이동·확대도 같은 줄로(헤더 높이 줄이기)
@@ -16,19 +21,19 @@ const biz = () => data.businesses.find(b => b.id === ui.b);
 const okCount = xs => xs.filter(x => x.locate.status === 'ok').length;
 
 function renderList() {
-  const done = data.businesses.filter(b => votes[b.id]).length;
+  const done = data.businesses.filter(complete).length;
   $('progress').textContent = `사업 ${done} / ${data.businesses.length} 판정`;
   const q = $('query').value.trim().toLowerCase(), f = $('filter').value;
   const shown = data.businesses.filter(b => {
     const hay = [b.id, b.search_name, ...b.mentions.flatMap(m => [m.original, m.row_id]), ...b.segments.flatMap(s => [s.사업명, String(s.회계연도), s.부처])].join(' ').toLowerCase();
     if (q && !q.split(/\s+/).every(t => hay.includes(t))) return false;
-    if (f === 'todo') return !votes[b.id]; if (f === 'done') return !!votes[b.id];
+    if (f === 'todo') return !complete(b); if (f === 'done') return complete(b);
     if (f === 'unloc') return [...b.mentions, ...b.segments].some(x => x.locate.status !== 'ok');
     return true;
   });
   $('items').replaceChildren(...(shown.length ? [] : [el('p', { className: 'none', textContent: '조건에 맞는 사업 없음' })]), ...shown.map(b => el('button', { type: 'button', className: b.id === ui.b ? 'on' : '', onclick: () => open(b.id) },
     `${b.id} ${b.search_name}`,
-    el('small', { textContent: `표기 ${b.mentions.length} · 구획 ${b.segments.length} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length}${votes[b.id] ? ' · 판정: ' + votes[b.id].choice : ''}` }))));
+    el('small', { textContent: `표기 ${b.mentions.length} · 구획 ${b.segments.length} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length} · 판정 ${segDone(b)}/${b.segments.length}구획${derived[b.id] && derived[b.id].result ? ' → ' + derived[b.id].result : ''}` }))));
 }
 
 function locLine(L, shown, pane) {
@@ -94,19 +99,28 @@ function choiceSet(key, title) {
     const res = await fetch('/api/votes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ business_id: bid, segment_id: sid || null, choice, note: note.value }) });
     const out = await res.json();
     if (!res.ok) { msg.className = 'err'; msg.textContent = '저장 실패: ' + out.error; return; }
-    votes[key] = out; msg.className = 'saved'; msg.textContent = `저장됨: ${out.choice} · ${out.saved_at}`; renderList(); if (sid) showBTabsOnly();
+    votes[key] = out; await refreshDerived(); msg.className = 'saved'; msg.textContent = `저장됨: ${out.choice} · ${out.saved_at}`; renderList(); if (sid) showBTabsOnly(); renderJudge(); // 계산된 사업 전체 결과를 바로 갱신
   } });
   return el('fieldset', {}, el('legend', { textContent: title }), radios, note, el('div', {}, save), msg);
 }
 function showBTabsOnly() { const b = biz(); document.querySelectorAll('#b-tabs .tab').forEach((t, i) => { t.textContent = `${b.segments[i].회계연도} ${b.segments[i].레벨명}${votes[b.id + '/' + b.segments[i].id] ? ' ✓' : ''}`; }); }
 
+function derivedBox(b) {
+  const d = derived[b.id] || {}, R = (data.aggregate_rules || { rules: [] }).rules.find(r => r.id === d.rule);
+  const text = d.result ? `${d.result} — 규칙 ${d.rule}: ${R ? R.when : ''}${d.detail && d.detail.판단불가_구획 ? ' (판단불가 구획 ' + d.detail.판단불가_구획.length + '개)' : ''}`
+    : d.rule === 'incomplete' ? `미완료 — 판정 안 한 구획 ${d.detail.미판정_구획.length}개`
+    : d.rule === 'undefined' ? `계산 불가 — 규칙에 없는 조합(${d.detail.판정_조합.join('+')}). 규칙은 설정 파일에서 정한다` : '계산 전';
+  return el('div', { className: 'derived' }, el('b', { textContent: '사업 전체 (구획 판정에서 자동 계산, 입력 안 함): ' }), text,
+    el('div', { className: 'muted', textContent: `규칙 ${d.rules_version || '-'} · 저장되지 않는 표시용 값` }));
+}
 function renderJudge() {
   const b = biz(), s = b.segments[ui.seg];
-  $('judge').replaceChildren(el('h2', { textContent: b.id + ' ' + b.search_name }), el('div', { className: 'q', textContent: data.question }),
-    choiceSet(b.id, '사업 전체 판정 — 결과서의 이 사업이 오른쪽 구획 전체와 같은 사업인가'),
-    s ? choiceSet(b.id + '/' + s.id, `선택한 탭의 구획만 따로 판정 (선택): [${s.회계연도} ${s.레벨명}] ${s.사업명}`) : null,
-    s ? el('p', { className: 'muted', textContent: '구획마다 결론이 다를 때만 쓴다. 예: 연도별로 일부 구획만 같은 사업이면 사업 전체는 부분일치, 구획별로 일치/불일치. 다른 구획은 B의 탭을 눌러 바꾼 뒤 판정한다.' }) : null,
-    el('p', { className: 'muted', textContent: '판정은 연결 결과 파일과 별도의 votes 파일에만 저장된다.' }));
+  $('judge').replaceChildren(...[el('h2', { textContent: b.id + ' ' + b.search_name }), el('div', { className: 'q', textContent: data.question }),
+    s ? choiceSet(b.id + '/' + s.id, `[${s.회계연도} ${s.레벨명}] ${s.사업명} — 결과서의 사업과 같은 사업인가?`) : null,
+    el('p', { className: 'muted', textContent: `모든 탭(구획)을 판정해야 사업이 완료된다. 지금 ${segDone(b)}/${b.segments.length}구획 판정. 다른 구획은 B의 탭을 눌러 바꾼다.` }),
+    derivedBox(b),
+    votes[b.id] ? el('p', { className: 'muted', textContent: `이전 방식 기록(사람이 직접 입력한 사업 전체 판정, 보존만 함): ${votes[b.id].choice} · ${votes[b.id].saved_at}` }) : null,
+    el('p', { className: 'muted', textContent: '판정은 연결 결과 파일과 별도의 votes 파일에만 저장된다.' })].filter(Boolean)); // 빈 줄(null)이 'null' 글자로 보이지 않게
 }
 
 function resetOpen(side) { $(side + '-dir').hidden = true; $(side + '-open-st').textContent = ''; }
