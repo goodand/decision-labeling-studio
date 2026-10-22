@@ -46,7 +46,7 @@ async function showA() {
   const b = biz(), m = b.mentions[ui.mention], d = data.docs[m.doc];
   $('a-tabs').replaceChildren(...b.mentions.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.mention ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
     title: '눌러서 이 행의 결과서/의견서 원본으로 전환', textContent: `${x.row_id} · ${x.role}`, onclick: () => { ui.mention = i; showA(); } })),
-    b.mentions.length > 1 ? el('span', { className: 'muted', textContent: `← 이 사업을 쓰는 행 ${b.mentions.length}개, 눌러서 원본 전환` }) : null);
+    b.mentions.length > 1 ? el('span', { className: 'muted', title: '탭(칩)을 누르면 원본이 바뀐다', textContent: `← 이 사업을 쓰는 행 ${b.mentions.length}개, 눌러서 원본 전환` }) : null);
   const meta = [el('div', {}, el('b', { textContent: '원래 표기: ' }), m.original),
     el('div', { className: m.scope || m.original !== b.search_name ? '' : 'opt' }, '정리된 이름: ', b.search_name, m.scope ? ' · 범위: ' + m.scope : ''), // 배치 2: 원래 표기와 같으면 뺀다
     m.administrative_metadata.length ? el('div', {}, '행정 표기: ', m.administrative_metadata.map(s => s.trim()).join(' | ')) : null,
@@ -64,7 +64,7 @@ async function showB() {
   const s = b.segments[ui.seg], d = data.docs[s.doc];
   $('b-tabs').replaceChildren(...b.segments.map((x, i) => el('button', { type: 'button', className: 'tab' + (i === ui.seg ? ' on' : '') + (x.locate.status === 'ok' ? '' : ' bad'),
     title: x.사업명, textContent: `${x.회계연도} ${x.레벨명}${votes[b.id + '/' + x.id] ? ' ✓' : ''}`, onclick: () => { ui.seg = i; showB(); renderJudge(); } })),
-    b.segments.length > 1 ? el('span', { className: 'muted', textContent: '← 눌러서 구획 전환' }) : null);
+    b.segments.length > 1 ? el('span', { className: 'muted', title: '탭(칩)을 누르면 원본이 바뀐다', textContent: '← 눌러서 구획 전환' }) : null);
   const body = s.content.filter(c => c.목적 || c.내용);
   const meta = [el('div', {}, el('b', { textContent: `[${s.회계연도}] ${s.부처} · ${s.레벨명} · ` }), s.사업명),
     el('div', { className: 'opt' }, '상위 세부사업: ', s.세부사업명 || '-', ' · 구조_id ', s.merged_구조_ids.join(', '), s.merged_구조_ids.length > 1 ? ` (같은 파일·이름·레벨 노드 ${s.merged_구조_ids.length}개를 한 탭으로 합침)` : ''),

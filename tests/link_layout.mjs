@@ -32,7 +32,7 @@ try {
       out.features[k] = !!q(s) && R(q(s)).width > 0;
     for (const side of ['a', 'b']) {
       const sec = q('#' + side), view = q('#' + side + '-pane .pview');
-      const ctrls = [...sec.querySelectorAll('button:not([hidden]), input, .pg, .zl, .scount')].filter(e => R(e).width > 0 && !e.closest('.pview'));
+      const ctrls = [...sec.querySelectorAll('button:not([hidden]), input, .pg, .zl, .scount')].filter(e => R(e).width > 0 && !e.closest('.pview') && (() => { const m = e.closest('.meta'); if (!m) return true; const a = R(e), b = R(m); return a.top >= b.top - 1 && a.bottom <= b.bottom + 1; })()); // 설명 영역 스크롤 밖으로 잘린 요소는 보이지 않으므로 겹침 대상 아님
       const pairs = []; for (let i = 0; i < ctrls.length; i++) for (let j = i + 1; j < ctrls.length; j++) if (!ctrls[i].contains(ctrls[j]) && !ctrls[j].contains(ctrls[i]) && overlap(R(ctrls[i]), R(ctrls[j]))) pairs.push((ctrls[i].textContent || ctrls[i].placeholder || ctrls[i].className).trim().slice(0, 12) + ' x ' + (ctrls[j].textContent || ctrls[j].placeholder || ctrls[j].className).trim().slice(0, 12));
       const clipped = ctrls.filter(e => e.scrollWidth > e.clientWidth + 1 && e.tagName === 'BUTTON').map(e => e.textContent.trim());
       out.panes[side] = { header_px: Math.round(R(view).top - R(sec).top), view_top: Math.round(R(view).top), view_h: Math.round(R(view).height), search_w: Math.round(R(sec.querySelector('.psearch input')).width), overlaps: pairs, clipped_buttons: clipped };
