@@ -234,8 +234,10 @@ def is_human_prompt(text: str) -> bool:
 
 # ---- run ----------------------------------------------------------------------------------------------
 class Run:
-    def __init__(self, dry: bool, since: str, use_state: bool, project_root: str = "", rebuild_repeat: bool = False):
+    def __init__(self, dry: bool, since: str, use_state: bool, project_root: str = "", rebuild_repeat: bool = False,
+                 until: str = ""):
         self.dry, self.since, self.use_state, self.rebuild_repeat = dry, since or "", use_state, rebuild_repeat
+        self.until = until or ""  # exclusive; with since it makes a [since, until) window
         self.projects = Projects(project_root)
         self.detector = "default (Kiwi if up, else regex)"
         self.counts = defaultdict(Counter)  # project_id -> counters
@@ -248,7 +250,7 @@ class Run:
         self.repeat = ri.Index.from_json(self.repeat_path.read_text("utf-8")) if use_state and self.repeat_path.exists() else ri.Index()
 
     def process(self, path: Path, reader):
-        key, lines_done = str(path), 0
+        key = str(path) if not (self.since or self.until) else f"{path}|{self.since}|{self.until}"  # state per window
         if self.use_state and key in self.state and self.state[key].get("size") == path.stat().st_size:
             self.files["unchanged"] += 1
             if not self.rebuild_repeat:
@@ -268,7 +270,7 @@ class Run:
                     self._skipped_live.add(sess)
                     self.files["live_session_skipped"] += 1
                 continue
-            if self.since and ts(when) < self.since:
+            if (self.since and ts(when) < self.since) or (self.until and ts(when) >= self.until):
                 continue
             meta = self.projects.resolve(cwd)
             c = self.counts[meta[0]]
@@ -411,6 +413,7 @@ def main(argv):
     ap.add_argument("paths", nargs="*", help="files or dirs (default: both standard roots)")
     ap.add_argument("--dry-run", action="store_true", help="count only; write nothing")
     ap.add_argument("--since", default="", help="skip records before this UTC date (YYYY-MM-DD)")
+    ap.add_argument("--until", default="", help="skip records on/after this UTC date (exclusive); pair with --since for windows")
     ap.add_argument("--source", choices=["all", "claude", "codex"], default="all")
     ap.add_argument("--no-state", action="store_true", help="ignore and do not write backfill_state.json")
     ap.add_argument("--decisions", nargs="*", default=[], metavar="PATH",
@@ -426,7 +429,7 @@ def main(argv):
         os.nice(19)  # a full replay reads GBs; never compete with the user's foreground work
     defaults = [r for r, s in ((CLAUDE_ROOT, "claude"), (CODEX_ROOT, "codex")) if a.source in ("all", s)]
     paths = a.paths if (a.paths or a.decisions) else defaults  # --decisions alone replays only the decision logs
-    run = Run(a.dry_run, a.since, not a.no_state, a.project_root, a.rebuild_repeat)
+    run = Run(a.dry_run, a.since, not a.no_state, a.project_root, a.rebuild_repeat, a.until)
     if a.rebuild_repeat and not a.dry_run:
         run.repeat = ri.Index()  # start the index over; the derived file is rewritten from it
     run.detector = pin_detector() if not a.regex else (setattr(cc, "is_correction", cc.is_correction_regex) or "regex")

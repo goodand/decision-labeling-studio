@@ -167,6 +167,30 @@ class ForcedProject(Base):
         self.assertFalse((self.store / "corrections.jsonl").exists())  # nothing fell into global
 
 
+class DateWindows(Base):
+    def test_reverse_chronological_windows_cover_everything_once(self):
+        """Newest window first, then older ones. A file read for one window must still be read for the next
+        (state is per window), and the union of disjoint windows equals one full run, with no duplicates."""
+        def run(since, until):
+            r = backfill.Run(False, since, True, until=until)
+            for f in sorted(self.codex.glob("*.jsonl")) + sorted(self.claude.glob("*.jsonl")):
+                r.process(f, backfill.read_codex if f.name.startswith("rollout-") else backfill.read_claude)
+            r.flush()
+            return r
+        run("2026-10-21", "")              # codex fixture lines (10-21)
+        run("2026-10-20", "2026-10-21")    # claude fixture lines (10-20)
+        run("", "2026-10-20")              # nothing older
+        windowed = (sorted(json.dumps(x, sort_keys=True) for x in self.records("corrections")),
+                    len(self.records("observations")))
+        run("2026-10-21", "")              # repeating a window adds nothing
+        self.assertEqual(len(self.records("observations")), windowed[1])
+        import shutil
+        shutil.rmtree(self.store)
+        run("", "")
+        full = (sorted(json.dumps(x, sort_keys=True) for x in self.records("corrections")), len(self.records("observations")))
+        self.assertEqual(windowed, full)
+
+
 class LiveSessions(Base):
     def test_sessions_the_live_hooks_already_recorded_are_skipped(self):
         """Verified 2026-10-24: the live hooks had 520 lines for the current session, and backfill would read
