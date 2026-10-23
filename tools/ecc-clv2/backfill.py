@@ -233,8 +233,8 @@ def is_human_prompt(text: str) -> bool:
 
 # ---- run ----------------------------------------------------------------------------------------------
 class Run:
-    def __init__(self, dry: bool, since: str, use_state: bool, project_root: str = ""):
-        self.dry, self.since, self.use_state = dry, since or "", use_state
+    def __init__(self, dry: bool, since: str, use_state: bool, project_root: str = "", rebuild_repeat: bool = False):
+        self.dry, self.since, self.use_state, self.rebuild_repeat = dry, since or "", use_state, rebuild_repeat
         self.projects = Projects(project_root)
         self.detector = "default (Kiwi if up, else regex)"
         self.counts = defaultdict(Counter)  # project_id -> counters
@@ -249,6 +249,12 @@ class Run:
         key, lines_done = str(path), 0
         if self.use_state and key in self.state and self.state[key].get("size") == path.stat().st_size:
             self.files["unchanged"] += 1
+            if not self.rebuild_repeat:
+                return
+            self.files["reread_for_repeat"] += 1  # repeat index only; corrections/observations stay as they are
+            for item in reader(path):
+                if item[0] == "prompt" and is_human_prompt(item[4]):
+                    self.repeat.add(item[2], item[4])
             return
         self.files["read"] += 1
         n_items = 0
@@ -391,13 +397,17 @@ def main(argv):
     ap.add_argument("--project-root", default="", metavar="DIR",
                     help="file every record under this project (for logs whose cwd is not a git repo or no longer exists)")
     ap.add_argument("--regex", action="store_true", help="use the regex detector only (no Kiwi server)")
+    ap.add_argument("--rebuild-repeat", action="store_true",
+                    help="reread files already in backfill_state for the repeat index only (after changing repeat_instr)")
     ap.add_argument("--max-files", type=int, default=0, help="stop after this many files (newest first); 0 = all")
     a = ap.parse_args(argv)
     if hasattr(os, "nice"):
         os.nice(19)  # a full replay reads GBs; never compete with the user's foreground work
     defaults = [r for r, s in ((CLAUDE_ROOT, "claude"), (CODEX_ROOT, "codex")) if a.source in ("all", s)]
     paths = a.paths if (a.paths or a.decisions) else defaults  # --decisions alone replays only the decision logs
-    run = Run(a.dry_run, a.since, not a.no_state, a.project_root)
+    run = Run(a.dry_run, a.since, not a.no_state, a.project_root, a.rebuild_repeat)
+    if a.rebuild_repeat and not a.dry_run:
+        run.repeat = ri.Index()  # start the index over; the derived file is rewritten from it
     run.detector = pin_detector() if not a.regex else (setattr(cc, "is_correction", cc.is_correction_regex) or "regex")
     todo = sorted(iter_files(paths, a.source), key=lambda fr: -fr[0].stat().st_mtime)
     for d in a.decisions:

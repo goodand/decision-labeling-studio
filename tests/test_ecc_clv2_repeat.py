@@ -112,6 +112,36 @@ class Backfill(unittest.TestCase):
         self.assertEqual([(r["phrase"], r["sessions"]) for r in out], [("상위개념 장단점 설명 해줘", 3)])
 
 
+class RebuildRepeat(unittest.TestCase):
+    def test_rebuild_rereads_skipped_files_without_appending_records(self):
+        """Changing repeat_instr after a backfill must not force a --no-state rerun (that would append
+        duplicate corrections/observations). --rebuild-repeat rereads every file for the repeat index only."""
+        import backfill
+        tmp = Path(tempfile.mkdtemp())
+        backfill.STORE = tmp / "store"
+        src = tmp / "src"
+        src.mkdir()
+        for i in range(3):
+            line = {"type": "user", "sessionId": f"sess-{i}", "timestamp": "2026-10-20T00:00:00Z", "cwd": "/none",
+                    "isSidechain": False, "entrypoint": "cli", "message": {"role": "user", "content": "그게 아니라 상위개념 장단점 설명"}}
+            (src / f"s{i}.jsonl").write_text(json.dumps(line, ensure_ascii=False) + "\n", "utf-8")
+        files = sorted(src.glob("*.jsonl"))
+        run = backfill.Run(False, "", True)
+        for f in files:
+            run.process(f, backfill.read_claude)
+        run.flush()
+        n_corr = len((backfill.STORE / "corrections.jsonl").read_text("utf-8").splitlines())
+        (backfill.STORE / "repeat_index.json").unlink()                      # as if the detector changed
+        run = backfill.Run(False, "", True, rebuild_repeat=True)
+        for f in files:
+            run.process(f, backfill.read_claude)
+        run.flush()
+        self.assertEqual(run.files["reread_for_repeat"], 3)
+        self.assertEqual(len((backfill.STORE / "corrections.jsonl").read_text("utf-8").splitlines()), n_corr)
+        out = [json.loads(l) for l in (backfill.STORE / "repeated_instructions.jsonl").read_text("utf-8").splitlines()]
+        self.assertEqual(out[0]["sessions"], 3)
+
+
 class LearnNow(unittest.TestCase):
     def test_repeated_instructions_reach_the_learner(self):
         import learn_now
