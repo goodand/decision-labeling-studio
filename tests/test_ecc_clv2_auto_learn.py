@@ -76,6 +76,23 @@ class AutoLearnFlow(unittest.TestCase):
         auto_learn.publish({"demo": cand}, {"p1": {"id": "p1", "name": "demo"}})   # same candidate again: once
         self.assertEqual(auto_learn.DIGEST.read_text("utf-8").count("b.md"), 1)
 
+    def test_failed_learn_is_not_marked_done_and_backs_off(self):
+        """Live run 2026-10-24: `claude -p` was refused (org disabled subscription access) 12 times, and each
+        failed run still called mark_done, so 507 lines were silently treated as learned. A failed learn must
+        leave the data due, and the next Stop must not respawn claude until a cooldown passes."""
+        import os
+        from unittest import mock
+        pdir = self.store / "projects" / "p1"
+        calls = []
+        with mock.patch.object(auto_learn.learn_now, "run", lambda p, m: calls.append(1) or "INCOMPLETE rc=1 instincts=[]"), \
+             mock.patch.object(auto_learn.eval_loop, "evaluate_project", lambda p, m, s: []), mock.patch.dict(os.environ):
+            os.environ.pop("ECC_LEARN_SEMANTIC", None)
+            auto_learn.main([])
+            self.assertTrue(auto_learn.due(pdir))          # still due: nothing was learned
+            auto_learn.main([])                            # next Stop, inside the cooldown
+        self.assertEqual(len(calls), 1)
+        self.assertIn("INCOMPLETE", json.loads((pdir / ".auto_learn_error.json").read_text("utf-8"))["result"])
+
     def test_default_cycle_uses_no_llm_judge(self):
         """User rule (2026-10-23): verification by rules + human, no LLM judge. The unattended cycle must
         run the gate with semantic=False unless ECC_LEARN_SEMANTIC=1 is set explicitly."""

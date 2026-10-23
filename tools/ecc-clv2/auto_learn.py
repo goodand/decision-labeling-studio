@@ -26,6 +26,7 @@ def _out(env: str, legacy: Path, name: str) -> Path:
 DIGEST = _out("ECC_LEARN_DIGEST", _MEM / "D--dev-eval-team" / "memory" / "learned-digest.md", "learned-digest.md")
 HABITS = _out("ECC_LEARN_HABITS", _MEM / "C--Users-INTEC" / "memory" / "learned-agent-habits.md", "learned-agent-habits.md")
 MIN_NEW = 20
+FAIL_COOLDOWN_S = 6 * 3600  # after a failed learn (e.g. claude -p refused), don't respawn it on every Stop
 MAX_HABITS = 15
 
 
@@ -40,6 +41,11 @@ def due(pdir: Path) -> bool:
     marker = pdir / ".auto_learn.json"
     last = json.loads(marker.read_text("utf-8")).get("count", 0) if marker.exists() else 0
     return _count(pdir) - last >= MIN_NEW
+
+
+def cooling_down(pdir: Path) -> bool:
+    err = pdir / ".auto_learn_error.json"
+    return err.exists() and time.time() - json.loads(err.read_text("utf-8")).get("epoch", 0) < FAIL_COOLDOWN_S
 
 
 def mark_done(pdir: Path):
@@ -88,9 +94,15 @@ def main(argv):
     results = {}
     for pid, meta in registry.items():
         pdir = STORE / "projects" / pid
-        if names and meta["name"] not in names or not (force or due(pdir)):
+        if names and meta["name"] not in names or not (force or (due(pdir) and not cooling_down(pdir))):
             continue
-        print(meta["name"], "learn ->", learn_now.run(pdir, meta), flush=True)
+        learned = learn_now.run(pdir, meta)
+        print(meta["name"], "learn ->", learned, flush=True)
+        if not learned.startswith("ok"):  # refused/incomplete/leak/skip: the data was not learned, keep it due
+            (pdir / ".auto_learn_error.json").write_text(json.dumps(
+                {"result": learned[:300], "epoch": time.time(), "at": time.strftime("%Y-%m-%dT%H:%M:%S")}), "utf-8")
+            continue
+        (pdir / ".auto_learn_error.json").unlink(missing_ok=True)
         # Rules + human review by default; the LLM judge stage is opt-in (user rule 2026-10-23:
         # LLM judging was neither more accurate nor reproducible — imitate human patterns as rules).
         results[meta["name"]] = eval_loop.evaluate_project(pdir, meta, os.environ.get("ECC_LEARN_SEMANTIC") == "1")
