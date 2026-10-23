@@ -1,0 +1,8 @@
+leak_guard.py is adapted from google-research/harness2 (Apache-2.0, Copyright 2026 Google LLC)
+  repo:   https://github.com/google-research/harness2
+  commit: 1cfe254e8d25b15f37048c3730134686abe60335
+  file:   harness2/core/context.py  sha256 63dd482e5d9467d7e659d186a11289fc7861d08c8aed603244ff0cee92de91f3
+  spans:  assert_no_grader_verdicts (lines 454-490), assert_tree_has_no_grader_verdicts (493-518),
+          _MARKER_SCAN_SUFFIXES (429-450). GRADER_VERDICT_MARKERS (419-427) replaced by MARKERS.
+  changed: markers, case-insensitive match, shorter messages; assert_records_metadata_only is ours.
+  LICENSE: copy of the upstream LICENSE file in this directory.

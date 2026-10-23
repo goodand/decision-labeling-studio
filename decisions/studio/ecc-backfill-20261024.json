@@ -44,6 +44,12 @@
       "status": "explicit_request",
       "user_quote": "완벽하지 않으면 결점을 파악하기 위하여 전수 조사를 해야하니까 그런 검증 비용이 커지고 그것들이 증폭된다고",
       "decision": "작업 순서 원칙: 규칙으로 판정 가능한 수정 → 최적화(임계값·파라미터) → 의미·맥락 판단(LLM). 비용은 구현 비용과 검증 비용을 나눠 보고, 순위는 검증 비용(특히 반복되는 사람 검토)으로 매긴다."
+    },
+    {
+      "id": "STUDIO-ECC-014",
+      "status": "explicit_choice",
+      "user_quote": "google-research/harness2 에서도 전체가 아니라 subtree, subflow or architecture, code pattern 중에서는 가장 뛰어난 것이 있겠지",
+      "decision": "harness2 전체 도입은 않고, 후보 7개(selection/_distil, library, context 누설 가드, judge 집계, ledger, prompts, spec)를 이득·검증 비용·규칙 적합으로 비교해 context.py 누설 가드만 vendor_h2/leak_guard.py로 발췌(Apache-2.0, SOURCE.txt·LICENSE 동봉). 우리 쪽 보완: 레코드가 메타데이터만인지(콘텐츠 필드 비어 있음, 5000자 초과 없음, parse_error raw 없음) 검사하는 assert_records_metadata_only. learn_now는 분석 파일을 쓰기 전에, eval_loop는 judge 패킷을 보내기 전에 호출하며 걸리면 보내지 않는다. R3의 ANSWER_SIDE는 같은 MARKERS에서 생성. 사용자의 정정 발화와 경로에 정답 쪽 단어가 있는 것은 허용(메타데이터)."
     }
   ]
 }

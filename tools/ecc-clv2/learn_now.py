@@ -9,7 +9,9 @@ import json, os, re, subprocess, sys, tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "vendor_h2"))
 import platform_compat as pc  # noqa: E402
+import leak_guard  # noqa: E402  (harness2 tripwire: metadata only may reach the learner)
 
 STORE = pc.store_dir()
 MODEL, EFFORT = "claude-opus-5-5", "low"
@@ -64,6 +66,13 @@ def run(project_dir: Path, meta: dict) -> str:
     lines += corr.read_text("utf-8").splitlines() if corr.exists() else []
     if len(lines) < MIN_LINES:
         return f"skip ({len(lines)} lines)"
+    try:  # tripwire: refuse before anything is written or sent
+        leak_guard.assert_records_metadata_only(json.loads(l) for l in lines[-MAX_LINES:] if l.strip())
+    except ValueError as e:
+        with open(project_dir / "learn_now.log", "a", encoding="utf-8") as log:
+            log.write(json.dumps({"ok": False, "rc": -1, "lines": min(len(lines), MAX_LINES), "instincts": [],
+                                  "stdout": "", "stderr": str(e)[:500]}, ensure_ascii=False) + "\n")
+        return f"skip (leak: {str(e)[:120]})"
     instincts = project_dir / "instincts" / "personal"
     instincts.mkdir(parents=True, exist_ok=True)
     tmp = project_dir / ".observer-tmp"

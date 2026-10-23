@@ -20,7 +20,9 @@ icli = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(icli)  # reuse ECC originals: parse_instinct_file, _trigger_keywords
 sys.path.insert(0, str(Path(__file__).resolve().parent / "vendor_wr"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "vendor_h2"))
 import platform_compat as pc  # noqa: E402
+import leak_guard  # noqa: E402  (harness2 tripwire: metadata only may reach the judge)
 import semantic_review  # workflow-runner judge contract (copy pinned in vendor_wr/SOURCE.txt)
 
 STORE = pc.store_dir()
@@ -28,7 +30,7 @@ MODEL, EFFORT = "claude-opus-5-5", "low"
 REQUIRED = ("id", "trigger", "confidence", "domain", "source", "scope", "project_id", "project_name")
 DOMAINS = {"code-style", "testing", "git", "debugging", "workflow", "file-patterns"}
 DOC_EXT = re.compile(r"[^\s\"']+\.(pdf|hwp|hwpx|xlsx?|xlsm|csv)\b", re.I)
-ANSWER_SIDE = re.compile(r"결과서|검토결과|정답|silver|gold[_ ]?label", re.I)
+ANSWER_SIDE = re.compile("|".join(re.escape(m) for m in leak_guard.MARKERS), re.I)  # R3, same words as the tripwire
 MIN_EVIDENCE_OBS = 3      # noise floor: pattern must be backed by >= 3 observations
 JUDGE_RUNS = 3            # E1: promote only when all runs accept
 EVIDENCE_SAMPLE = 8      # metadata lines per cited session in the judge packet (0 = ids/counts only)
@@ -113,7 +115,7 @@ def evaluate_project(pdir: Path, meta: dict, semantic: bool):
         except ValueError:
             continue
         sessions[s] = sessions.get(s, 0) + 1
-        lines.setdefault(s, []).append({k: str(rec[k])[:200] for k in ("event", "tool", "input") if k in rec})
+        lines.setdefault(s, []).append({k: str(rec[k])[:200] for k in ("event", "tool", "input", "output", "raw") if k in rec})
     files = sorted((pdir / "instincts" / "personal").glob("*.md"))
     parsed = {f: parse(f) for f in files}
     results = []
@@ -125,10 +127,16 @@ def evaluate_project(pdir: Path, meta: dict, semantic: bool):
         evidence = [{"event_id": i, "session": s, "observations": sessions.get(s, 0),
                      **({"sample": lines.get(s, [])[:EVIDENCE_SAMPLE]} if EVIDENCE_SAMPLE else {})}
                     for i, s in enumerate(info["cited_sessions"])]
-        sems = [judge(text, evidence) for _ in range(JUDGE_RUNS)] if (semantic and hard_ok) else []  # semantic last
+        sems = []
+        if semantic and hard_ok:  # semantic last; and only if the evidence packet is metadata-only
+            try:
+                leak_guard.assert_records_metadata_only(x for e in evidence for x in e.get("sample", []))
+                sems = [judge(text, evidence) for _ in range(JUDGE_RUNS)]
+            except ValueError as e:
+                sems = [{"error": str(e)[:300]}]  # stays candidate; never sent
         valid = [s for s in sems if s is not None and semantic_review.valid_assessment(s, evidence)]  # rule check
         verdicts = [s["verdict"] for s in valid]
-        sem = {"runs": sems, "verdicts": verdicts} if sems else None
+        sem = {"runs": sems, "verdicts": verdicts, **({"error": sems[0]["error"]} if sems and "error" in sems[0] else {})} if sems else None
         if not hard_ok:
             status = "rejected"
         elif "reject" in verdicts:

@@ -138,5 +138,6 @@
    ],
    "live_hooks": "변경 없음: 훅은 C:\\Users\\INTEC\\.claude\\ecc-clv2 사본을 실행한다. 저장소 사본과의 일치 여부는 files[*].identical_to_source."
   }
- ]
+ ],
+ "vendor_h2": "leak_guard.py = google-research/harness2 harness2/core/context.py 발췌(Apache-2.0, 수정함). 세부는 vendor_h2/SOURCE.txt"
 }
