@@ -1,0 +1,25 @@
+{
+  "author": "Claude (Opus 5.5)",
+  "recorded_on": "2026-10-23",
+  "recording_method": "From this chat; not artifact approval",
+  "decisions": [
+    {
+      "id": "STUDIO-ECC-001",
+      "status": "explicit_choice",
+      "user_quote": "데이터 빼고 비즈니스 로직, 인터페이스 부터 넣고",
+      "decision": "ECC continuous-learning-v2 로직을 tools/ecc-clv2에 사본으로 넣는다(커밋 d472e54). 데이터(관측·정정 원문·instinct)는 넣지 않는다."
+    },
+    {
+      "id": "STUDIO-ECC-002",
+      "status": "explicit_request",
+      "user_quote": "원문도 다 필요하다기 보다는 결정(승격)된 것의 근거로서 필요한 것이긴해",
+      "decision": "원문은 저장소에 넣지 않고, 승격된 결정마다 근거 발언만 user_quote로 인용한다."
+    },
+    {
+      "id": "STUDIO-ECC-003",
+      "status": "explicit_choice",
+      "user_quote": "인터페이스 보류 하고 로직만",
+      "decision": "결정 승격 화면(인터페이스)은 보류. 실행 중인 훅은 ~/.claude/ecc-clv2를 그대로 쓴다(저장소 사본으로 전환은 별도 결정)."
+    }
+  ]
+}
