@@ -76,7 +76,11 @@ def publish(results: dict, registry: dict):
 def main(argv):
     force = "--force" in argv
     names = [a for a in argv if not a.startswith("--")]
-    registry = json.loads((STORE / "projects.json").read_text("utf-8"))
+    reg_file = STORE / "projects.json"  # written by ECC observe.sh once a git project is seen
+    if not reg_file.exists():
+        print("nothing due (no projects registered yet)")
+        return
+    registry = json.loads(reg_file.read_text("utf-8"))
     results = {}
     for pid, meta in registry.items():
         pdir = STORE / "projects" / pid
