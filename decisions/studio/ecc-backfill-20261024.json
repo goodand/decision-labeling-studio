@@ -64,6 +64,18 @@
       "status": "explicit_choice",
       "user_quote": "성능이 더 좋은 것으로 골라 … 속도 보다 정확성이 높아야 검증 비용이 낮아져",
       "decision": "Kiwi를 kiwipiepy 0.24.1 + kiwipiepy_model 0.24.0(cong, cong.mdl sha256 5f64105e…)으로 고정한다. 근거: 속도는 동일(0.51 vs 0.49 ms/프롬프트, 메모리 증가 둘 다 0), 정확성은 0.24.1 우위(판정이 뒤집힌 2건이 모두 공식 모델 오류 수정에 해당). 공유 venv(~/.claude/venvs/kiwi, 0.23.2)는 concept-gate-h1-wt 테스트와 evidence-evaluator HANDOFF가 전제하므로 건드리지 않고, ecc-clv2 전용 venv(~/.claude/venvs/ecc-kiwi)를 쓴다. 통제: kiwi_server.PIN(버전+모델 해시), 고정과 다르면 서버 기동 거부·backfill 중단, 고정 세트 토큰 스냅샷(tests/fixtures/kiwi_golden.json). 훅의 PY 경로를 ecc-kiwi로 바꾸는 것은 사용자가 settings.json에서 수행."
+    },
+    {
+      "id": "STUDIO-ECC-017",
+      "status": "explicit_request",
+      "user_quote": "내가 프롬프트로 건넸던 repo들도 listup해서 재사용 할 수 있게 하면 좋겠네 그런게 엄청 많은데, 중복되는 것고 꽤 있을꺼야",
+      "decision": "repo_refs.py: 과거 사람 프롬프트의 github.com URL을 모아 owner/repo로 정규화(대소문자·.git·?utm·/tree·/blob 흡수), fork는 gh api로 부모 아래 묶고, 고정 키워드로 주제를 붙인다. 결과는 저장소(~/.claude/ecc-homunculus/referenced_repos.md)에만 둔다(비공개 repo 이름 포함). 실측 44키→43묶음, 주제: agent memory 12·NLP dataset 5·skills/agents 4·Lean 4·LLM wiki 4·MCP 2·기타 12."
+    },
+    {
+      "id": "STUDIO-ECC-018",
+      "status": "measured_not_adopted",
+      "user_quote": "BM25 계열 이나 vn보정 을 보다 적극적으로 사용하는 방법도 있을 것 같네",
+      "decision": "반복 지시 순위에 사용자-vs-어시스턴트 대비(코퍼스 크기 N 보정, 어시스턴트 쪽 3/4 평활)를 적용해 측정: 사용자 키워드 8개의 순위가 raw 세션 수 대비 개선되지 않았고(검증 13→260, 장단점 598→420, 나머지 비슷), 상위 15개가 대화체 단어로 바뀜. 채택하지 않음. 근본 제약은 코퍼스 크기(사람 세션 약 16 Claude + 13 Codex, 프롬프트 2,125)라 세션 수 기반 순위에 동률이 많다. 임베딩/LLM은 3단계(의미)로 미룸. 사용자 발언: 지금은 LLM이 임베딩을 대체."
     }
   ]
 }
