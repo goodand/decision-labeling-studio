@@ -109,22 +109,38 @@ START_TASK = os.environ.get("ECC_KIWI_START_TASK", "ECC_KiwiStart")
 import tempfile  # noqa: E402
 SPAWN_MARK = Path(tempfile.gettempdir()) / "ecc-clv2-kiwi-spawn.mark"
 SPAWN_WINDOW_S = 30  # one start attempt per window, across processes: a booting server takes seconds
+_spawned_here = False
 
 
 def _start_server_detached():
     """Task Scheduler (Windows) / launchd (macOS) job named START_TASK, else a detached child (tests).
     At most one attempt per SPAWN_WINDOW_S, or every call while the server boots starts another one."""
-    try:
-        if SPAWN_MARK.exists() and time.time() - SPAWN_MARK.stat().st_mtime < SPAWN_WINDOW_S:
-            return
-        SPAWN_MARK.touch()
-    except OSError:
+    global _spawned_here
+    window = SPAWN_MARK.with_name(f"{SPAWN_MARK.name}.{int(time.time() // SPAWN_WINDOW_S)}")
+    try:  # O_EXCL: exactly one process wins each window, whatever the clock or old marks say
+        os.close(os.open(window, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
+    except FileExistsError:
         return
+    except OSError:  # cannot write a mark at all: still try, but once per process
+        if _spawned_here:
+            return
+    _spawned_here = True
     pc.start_detached([sys.executable, "-X", "utf8", "-I", str(Path(__file__).with_name("kiwi_server.py"))], START_TASK)
 
 
+# Credential shapes in free text (the user's own words cannot be allow-listed without losing them).
+SECRET_TOKEN = re.compile(r"(?<![\w])(?:AKIA[0-9A-Z]{16}|sk[_-][0-9A-Za-z_-]{16,}|gh[pousr]_[0-9A-Za-z]{30,}"
+                          r"|xox[abprs]-[0-9A-Za-z-]{10,}|AIza[0-9A-Za-z_-]{30,}|eyJ[0-9A-Za-z_.-]{20,}"
+                          r"|(?=(?:[0-9A-Za-z_-]*\d){2})(?=(?:[0-9A-Za-z_-]*[A-Za-z]){2})[0-9A-Za-z_-]{20,})(?![\w])")
+URL_CRED = re.compile(r"(://)[^/\s@]+@")
+
+
+def mask_secrets(text: str) -> str:
+    return SECRET_TOKEN.sub("[비밀]", URL_CRED.sub(r"\1[비밀]@", text))
+
+
 def make_record(session: str, cwd: str, text: str) -> dict:
-    text = DOC_REF.sub("[문서파일]", " ".join(text.split()))[:MAX_CHARS]
+    text = mask_secrets(DOC_REF.sub("[문서파일]", " ".join(text.split())))[:MAX_CHARS]
     return {"timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "event": "user_correction",
             "session": session, "cwd": cwd, "text": text}
 

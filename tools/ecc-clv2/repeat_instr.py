@@ -42,7 +42,7 @@ def _content(w: str) -> bool:
 
 
 def words(text: str) -> list:
-    t = cc.DOC_REF.sub("[문서파일]", text)
+    t = cc.mask_secrets(cc.DOC_REF.sub("[문서파일]", text))
     t = _PATH.sub(" [경로] ", _URL.sub(" [url] ", t))
     t = unicodedata.normalize("NFKC", t).lower()
     out = []
@@ -51,7 +51,8 @@ def words(text: str) -> list:
         if not w:
             continue
         if w.startswith("["):
-            out.append(w)
+            if w != "[비밀]":  # a masked secret is not a word of an instruction
+                out.append(w)
             continue
         for j in JOSA:  # longest first (tuple is ordered that way)
             if w.endswith(j) and len(w) - len(j) >= 2:

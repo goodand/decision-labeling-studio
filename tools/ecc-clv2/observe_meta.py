@@ -24,9 +24,11 @@ CMD_LIMIT = 200
 # Residual risk, documented: an unquoted all-lowercase secret without digits used as a positional word.
 _TOK = re.compile(r"""(?:"[^"]*"|'[^']*'|[^\s"'])+""")
 _SEP = {"&&", "||", "|", ";"}
-_PROG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]{0,39}$")
-_FLAG = re.compile(r"^--?[A-Za-z][A-Za-z0-9-]{0,39}$")
-_WORD = re.compile(r"^[a-z][a-z_.-]{0,29}$")          # no digits, no upper case: subcommands, module names
+_PROG = re.compile(r"^[a-z][a-z0-9._+-]{0,29}$")       # lower case program names (python3, kubectl, gh)
+_FLAG = re.compile(r"^--?[A-Za-z][A-Za-z-]{0,39}$")     # flag NAMES carry no digits
+_SHORT_JOINED = re.compile(r"^-[A-Za-z].")              # -pVALUE: keep -p, drop the joined value
+_WORD = re.compile(r"^[a-z][a-z_.:-]{0,29}$|^[a-z][a-z0-9]{1,2}$")  # subcommands; digits only in short words (s3, k8s)
+_FREE_WORD = re.compile(r"^[A-Za-z][a-z]{0,19}$")       # free text: plain words only (Run, tests, password)
 _ASSIGN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
 
@@ -44,11 +46,13 @@ def safe_command(cmd: str) -> str:
             if _ASSIGN.match(tok):
                 continue  # VAR=value prefix
             name = tok.rstrip("/").rsplit("/", 1)[-1]
-            if _PROG.match(name):
+            if _PROG.match(name) and sum(ch.isdigit() for ch in name) <= 2:
                 out.append(name)
             expect_prog = False
         elif tok.startswith("-"):
             name = tok.split("=", 1)[0]
+            if not name.startswith("--") and _SHORT_JOINED.match(name) and not _FLAG.match(name):
+                name = name[:2]
             if _FLAG.match(name):
                 out.append(name)
         elif _WORD.match(tok):
@@ -56,11 +60,31 @@ def safe_command(cmd: str) -> str:
     return " ".join(out)[:CMD_LIMIT]
 
 
+def safe_url(url: str) -> str:
+    """scheme://host only: paths and query strings carry tokens and signatures."""
+    from urllib.parse import urlsplit
+    try:
+        u = urlsplit(url.strip())
+    except ValueError:
+        return ""
+    host = (u.hostname or "").lower()
+    return f"{u.scheme.lower()}://{host}" if u.scheme in ("http", "https") and host else ""
+
+
+def safe_text(text: str) -> str:
+    """Free text (description, pattern): plain words only; any token with digits, symbols or mixed case goes."""
+    return " ".join(w for w in re.split(r"[^\w]+", text) if _FREE_WORD.match(w))[:CMD_LIMIT]
+
+
+SHAPE = {"url": safe_url, "description": safe_text, "pattern": safe_text}
+
+
 def sanitize(data: dict) -> dict:
     tool_input = data.get("tool_input") or {}
     safe = {}
     if isinstance(tool_input, dict):
-        safe = {k: tool_input[k][:CMD_LIMIT] for k in KEEP_INPUT_KEYS if isinstance(tool_input.get(k), str)}
+        safe = {k: SHAPE.get(k, lambda v: v[:CMD_LIMIT])(tool_input[k]) for k in KEEP_INPUT_KEYS
+                if isinstance(tool_input.get(k), str)}
         if isinstance(tool_input.get("command"), str):  # first line only: heredoc/inline-script bodies are content
             safe["command"] = safe_command(tool_input["command"])
     out = {k: data[k] for k in ("session_id", "tool_name", "tool_use_id", "cwd", "agent_id") if k in data}

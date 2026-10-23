@@ -279,5 +279,80 @@ class SpawnStorm(unittest.TestCase):
         self.assertEqual(len(spawned), 1)
 
 
+SYN = "SYNTH" + "abc123xyz"            # built at run time: never a literal credential-shaped string
+SYN_LOWER = "hunter" + "2pass"
+
+
+class AllowlistRound4(unittest.TestCase):
+    def san(self, **ti):
+        return observe_meta.sanitize({"tool_input": ti})["tool_input"]
+
+    def test_1a_1b_1c_values_hidden_in_flags_and_program_names(self):
+        for cmd in (f"mysql -p{SYN} db", f"./{SYN} --run", f"tool-ghp_{SYN}x go", "app --sk-live-q1w2e3r4 go"):
+            out = self.san(command=cmd)["command"].lower()
+            self.assertNotIn(SYN.lower(), out, cmd)
+            self.assertNotIn("q1w2e3r4", out, cmd)
+        self.assertEqual(self.san(command=f"mysql -p{SYN} db")["command"], "mysql -p db")
+
+    def test_1e_useful_shape_kept(self):
+        self.assertEqual(self.san(command="aws s3 ls")["command"], "aws s3 ls")
+        self.assertEqual(self.san(command="npm run build:prod")["command"], "npm run build:prod")
+        self.assertEqual(self.san(command="kubectl get pods -n prod-1")["command"], "kubectl get pods -n")
+
+    def test_2a_url_keeps_scheme_and_host_only(self):
+        self.assertEqual(self.san(url=f"https://api.example.com/v1/x?sig={SYN}&k=abc")["url"], "https://api.example.com")
+
+    def test_2b_2c_free_text_fields_keep_words_not_values(self):
+        d = self.san(description=f"Run tests; password is {SYN} AKIA{SYN}", pattern=f"{SYN_LOWER}|token={SYN}")
+        self.assertNotIn(SYN.lower(), json.dumps(d).lower())
+        self.assertNotIn(SYN_LOWER, json.dumps(d))
+        self.assertIn("run tests", d["description"].lower())
+
+
+class CorrectionSecrets(unittest.TestCase):
+    def test_2d_secrets_in_a_correction_are_masked(self):
+        key = "sk_" + "live_" + "q1w2e3r4" * 3
+        rec = cc.make_record("s", "/x", f"그게 아니라 이 키 {key} 말고 https://u:{SYN}@h/x 써 AKIA{'Z9Y8X7W6V5U4T3S2'}")
+        self.assertNotIn(key, rec["text"])
+        self.assertNotIn(SYN, rec["text"])
+        self.assertNotIn("Z9Y8X7W6V5U4T3S2", rec["text"])
+        self.assertIn("그게 아니라", rec["text"])
+
+
+class SpawnMarkRound4(unittest.TestCase):
+    def setUp(self):
+        self.mark = Path(tempfile.mkdtemp()) / "mark"
+        cc._spawned_here = False  # per-process fallback flag; earlier tests in this process may have set it
+
+    def spawn_count(self, n=10):
+        spawned = []
+        with mock.patch.object(cc, "_tokens_from_server", side_effect=OSError("down")), \
+             mock.patch.object(cc.pc, "start_detached", lambda argv, task: spawned.append(1)), \
+             mock.patch.object(cc, "SPAWN_MARK", self.mark):
+            for _ in range(n):
+                cc.is_correction("그게 아니라 이렇게 해")
+        return len(spawned)
+
+    def test_3b_future_mtime_does_not_block_forever(self):
+        self.mark.touch()
+        future = __import__("time").time() + 3600
+        os.utime(self.mark, (future, future))
+        self.assertEqual(self.spawn_count(), 1)
+
+    def test_3c_unwritable_mark_still_spawns_once(self):
+        with mock.patch.object(Path, "touch", side_effect=OSError("read-only")), \
+             mock.patch.object(os, "open", side_effect=OSError("read-only")):
+            self.assertEqual(self.spawn_count(), 1)
+
+    def test_3a_concurrent_processes_spawn_once_per_window(self):
+        import subprocess
+        code = (f"import sys;sys.path.insert(0,{str(_ECC)!r});import capture_correction as cc;from pathlib import Path;"
+                f"cc.SPAWN_MARK=Path({str(self.mark)!r});cc._tokens_from_server=lambda *a,**k:(_ for _ in ()).throw(OSError());"
+                f"import platform_compat as pc;pc.start_detached=lambda a,t:print('SPAWN',flush=True);cc.is_correction('그게 아니라 x')")
+        procs = [subprocess.Popen([sys.executable, "-I", "-c", code], stdout=subprocess.PIPE, text=True) for _ in range(20)]
+        outs = "".join(p.communicate(timeout=60)[0] for p in procs)
+        self.assertEqual(outs.count("SPAWN"), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -341,17 +341,17 @@ class Run:
                     entry = reg.get(pid, {})
                     reg[pid] = {"id": pid, "name": pname, "root": root, "remote": remote,
                                 "created_at": entry.get("created_at", now), "last_seen": now}
-            reg_path.write_text(json.dumps(reg, indent=2, ensure_ascii=False), "utf-8")
+            write_atomic(reg_path, json.dumps(reg, indent=2, ensure_ascii=False))
             recs = ri.records(self.repeat)
-            (STORE / "repeated_instructions.jsonl").write_text(  # derived: rewritten whole each run
-                "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in recs), "utf-8")
+            write_atomic(STORE / "repeated_instructions.jsonl",  # derived: rewritten whole each run
+                         "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in recs))
             self.files["repeated_instructions"] = len(recs)
             if self.use_state:  # merge with what another run may have written meanwhile (we hold the lock)
                 disk = json.loads(self.state_path.read_text("utf-8")) if self.state_path.exists() else {}
-                self.state_path.write_text(json.dumps({**disk, **self.state}, indent=1), "utf-8")
+                write_atomic(self.state_path, json.dumps({**disk, **self.state}, indent=1))
                 if self.repeat_path.exists() and not self.rebuild_repeat:
                     self.repeat.merge(ri.Index.from_json(self.repeat_path.read_text("utf-8")))
-                self.repeat_path.write_text(self.repeat.to_json(), "utf-8")
+                write_atomic(self.repeat_path, self.repeat.to_json())
 
     def report(self):
         tot = Counter()
@@ -365,6 +365,12 @@ class Run:
               f"   detector: {self.detector}")
         print("\n".join(rows[:40]) + (f"\n... {len(rows) - 40} more projects" if len(rows) > 40 else ""))
         print(f"TOTAL prompts={tot['prompt']} corrections={tot['correction']} decisions={tot['decision']} tool_uses={tot['tool_use']} injected={tot['prompt_injected']}")
+
+
+def write_atomic(path: Path, text: str):
+    tmp = path.with_name(path.name + f".tmp{os.getpid()}")
+    tmp.write_text(text, "utf-8")
+    os.replace(tmp, path)
 
 
 def file_digest(path: Path) -> str:
