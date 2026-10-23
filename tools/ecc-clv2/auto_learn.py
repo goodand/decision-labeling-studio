@@ -30,8 +30,10 @@ MAX_HABITS = 15
 
 
 def _count(pdir: Path) -> int:
-    f = pdir / "observations.jsonl"
-    return sum(1 for l in f.read_text("utf-8").splitlines() if l.strip()) if f.exists() else 0
+    """Lines across observations.jsonl, its observe.sh archive (rotation at 10MB) and corrections.jsonl,
+    so the delta since the last run is monotonic and corrections alone can trigger a run."""
+    files = sorted((pdir / "observations.archive").glob("*.jsonl")) + [pdir / "observations.jsonl", pdir / "corrections.jsonl"]
+    return sum(1 for f in files if f.exists() for l in f.read_text("utf-8").splitlines() if l.strip())
 
 
 def due(pdir: Path) -> bool:
@@ -57,9 +59,8 @@ def publish(results: dict, registry: dict):
     existing = HABITS.read_text("utf-8") if HABITS.exists() else head
     digest = [f"# Learned digest ({time.strftime('%Y-%m-%d %H:%M')})", ""]
     for name, rs in results.items():
-        pdir = STORE / "projects" / by_name[name]
         for r in rs:
-            md = pdir / "instincts" / "personal" / r["file"]
+            md = STORE / "projects" / by_name[name] / "instincts" / "personal" / r["file"]
             key = f"<!-- {name}/{r['file']} -->"
             if r["status"] == "active" and key not in existing and md.exists():
                 existing += f"- {_action(md)} {key}\n"
@@ -70,7 +71,10 @@ def publish(results: dict, registry: dict):
     HABITS.parent.mkdir(parents=True, exist_ok=True)
     HABITS.write_text("\n".join([l for l in lines if not l.startswith("- ")] + body) + "\n", "utf-8")
     DIGEST.parent.mkdir(parents=True, exist_ok=True)
-    DIGEST.write_text("\n".join(digest) + "\n", "utf-8")
+    old = DIGEST.read_text("utf-8").splitlines() if DIGEST.exists() else []
+    kept = [l for l in old if l.startswith("- ")]                      # unread candidates from earlier runs
+    new = [l for l in digest if l.startswith("- ") and l not in kept]
+    DIGEST.write_text("\n".join([digest[0], ""] + kept + new) + "\n", "utf-8")
 
 
 def main(argv):

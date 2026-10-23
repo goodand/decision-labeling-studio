@@ -4,7 +4,7 @@ Mapping to RRSI (google-research/rrsi): learn_now.py = analyze+propose,
 R* rules = critic screen (leakage/format), evidence/generalization = evaluate with a
 noise floor, semantic judge = final check, select = promote/keep/prune.
 Writes one structured JSON report; instinct status goes to <project>/instinct_status.json.
-Usage: python eval_loop.py [--no-semantic] [project_name ...]
+Usage: python eval_loop.py [--semantic] [project_name ...]   (judge off unless --semantic)
 """
 import json, os, re, subprocess, sys
 from datetime import datetime, timezone
@@ -151,7 +151,7 @@ def evaluate_project(pdir: Path, meta: dict, semantic: bool):
 
 
 def main(argv):
-    semantic = "--no-semantic" not in argv
+    semantic = "--semantic" in argv  # opt-in, like auto_learn (--no-semantic is accepted and is the default)
     names = [a for a in argv if not a.startswith("--")]
     registry = json.loads((STORE / "projects.json").read_text("utf-8"))
     report = {"run_at": datetime.now(timezone.utc).isoformat(), "semantic": semantic, "projects": {}}

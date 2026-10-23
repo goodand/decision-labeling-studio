@@ -92,17 +92,22 @@ def run(project_dir: Path, meta: dict) -> str:
         os.remove(path)
     text = r.stdout.decode("utf-8", "replace")
     ok = text.strip().endswith('{"status":"analysis_complete"}')
+    seen, dups = set(), []
     for block in re.findall(r"<<<INSTINCT>>>\s*\n(.*?)\n<<<END>>>", text, re.S):
         m = re.search(r"^id:\s*([a-z0-9-]+)\s*$", block, re.M)
         if block.lstrip().startswith("---") and m:
+            if m.group(1) in seen:  # same label twice in one answer: keep the first, never overwrite silently
+                dups.append(m.group(1))
+                continue
+            seen.add(m.group(1))
             (instincts / f"{m.group(1)}.md").write_text(block.strip() + "\n", "utf-8")
     written = sorted(p.name for p in instincts.glob("*.md"))
     with open(project_dir / "learn_now.log", "a", encoding="utf-8") as log:
         log.write(json.dumps({"ok": ok, "rc": r.returncode, "lines": min(len(lines), MAX_LINES),
-                              "instincts": written, "stdout": r.stdout.decode("utf-8", "replace")[-800:],
+                              "instincts": written, "duplicate_ids": dups, "stdout": r.stdout.decode("utf-8", "replace")[-800:],
                               "stderr": r.stderr.decode("utf-8", "replace")[-500:]},
                              ensure_ascii=False) + "\n")
-    return f"{'ok' if ok else 'INCOMPLETE'} rc={r.returncode} instincts={written}"
+    return f"{'ok' if ok else 'INCOMPLETE'} rc={r.returncode} instincts={written}" + (f" duplicate={dups}" if dups else "")
 
 
 def main(names):

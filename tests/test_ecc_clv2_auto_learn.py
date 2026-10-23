@@ -47,6 +47,35 @@ class AutoLearnFlow(unittest.TestCase):
             f.write("\n" + "\n".join(json.dumps({"session": "s"}) for _ in range(auto_learn.MIN_NEW)))
         self.assertTrue(auto_learn.due(pdir))
 
+    def test_due_survives_observe_sh_rotation(self):
+        """observe.sh moves observations.jsonl to observations.archive/ at 10MB. The throttle must count
+        archived lines too, or the first run after a rotation sees a negative delta and never fires."""
+        pdir = self.store / "projects" / "p1"
+        auto_learn.mark_done(pdir)                                    # 30 seen
+        (pdir / "observations.archive").mkdir()
+        (pdir / "observations.jsonl").rename(pdir / "observations.archive" / "observations-20261024-000000-1.jsonl")
+        (pdir / "observations.jsonl").write_text("\n".join(json.dumps({"session": "s"}) for _ in range(auto_learn.MIN_NEW)), "utf-8")
+        self.assertTrue(auto_learn.due(pdir))                         # 30 archived + 20 new - 30 seen = 20
+
+    def test_due_counts_corrections(self):
+        """Corrections are the strongest evidence (learn_now), so MIN_NEW new corrections alone must trigger a run."""
+        pdir = self.store / "projects" / "p1"
+        auto_learn.mark_done(pdir)
+        (pdir / "corrections.jsonl").write_text("\n".join(json.dumps({"event": "user_correction", "text": "아니라"})
+                                                          for _ in range(auto_learn.MIN_NEW)), "utf-8")
+        self.assertTrue(auto_learn.due(pdir))
+
+    def test_digest_keeps_unread_entries_from_earlier_runs(self):
+        """A later run on another project must not erase candidates a human has not read yet."""
+        pdir = self.store / "projects" / "p1"
+        (pdir / "instincts" / "personal" / "b.md").write_text("---\nid: b\n---\n## Action\nDo b.\n", "utf-8")
+        cand = [{"file": "b.md", "status": "candidate", "rules": {}, "evidence": {}, "semantic": None}]
+        auto_learn.publish({"demo": cand}, {"p1": {"id": "p1", "name": "demo"}})
+        auto_learn.publish({"other": []}, {"p1": {"id": "p1", "name": "demo"}})   # a run that found nothing new
+        self.assertIn("b.md", auto_learn.DIGEST.read_text("utf-8"))
+        auto_learn.publish({"demo": cand}, {"p1": {"id": "p1", "name": "demo"}})   # same candidate again: once
+        self.assertEqual(auto_learn.DIGEST.read_text("utf-8").count("b.md"), 1)
+
     def test_default_cycle_uses_no_llm_judge(self):
         """User rule (2026-10-23): verification by rules + human, no LLM judge. The unattended cycle must
         run the gate with semantic=False unless ECC_LEARN_SEMANTIC=1 is set explicitly."""

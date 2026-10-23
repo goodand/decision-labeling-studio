@@ -98,5 +98,22 @@ class GateTest(unittest.TestCase):
             self.assertEqual(res["good"]["status"], expected, seq)
 
 
+class CliDefault(unittest.TestCase):
+    def test_direct_run_defaults_to_rules_only(self):
+        """README: the LLM judge is opt-in everywhere. `python eval_loop.py` without flags must evaluate with
+        semantic=False; --semantic turns it on (the old --no-semantic stays accepted)."""
+        from unittest import mock
+        tmp = Path(tempfile.mkdtemp())
+        eval_loop.STORE = tmp
+        (tmp / "projects.json").write_text(json.dumps({"p1": {"id": "p1", "name": "demo"}}), "utf-8")
+        (tmp / "projects" / "p1").mkdir(parents=True)
+        seen = []
+        with mock.patch.object(eval_loop, "evaluate_project", lambda pdir, meta, semantic: seen.append(semantic) or []):
+            eval_loop.main([])
+            eval_loop.main(["--semantic"])
+            eval_loop.main(["--no-semantic"])
+        self.assertEqual(seen, [False, True, False])
+
+
 if __name__ == "__main__":
     unittest.main()
