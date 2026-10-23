@@ -12,7 +12,10 @@ from pathlib import Path
 
 import importlib.util
 _spec = importlib.util.spec_from_file_location(
-    "instinct_cli", Path(__file__).resolve().parent / "continuous-learning-v2" / "scripts" / "instinct-cli.py")
+    "instinct_cli", Path(os.environ.get("ECC_CLV2_SKILL_DIR") or next(
+        (d for d in (Path(__file__).resolve().parent / "continuous-learning-v2",
+                     Path(__file__).resolve().parent / "upstream" / "continuous-learning-v2") if d.exists()),
+        Path(__file__).resolve().parent / "continuous-learning-v2")) / "scripts" / "instinct-cli.py")  # ECC skill dir
 icli = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(icli)  # reuse ECC originals: parse_instinct_file, _trigger_keywords
 sys.path.insert(0, str(Path(__file__).resolve().parent / "vendor_wr"))

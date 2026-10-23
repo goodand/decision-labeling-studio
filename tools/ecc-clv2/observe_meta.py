@@ -8,8 +8,11 @@ Usage (Claude Code hook): python observe_meta.py pre|post
 import json, msvcrt, os, re, subprocess, sys, time
 from pathlib import Path
 
-GIT_BASH = r"C:\Program Files\Git\bin\bash.exe"
-OBSERVE = Path(__file__).resolve().parent / "continuous-learning-v2" / "hooks" / "observe.sh"
+GIT_BASH = os.environ.get("ECC_GIT_BASH", r"C:\Program Files\Git\bin\bash.exe")
+_HERE = Path(__file__).resolve().parent
+OBSERVE = Path(os.environ.get("ECC_CLV2_SKILL_DIR") or next(
+    (d for d in (_HERE / "continuous-learning-v2", _HERE / "upstream" / "continuous-learning-v2") if d.exists()),
+    _HERE / "continuous-learning-v2")) / "hooks" / "observe.sh"
 KEEP_INPUT_KEYS = ("file_path", "path", "pattern", "glob", "notebook_path", "url", "subagent_type", "description")
 CMD_LIMIT = 200
 
@@ -43,7 +46,7 @@ def main():
     env.setdefault("CLV2_PYTHON_CMD", "python")
     # Pin the store here. Claude Code rewrites settings.json env paths to "C:/...",
     # which observe.sh rejects as non-absolute and then falls back to ~/.local/share.
-    env["CLV2_HOMUNCULUS_DIR"] = os.environ.get("ECC_CLV2_STORE", "/c/Users/INTEC/.claude/ecc-homunculus")
+    env["CLV2_HOMUNCULUS_DIR"] = os.environ.get("ECC_CLV2_STORE", posix(Path.home() / ".claude" / "ecc-homunculus"))
     store = Path(re.sub(r"^/([a-z])/", r"\1:/", env["CLV2_HOMUNCULUS_DIR"]))
     store.mkdir(parents=True, exist_ok=True)
     with open(store / ".observe.lock", "a+b") as guard:  # E5: serialize observe.sh appends (no lock in ECC)

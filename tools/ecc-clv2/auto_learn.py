@@ -6,15 +6,16 @@ Runs per project only when MIN_NEW new observations exist since the last run (th
 Nothing here edits project rules or domain memory (실사용 lessons stay human-written).
 Usage: python auto_learn.py [--force] [project ...]
 """
-import json, sys, time
+import json, os, sys, time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import learn_now, eval_loop  # noqa: E402  (reuse, no new logic)
 
 STORE = learn_now.STORE
-DIGEST = Path(r"C:\Users\INTEC\.claude\projects\D--dev-eval-team\memory\learned-digest.md")
-HABITS = Path(r"C:\Users\INTEC\.claude\projects\C--Users-INTEC\memory\learned-agent-habits.md")
+_MEM = Path.home() / ".claude" / "projects"  # Claude Code auto-memory root; override per machine via env
+DIGEST = Path(os.environ.get("ECC_LEARN_DIGEST", _MEM / "D--dev-eval-team" / "memory" / "learned-digest.md"))
+HABITS = Path(os.environ.get("ECC_LEARN_HABITS", _MEM / "C--Users-INTEC" / "memory" / "learned-agent-habits.md"))
 MIN_NEW = 20
 MAX_HABITS = 15
 
@@ -73,7 +74,9 @@ def main(argv):
         if names and meta["name"] not in names or not (force or due(pdir)):
             continue
         print(meta["name"], "learn ->", learn_now.run(pdir, meta), flush=True)
-        results[meta["name"]] = eval_loop.evaluate_project(pdir, meta, True)
+        # Rules + human review by default; the LLM judge stage is opt-in (user rule 2026-10-23:
+        # LLM judging was neither more accurate nor reproducible — imitate human patterns as rules).
+        results[meta["name"]] = eval_loop.evaluate_project(pdir, meta, os.environ.get("ECC_LEARN_SEMANTIC") == "1")
         mark_done(pdir)
     if results:
         publish(results, registry)

@@ -8,12 +8,13 @@ Never blocks the prompt (always exit 0).
 import json, os, re, sys, time
 from pathlib import Path
 
-STORE = Path(os.environ.get("ECC_CLV2_STORE_WIN", r"C:\Users\INTEC\.claude\ecc-homunculus"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # hooks run with `python -I`: script dir not on path
+STORE = Path(os.environ.get("ECC_CLV2_STORE_WIN", Path.home() / ".claude" / "ecc-homunculus"))
 MAX_CHARS = 300
 AUTOMATED_MARK = "[ECC-AUTOMATED]"  # learner/judge prompts carry this; never treat them as user input
 MARKERS = re.compile(
-    r"(아니라|아니고|아니야|말고|하지\s*마|하지마|마라|해야지|해야\s*해|해야\s*한다|잖아|틀렸|잘못|왜\s|다시\s*해|"
-    r"재사용|덮어쓰|원본|정답\s*전용|섞지)")
+    r"(아니라|아니고|아니야|말고|하지\s*마|하지마|마라|해야지|해야\s*해|해야\s*한다|잖아|틀렸|틀린|잘못|다시\s*해|"
+    r"지\s*않|안\s*(돼|되|된다)|못\s|재사용|덮어쓰|원본|정답\s*전용|섞지)")  # mirrors the Kiwi rule; "왜" dropped (questions)
 DOC_REF = re.compile(r"[^\s\"']*\.(pdf|hwpx?|xlsx?|xlsm)\b", re.I)
 
 
@@ -66,9 +67,19 @@ def is_correction(text: str) -> bool:
         return is_correction_regex(text)
 
 
+START_TASK = os.environ.get("ECC_KIWI_START_TASK", "ECC_KiwiStart")
+
+
 def _start_server_detached():
+    """A child of the hook dies with the hook's Job Object on Windows (cf. ECC #2489), so ask Task
+    Scheduler to start the server; fall back to a detached child where no task exists (tests)."""
+    import subprocess
     try:
-        import subprocess
+        if subprocess.run(["schtasks", "/Run", "/TN", START_TASK], capture_output=True, timeout=5).returncode == 0:
+            return
+    except Exception:
+        pass
+    try:
         subprocess.Popen([sys.executable, "-X", "utf8", "-I", str(Path(__file__).with_name("kiwi_server.py"))],
                          creationflags=getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0),
                          stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)

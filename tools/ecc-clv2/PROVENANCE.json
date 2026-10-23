@@ -14,17 +14,17 @@
  "evidence_policy": "원문(정정 발언)은 저장소에 넣지 않는다. 승격된 결정마다 근거가 된 발언만 user_quote로 인용한다(사용자 2026-10-23).",
  "files": {
   "auto_learn.py": {
-   "sha256": "6e071a70ebc9b70a369fe996e0682a894f44a8dab6b1650fcbb387b414ef0194",
+   "sha256": "193eb921629a5765b92e794b9551106aa7eae8c347cfdcaeb9e87a2d5847c11e",
    "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\auto_learn.py",
    "identical_to_source": true
   },
   "capture_correction.py": {
-   "sha256": "89ae294eb2906d77481fcb6ed552b38684a0ee3de9c06a333da368f268b7d097",
+   "sha256": "344a3fed4bd62d3323c293c315858e300f1bb13f7782f1b92fc23344e3bd0d92",
    "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\capture_correction.py",
    "identical_to_source": true
   },
   "eval_loop.py": {
-   "sha256": "84d5d3b46f66d4cd9a70250c9b9ed127b9d4bd1ed6ada79d9b8f151c36f09c31",
+   "sha256": "f8e227e575d1f744c193f38f664a8089a60dc7f801535eab9e46d3fe37217b8f",
    "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\eval_loop.py",
    "identical_to_source": true
   },
@@ -34,7 +34,7 @@
    "identical_to_source": true
   },
   "observe_meta.py": {
-   "sha256": "a0c0d354fa627da8d547b6394882d36ec2cd1cffba19a307040624e4777e56f2",
+   "sha256": "3ea7c74eeb1ec25c67647908877bd83066c7c11b7ac0d3a0f3b9a796146acb96",
    "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\observe_meta.py",
    "identical_to_source": true
   },
@@ -112,6 +112,31 @@
    "sha256": "b803f1cbcc4910cfd5578737d078b14d8a7fd8ffe1115599bc4cfecc47a4223c",
    "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\vendor_wr\\SOURCE.txt",
    "identical_to_source": true
+  },
+  "kiwi_server.py": {
+   "sha256": "2e2fcea906958a0d5d365744a19b101858c1e94ba74e011c7209cbd5edfb0f86",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\kiwi_server.py",
+   "identical_to_source": true
+  },
+  "block_doc_read.py": {
+   "sha256": "ca955a9a84224c397b124e5da455d53a1fcd861eafdf2ef02262f52886aff06f",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\block_doc_read.py",
+   "identical_to_source": false
   }
- }
+ },
+ "updates": [
+  {
+   "recorded_on": "2026-10-23",
+   "author": "Claude (Harness session)",
+   "what": "래퍼 5개를 최신판으로 갱신, kiwi_server.py·block_doc_read.py·README.md·tests/test_ecc_clv2_*.py 추가. 데이터 없음(결정 STUDIO-ECC-001~003 유지).",
+   "changes": [
+    "Kiwi(cong) 상주 서버 + 형태소 규칙 정정 감지, 정규식 폴백",
+    "자동 세션 자기관찰 차단(--settings disableAllHooks, [ECC-AUTOMATED])",
+    "auto_learn 기본 = 규칙 게이트만, LLM judge는 ECC_LEARN_SEMANTIC=1 옵트인(사용자 원칙 2026-10-23)",
+    "기계 고정 경로 → 환경변수 기본값(ECC_CLV2_STORE_WIN, ECC_LEARN_DIGEST/HABITS, ECC_GIT_BASH, ECC_CLV2_SKILL_DIR)",
+    "버그: python -I 훅에서 kiwi_server import 실패→정규식 퇴화; 서버가 바인드 후 로드하여 준비 전 응답 지연"
+   ],
+   "live_hooks": "변경 없음: 훅은 C:\\Users\\INTEC\\.claude\\ecc-clv2 사본을 실행한다. 저장소 사본과의 일치 여부는 files[*].identical_to_source."
+  }
+ ]
 }
