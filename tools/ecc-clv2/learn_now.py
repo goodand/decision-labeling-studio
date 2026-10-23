@@ -21,6 +21,7 @@ PROMPT = """[ECC-AUTOMATED] IMPORTANT: You are running in non-interactive --prin
 
 Read {analysis} and identify patterns for the project {name} (user corrections, error resolutions, repeated workflows, tool preferences).
 Lines with "event": "user_correction" are the user's own corrections: treat each as strong evidence (one correction counts as 3 observations) and prefer instincts that encode the rule the user stated.
+Lines with "event": "user_repeated_instruction" are phrases the user wrote in N different sessions ("sessions" field): a standing instruction the agent keeps forgetting; treat each as N observations and prefer an instinct that encodes it.
 Lines with "event": "user_decision" are decisions the user already confirmed (fields decision_id, status, decision; text = the user's words): treat each as settled (counts as 3 observations) and never propose an instinct that contradicts one.
 If you find 3+ occurrences of the same pattern, you MUST output an instinct block for it.
 
@@ -64,6 +65,8 @@ def run(project_dir: Path, meta: dict) -> str:
     lines = obs.read_text("utf-8").splitlines() if obs.exists() else []
     corr = project_dir / "corrections.jsonl"  # user corrections (capture_correction.py): strongest evidence
     lines += corr.read_text("utf-8").splitlines() if corr.exists() else []
+    rep = STORE / "repeated_instructions.jsonl"  # cross-session instructions (backfill/repeat_instr), store-wide
+    lines += rep.read_text("utf-8").splitlines() if rep.exists() else []
     if len(lines) < MIN_LINES:
         return f"skip ({len(lines)} lines)"
     try:  # tripwire: refuse before anything is written or sent

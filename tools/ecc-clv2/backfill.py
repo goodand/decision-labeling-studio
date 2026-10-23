@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import capture_correction as cc  # noqa: E402  (correction rule, record shape, automated marker)
 import observe_meta  # noqa: E402  (metadata-only input filter)
 import platform_compat as pc  # noqa: E402
+import repeat_instr as ri  # noqa: E402  (cross-session repeated instructions)
 
 STORE = pc.store_dir()
 MAX_FILE_SIZE_MB = 10  # same rotation as observe.sh
@@ -241,6 +242,8 @@ class Run:
         self.state_path = STORE / "backfill_state.json"
         self.state = json.loads(self.state_path.read_text("utf-8")) if use_state and self.state_path.exists() else {}
         self.buf = defaultdict(lambda: {"corrections": [], "observations": []})
+        self.repeat_path = STORE / "repeat_index.json"  # phrase -> sessions, merged across runs
+        self.repeat = ri.Index.from_json(self.repeat_path.read_text("utf-8")) if use_state and self.repeat_path.exists() else ri.Index()
 
     def process(self, path: Path, reader):
         key, lines_done = str(path), 0
@@ -262,6 +265,7 @@ class Run:
                     c["prompt_injected"] += 1
                     continue
                 c["prompt"] += 1
+                self.repeat.add(sess, text)
                 if cc.is_correction(text):
                     rec = cc.make_record(sess, cwd, text)
                     rec["timestamp"] = ts(when)
@@ -304,8 +308,13 @@ class Run:
                     reg[pid] = {"id": pid, "name": pname, "root": root, "remote": remote,
                                 "created_at": entry.get("created_at", now), "last_seen": now}
             reg_path.write_text(json.dumps(reg, indent=2, ensure_ascii=False), "utf-8")
+            recs = ri.records(self.repeat)
+            (STORE / "repeated_instructions.jsonl").write_text(  # derived: rewritten whole each run
+                "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in recs), "utf-8")
+            self.files["repeated_instructions"] = len(recs)
             if self.use_state:
                 self.state_path.write_text(json.dumps(self.state, indent=1), "utf-8")
+                self.repeat_path.write_text(self.repeat.to_json(), "utf-8")
 
     def report(self):
         tot = Counter()
