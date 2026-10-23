@@ -16,6 +16,7 @@ import leak_guard  # noqa: E402  (harness2 tripwire: metadata only may reach the
 STORE = pc.store_dir()
 MODEL, EFFORT = "claude-opus-5-5", "low"
 MAX_LINES, MIN_LINES = 500, 20
+MAX_REPEATED = 60  # tier-2 tunable: repeated-instruction lines get their own budget (top by sessions)
 
 PROMPT = """[ECC-AUTOMATED] IMPORTANT: You are running in non-interactive --print mode. Do NOT write files. Output each instinct file's full content between a line '<<<INSTINCT>>>' and a line '<<<END>>>'; the caller saves them. Read the whole file (all lines).
 
@@ -66,11 +67,12 @@ def run(project_dir: Path, meta: dict) -> str:
     corr = project_dir / "corrections.jsonl"  # user corrections (capture_correction.py): strongest evidence
     lines += corr.read_text("utf-8").splitlines() if corr.exists() else []
     rep = STORE / "repeated_instructions.jsonl"  # cross-session instructions (backfill/repeat_instr), store-wide
-    lines += rep.read_text("utf-8").splitlines() if rep.exists() else []
+    reps = [l for l in (rep.read_text("utf-8").splitlines() if rep.exists() else []) if l.strip()]
+    reps = sorted(reps, key=lambda l: -json.loads(l).get("sessions", 0))[:MAX_REPEATED]  # own budget, never crowds out
     if len(lines) < MIN_LINES:
         return f"skip ({len(lines)} lines)"
     try:  # tripwire: refuse before anything is written or sent
-        leak_guard.assert_records_metadata_only(json.loads(l) for l in lines[-MAX_LINES:] if l.strip())
+        leak_guard.assert_records_metadata_only(json.loads(l) for l in lines[-MAX_LINES:] + reps if l.strip())
     except ValueError as e:
         with open(project_dir / "learn_now.log", "a", encoding="utf-8") as log:
             log.write(json.dumps({"ok": False, "rc": -1, "lines": min(len(lines), MAX_LINES), "instincts": [],
@@ -82,7 +84,7 @@ def run(project_dir: Path, meta: dict) -> str:
     tmp.mkdir(exist_ok=True)
     fd, path = tempfile.mkstemp(prefix="analysis-", suffix=".jsonl", dir=tmp)
     with os.fdopen(fd, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines[-MAX_LINES:]) + "\n")
+        f.write("\n".join(lines[-MAX_LINES:] + reps) + "\n")
     prompt = PROMPT.format(analysis=f".observer-tmp/{Path(path).name}", name=meta["name"], pid=meta["id"],
                            instincts="instincts/personal")
     env = dict(os.environ, ECC_SKIP_OBSERVE="1", ECC_HOOK_PROFILE="minimal")

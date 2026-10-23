@@ -135,6 +135,35 @@ class LearnNow(unittest.TestCase):
         self.assertIn("user_repeated_instruction", seen["analysis"])
         self.assertIn("user_repeated_instruction", seen["prompt"])
 
+    def test_repeated_lines_cannot_crowd_out_observations_and_corrections(self):
+        """learn_now keeps the last MAX_LINES lines; 1,588 repeated phrases (real run) would push out every
+        observation and correction. Repeated instructions get their own budget, highest sessions first."""
+        import learn_now
+        store = Path(tempfile.mkdtemp())
+        pdir = store / "projects" / "p"
+        pdir.mkdir(parents=True)
+        obs = {"timestamp": "t", "event": "tool_start", "tool": "Bash", "session": "s", "input": "{}"}
+        corr = {"timestamp": "t", "event": "user_correction", "session": "s", "text": "그게 아니라"}
+        (pdir / "observations.jsonl").write_text("\n".join([json.dumps(obs)] * 300), "utf-8")
+        (pdir / "corrections.jsonl").write_text(json.dumps(corr, ensure_ascii=False), "utf-8")
+        reps = [{"event": "user_repeated_instruction", "phrase": f"p{i}", "sessions": 3 + i % 7, "text": f"p{i}"}
+                for i in range(1600)]
+        (store / "repeated_instructions.jsonl").write_text("\n".join(json.dumps(r) for r in reps), "utf-8")
+        seen = {}
+
+        def fake_run(cmd, cwd, input, **kw):
+            seen["lines"] = [json.loads(l) for l in next((cwd / ".observer-tmp").glob("analysis-*.jsonl")).read_text("utf-8").splitlines() if l]
+            return mock.Mock(stdout=b'{"status":"analysis_complete"}', stderr=b"", returncode=0)
+
+        with mock.patch.object(learn_now, "STORE", store), mock.patch.object(learn_now.subprocess, "run", fake_run):
+            learn_now.run(pdir, {"id": "p", "name": "n"})
+        ev = [l["event"] for l in seen["lines"]]
+        self.assertIn("user_correction", ev)
+        self.assertGreaterEqual(ev.count("tool_start"), 300)
+        rep = [l for l in seen["lines"] if l["event"] == "user_repeated_instruction"]
+        self.assertEqual(len(rep), learn_now.MAX_REPEATED)
+        self.assertEqual(min(r["sessions"] for r in rep), max(r["sessions"] for r in reps) - 0)  # top by sessions
+
 
 if __name__ == "__main__":
     unittest.main()
