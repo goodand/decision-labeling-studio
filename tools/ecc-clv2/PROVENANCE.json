@@ -1,0 +1,117 @@
+{
+ "recorded_on": "2026-10-23",
+ "author": "Claude (review screen session)",
+ "what": "ECC continuous-learning-v2 로직 사본(비즈니스 로직만). 데이터(관측·정정 원문·instinct)는 넣지 않음.",
+ "upstream": {
+  "name": "ECC (ecc-universal) 2.2.3 continuous-learning-v2",
+  "license": "MIT, Copyright (c) 2026 Affaan Mustafa",
+  "repo": "https://github.com/affaan-m/ECC",
+  "license_file_from": "C:\\Users\\INTEC\\.codex\\plugins\\cache\\ecc\\ecc\\2.2.3\\LICENSE"
+ },
+ "local_wrappers": "observe_meta.py, capture_correction.py, learn_now.py, eval_loop.py, auto_learn.py: 사용자 환경(Windows)용 래퍼, 원본 위치 C:\\Users\\INTEC\\.claude\\ecc-clv2",
+ "vendor_wr": "semantic_review.py = D:\\web_chat_gpt\\workflow-runner\\semantic_review.py 와 동일(sha256 일치)",
+ "live_hooks": "설정의 훅은 여전히 C:\\Users\\INTEC\\.claude\\ecc-clv2 를 실행한다. 이 사본으로 바꾸는 것은 별도 결정.",
+ "evidence_policy": "원문(정정 발언)은 저장소에 넣지 않는다. 승격된 결정마다 근거가 된 발언만 user_quote로 인용한다(사용자 2026-10-23).",
+ "files": {
+  "auto_learn.py": {
+   "sha256": "6e071a70ebc9b70a369fe996e0682a894f44a8dab6b1650fcbb387b414ef0194",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\auto_learn.py",
+   "identical_to_source": true
+  },
+  "capture_correction.py": {
+   "sha256": "89ae294eb2906d77481fcb6ed552b38684a0ee3de9c06a333da368f268b7d097",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\capture_correction.py",
+   "identical_to_source": true
+  },
+  "eval_loop.py": {
+   "sha256": "84d5d3b46f66d4cd9a70250c9b9ed127b9d4bd1ed6ada79d9b8f151c36f09c31",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\eval_loop.py",
+   "identical_to_source": true
+  },
+  "learn_now.py": {
+   "sha256": "82bc87cd6427b9ff2aabd2a4f164a7048e44e359a46eea0753f0433a96195714",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\learn_now.py",
+   "identical_to_source": true
+  },
+  "observe_meta.py": {
+   "sha256": "a0c0d354fa627da8d547b6394882d36ec2cd1cffba19a307040624e4777e56f2",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\observe_meta.py",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/agents/observer-loop.sh": {
+   "sha256": "a6d119252c8ff2eda7aa7b345c2254fd6bdaf14056f6b5bf54835a2738ff310d",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\agents\\observer-loop.sh",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/agents/observer.md": {
+   "sha256": "320d50ff2965efeabd6f07c2be134e11da160293e958c1bc27c309d613839ad2",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\agents\\observer.md",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/agents/session-guardian.sh": {
+   "sha256": "ee6e4c0990f8d538cae1c85aa194e01e9ca2336e5d993ef68eb608b96cb0d82c",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\agents\\session-guardian.sh",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/agents/start-observer.sh": {
+   "sha256": "6f5beed1e96f685c09ffa7f614f9673ba68f1466a60830252b8b9138efe05e84",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\agents\\start-observer.sh",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/config.json": {
+   "sha256": "6f17e7a99aafe252ecd0b9212fb5f606be50b8ce1685f5a6435e46e87ffeb970",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\config.json",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/hooks/observe.sh": {
+   "sha256": "1f4b95054252a3c0fa88a6bde5365006418d6acf80d73993cfecc054733da37d",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\hooks\\observe.sh",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/scripts/detect-project.sh": {
+   "sha256": "43215ad15ce0c6585c13b1c45cbba6bf8df0dc459b663ddca77c0b86c459c283",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\scripts\\detect-project.sh",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/scripts/instinct-cli.py": {
+   "sha256": "d5450455a0cb3a1fa57c960a503c6e47f72910e2bb065874674bd567212549d4",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\scripts\\instinct-cli.py",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/scripts/lib/homunculus-dir.sh": {
+   "sha256": "99dfa99ae0f7c6e2e15ed5b5bf3c46e91a5f089f4060ba93d5da5e85e04fd308",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\scripts\\lib\\homunculus-dir.sh",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/scripts/migrate-homunculus.sh": {
+   "sha256": "34f121c143a676d330f06209618aae8cb08f8155298cb5fa70c893314bf9b303",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\scripts\\migrate-homunculus.sh",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/scripts/test_parse_instinct.py": {
+   "sha256": "5f3eea08474da2d3ea8b435fd14ff885531e3c6c69cf0168c417eecce4371363",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\scripts\\test_parse_instinct.py",
+   "identical_to_source": true
+  },
+  "upstream/continuous-learning-v2/SKILL.md": {
+   "sha256": "ddad12451a0d582c6ef1b197b7be193bef613cbc74eba4117fcb74fc7a4ecd00",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\continuous-learning-v2\\SKILL.md",
+   "identical_to_source": true
+  },
+  "upstream/LICENSE": {
+   "sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+   "copied_from": null,
+   "identical_to_source": null
+  },
+  "vendor_wr/semantic_review.py": {
+   "sha256": "56794b7d46cdcaa79d981cc8a1e9c8ed1764bc5df6bf0f5bd1e645e221feb9f5",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\vendor_wr\\semantic_review.py",
+   "identical_to_source": true
+  },
+  "vendor_wr/SOURCE.txt": {
+   "sha256": "b803f1cbcc4910cfd5578737d078b14d8a7fd8ffe1115599bc4cfecc47a4223c",
+   "copied_from": "C:\\Users\\INTEC\\.claude\\ecc-clv2\\vendor_wr\\SOURCE.txt",
+   "identical_to_source": true
+  }
+ }
+}
