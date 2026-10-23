@@ -167,6 +167,18 @@ class ForcedProject(Base):
         self.assertFalse((self.store / "corrections.jsonl").exists())  # nothing fell into global
 
 
+class LiveSessions(Base):
+    def test_sessions_the_live_hooks_already_recorded_are_skipped(self):
+        """Verified 2026-10-24: the live hooks had 520 lines for the current session, and backfill would read
+        that session's transcript again. Sessions already present in the store are skipped (counted)."""
+        self.store.mkdir(parents=True, exist_ok=True)
+        (self.store / "observations.jsonl").write_text(json.dumps({"session": "sess-1", "event": "tool_start"}) + "\n", "utf-8")
+        run = self.run_bf(self.claude)
+        self.assertEqual(run.files["live_session_skipped"], 1)
+        self.assertEqual(len(self.records("corrections")), 0)
+        self.assertEqual(len(self.records("observations")), 1)  # only the live line
+
+
 class StateAndDryRun(Base):
     def test_rerun_adds_nothing(self):
         self.run_bf(self.claude, self.codex)

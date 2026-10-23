@@ -213,7 +213,8 @@ def read_decisions(path: Path):
 # ---- record builders (same shapes as the live hooks) -----------------------------------------------
 def observation_pair(when, sess, name, inp, meta):
     safe = observe_meta.sanitize({"tool_input": inp})["tool_input"]
-    base = {"timestamp": ts(when), "tool": name, "session": sess, "project_id": meta[0], "project_name": meta[1]}
+    base = {"timestamp": ts(when), "tool": name, "session": sess, "project_id": meta[0], "project_name": meta[1],
+            "source": "backfill"}
     return [{**base, "event": "tool_start", "input": scrub(json.dumps(safe, ensure_ascii=False)[:5000])},
             {**base, "event": "tool_complete", "output": ""}]
 
@@ -242,6 +243,7 @@ class Run:
         self.state_path = STORE / "backfill_state.json"
         self.state = json.loads(self.state_path.read_text("utf-8")) if use_state and self.state_path.exists() else {}
         self.buf = defaultdict(lambda: {"corrections": [], "observations": []})
+        self.live, self._skipped_live = live_sessions(), set()  # sessions the live hooks recorded: never replay them (duplicates)
         self.repeat_path = STORE / "repeat_index.json"  # phrase -> sessions, merged across runs
         self.repeat = ri.Index.from_json(self.repeat_path.read_text("utf-8")) if use_state and self.repeat_path.exists() else ri.Index()
 
@@ -261,6 +263,11 @@ class Run:
         for item in reader(path):
             n_items += 1
             kind, when, sess, cwd = item[:4]
+            if sess in self.live:
+                if sess not in self._skipped_live:
+                    self._skipped_live.add(sess)
+                    self.files["live_session_skipped"] += 1
+                continue
             if self.since and ts(when) < self.since:
                 continue
             meta = self.projects.resolve(cwd)
@@ -274,7 +281,7 @@ class Run:
                 self.repeat.add(sess, text)
                 if cc.is_correction(text):
                     rec = cc.make_record(sess, cwd, text)
-                    rec["timestamp"] = ts(when)
+                    rec.update(timestamp=ts(when), source="backfill")
                     self.buf[meta[0]]["corrections"].append(rec)
                     c["correction"] += 1
             elif kind == "decision_unsettled":
@@ -334,6 +341,20 @@ class Run:
               f"   detector: {self.detector}")
         print("\n".join(rows[:40]) + (f"\n... {len(rows) - 40} more projects" if len(rows) > 40 else ""))
         print(f"TOTAL prompts={tot['prompt']} corrections={tot['correction']} decisions={tot['decision']} tool_uses={tot['tool_use']} injected={tot['prompt_injected']}")
+
+
+def live_sessions() -> set:
+    """Session ids in records the live hooks wrote (no "source": "backfill")."""
+    out = set()
+    for f in list(STORE.glob("*.jsonl")) + list(STORE.glob("projects/*/*.jsonl")) + list(STORE.glob("projects/*/observations.archive/*.jsonl")):
+        for line in f.open(encoding="utf-8", errors="replace"):
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(r, dict) and r.get("session") and r.get("source") != "backfill":
+                out.add(r["session"])
+    return out
 
 
 def pin_detector(wait: float = 20.0) -> str:
