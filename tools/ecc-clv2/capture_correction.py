@@ -106,8 +106,20 @@ def is_correction(text: str) -> bool:
 START_TASK = os.environ.get("ECC_KIWI_START_TASK", "ECC_KiwiStart")
 
 
+import tempfile  # noqa: E402
+SPAWN_MARK = Path(tempfile.gettempdir()) / "ecc-clv2-kiwi-spawn.mark"
+SPAWN_WINDOW_S = 30  # one start attempt per window, across processes: a booting server takes seconds
+
+
 def _start_server_detached():
-    """Task Scheduler (Windows) / launchd (macOS) job named START_TASK, else a detached child (tests)."""
+    """Task Scheduler (Windows) / launchd (macOS) job named START_TASK, else a detached child (tests).
+    At most one attempt per SPAWN_WINDOW_S, or every call while the server boots starts another one."""
+    try:
+        if SPAWN_MARK.exists() and time.time() - SPAWN_MARK.stat().st_mtime < SPAWN_WINDOW_S:
+            return
+        SPAWN_MARK.touch()
+    except OSError:
+        return
     pc.start_detached([sys.executable, "-X", "utf8", "-I", str(Path(__file__).with_name("kiwi_server.py"))], START_TASK)
 
 

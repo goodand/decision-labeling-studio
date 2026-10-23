@@ -87,7 +87,7 @@ class MetadataOnly(unittest.TestCase):
     def test_R4_heredoc_body_is_not_stored(self):
         s = observe_meta.sanitize({"tool_input": {"command": "cat > a.py <<'EOF'\nSECRET_FILE_BODY\nEOF"}})["tool_input"]
         self.assertNotIn("SECRET_FILE_BODY", s["command"])
-        self.assertTrue(s["command"].startswith("cat > a.py <<"))
+        self.assertEqual(s["command"], "cat a.py")  # allowlist (STUDIO-ECC-019): a plain file name is metadata (like file_path); the heredoc is not
 
     def test_R4_multiline_command_keeps_first_line_only(self):
         s = observe_meta.sanitize({"tool_input": {"command": "python3 - <<X\nimport os\nprint(os.environ)\nX"}})["tool_input"]
@@ -197,6 +197,86 @@ class MetadataRound2(unittest.TestCase):
         blob = json.dumps(repeat_instr.records(idx, min_sessions=3), ensure_ascii=False).lower()
         self.assertNotIn("akia", blob)
         self.assertNotIn("sk_live", blob)
+
+
+class CommandAllowlist(unittest.TestCase):
+    """Round 3: a blocklist of secret patterns kept leaking. Commands are reduced to their SHAPE:
+    program names, subcommand words, flag names, and shell separators. No value survives."""
+    SECRETS = ['curl -H "Authorization: Bearer ABCSECRET123" https://api.x/y', "curl -H 'Authorization: token ABCSECRET123' u",
+               "app --password ABCSECRET123", "app --password=ABCSECRET123", "app --token=ABCSECRET123",
+               "api_key=ABCSECRET123 ./run", "export DB_CONN=ABCSECRET123", 'PASSWORD="my ABCSECRET123 pass" ./run',
+               "gh auth login --with-token ghp_ABCSECRET123", "aws configure set aws_access_key_id AKIAABCSECRET123",
+               "curl 'https://x/y?access_token=ABCSECRET123'", "psql postgres://admin:p@ABCSECRET123@db.local",
+               "node -p \"process.env.ABCSECRET123\"", "bash -lc 'echo ABCSECRET123'", 'python3 -c"print(1)" ABCSECRET123',
+               'powershell -Command "Get-Secret ABCSECRET123"']
+
+    def san(self, cmd):
+        return observe_meta.sanitize({"tool_input": {"command": cmd}})["tool_input"]["command"]
+
+    def test_no_value_survives(self):
+        for c in self.SECRETS:
+            self.assertNotIn("abcsecret123", self.san(c).lower(), c)
+
+    def test_shape_is_kept(self):
+        self.assertEqual(self.san("git -c user.name=x commit -m 'msg'"), "git -c commit -m")
+        self.assertEqual(self.san("echo $((1<<2)) && make test"), "echo && make test")
+        self.assertEqual(self.san("curl -H 'X: y' https://api.x/y"), "curl -H")
+        self.assertEqual(self.san("python3 -m pytest tests -q"), "python3 -m pytest tests -q")
+
+
+class OriginRound3(Store):
+    def test_1a_two_identical_tool_calls_in_one_message_are_two_events(self):
+        line = {"type": "assistant", "sessionId": "S9", "timestamp": "2026-10-22T00:00:01.000Z", "cwd": "/none",
+                "isSidechain": False, "entrypoint": "cli", "message": {"role": "assistant", "content": [
+                    {"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "git status"}},
+                    {"type": "tool_use", "id": "t2", "name": "Bash", "input": {"command": "git status"}}]}}
+        self.f.write_text(json.dumps(line) + "\n", "utf-8")
+        self.run_bf()
+        obs = [json.loads(l) for l in (backfill.STORE / "observations.jsonl").read_text("utf-8").splitlines()]
+        self.assertEqual(sum(o["event"] == "tool_start" for o in obs), 2)
+
+    def test_1e_lone_surrogate_does_not_abort_the_run(self):
+        bad = json.dumps({"type": "user", "sessionId": "S1", "timestamp": "2026-10-22T00:00:01.000Z", "cwd": "/none",
+                          "isSidechain": False, "entrypoint": "cli", "message": {"role": "user", "content": "그게 아니라 \ud83d 깨진 문자"}})
+        self.f.write_text(bad + "\n" + cc_line("S1", 2, "그게 아니라 b"), "utf-8")
+        self.run_bf()
+        self.assertGreaterEqual(len(self.corrections()), 1)
+
+    def test_3b_concurrent_runs_keep_both_states(self):
+        g = self.src / "g.jsonl"
+        g.write_text(cc_line("S2", 1, "그게 아니라 g"), "utf-8")
+        r1, r2 = backfill.Run(False, "", True), backfill.Run(False, "", True)
+        r1.process(self.f, backfill.read_claude)
+        r2.process(g, backfill.read_claude)
+        r1.flush()
+        r2.flush()
+        state = json.loads((backfill.STORE / "backfill_state.json").read_text("utf-8"))
+        self.assertEqual({Path(k).name for k in state}, {"f.jsonl", "g.jsonl"})
+
+
+class KeyShapeRound3(unittest.TestCase):
+    def test_ordinary_words_survive(self):
+        kept = repeat_instr.words("v2beta1workflow sonnet45latest gpt4turbo2024 sk_learn xoxo eyjournal akiapowerful")
+        self.assertEqual(kept, ["v2beta1workflow", "sonnet45latest", "gpt4turbo2024", "sk_learn", "xoxo", "eyjournal", "akiapowerful"])
+
+    def test_real_key_shapes_still_dropped(self):
+        # assembled at run time: literal credential-shaped strings trip GitHub push protection
+        fake = ["AKIA" + "Z9Y8X7W6V5U4T3S2", "sk_" + "live_" + "q1w2e3r4" * 3, "ghp_" + "a1b2c3d4e5" * 4]
+        kept = repeat_instr.words(" ".join(fake) + " 기억해")
+        self.assertEqual(kept, ["기억해"])
+
+
+class SpawnStorm(unittest.TestCase):
+    """Measured 2026-10-24: 20 classifications with the Kiwi server down spawned 20 servers, each loading the
+    ~100MB model (likely what overheated the machine during the first backfill). At most one spawn per window."""
+    def test_classifications_with_server_down_spawn_at_most_once(self):
+        spawned = []
+        with mock.patch.object(cc, "_tokens_from_server", side_effect=OSError("down")), \
+             mock.patch.object(cc.pc, "start_detached", lambda argv, task: spawned.append(1)), \
+             mock.patch.object(cc, "SPAWN_MARK", Path(tempfile.mkdtemp()) / "kiwi-spawn.mark"):
+            for _ in range(20):
+                cc.is_correction("그게 아니라 이렇게 해")
+        self.assertEqual(len(spawned), 1)
 
 
 if __name__ == "__main__":

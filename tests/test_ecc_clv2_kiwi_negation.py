@@ -98,6 +98,8 @@ class Resident(unittest.TestCase):
         self.assertEqual(cc.last_backend, "kiwi")
         self.assertTrue(kiwi_server.stop())
         self.assertTrue(wait_port(False))
+        import tempfile
+        cc.SPAWN_MARK = Path(tempfile.mkdtemp()) / "mark"   # isolate from spawns earlier in this test run
         self.assertTrue(cc.is_correction("그게 아니라 원본 코드를 import 해야지"))
         self.assertEqual(cc.last_backend, "regex")              # fallback when the server is down
         self.assertTrue(wait_port(True))                        # ...and the fallback lazily restarts it

@@ -18,21 +18,42 @@ OBSERVE = Path(os.environ.get("ECC_CLV2_SKILL_DIR") or next(
     _HERE / "continuous-learning-v2")) / "hooks" / "observe.sh"
 KEEP_INPUT_KEYS = ("file_path", "path", "pattern", "glob", "notebook_path", "url", "subagent_type", "description")
 CMD_LIMIT = 200
-# A command's first line only, and nothing after an inline-script flag: those bodies are content.
-_INLINE = re.compile(r"(\s-(?:c|e|E|exec)\s)|(<<)")
-# Credentials that can sit on the first line: user:pass@ in URLs, and KEY=value for secret-like keys.
-_URL_CRED = re.compile(r"(://[^/\s:@]+:)[^@\s]+(@)")
-_ENV_CRED = re.compile(r"((?:^|\s)(?:[A-Z0-9_]*(?:PASS(?:WORD)?|SECRET|TOKEN|KEY|AUTH)[A-Z0-9_]*)=)(\S+)")
+# Allowlist (STUDIO-ECC-019): a command is reduced to its SHAPE. Kept: program names, unquoted
+# lowercase subcommand words, flag NAMES, shell separators. Dropped: every quoted token, every value
+# (anything after "=", paths, URLs, numbers, mixed case), assignments, and all lines after the first.
+# Residual risk, documented: an unquoted all-lowercase secret without digits used as a positional word.
+_TOK = re.compile(r"""(?:"[^"]*"|'[^']*'|[^\s"'])+""")
+_SEP = {"&&", "||", "|", ";"}
+_PROG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]{0,39}$")
+_FLAG = re.compile(r"^--?[A-Za-z][A-Za-z0-9-]{0,39}$")
+_WORD = re.compile(r"^[a-z][a-z_.-]{0,29}$")          # no digits, no upper case: subcommands, module names
+_ASSIGN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
 
 def safe_command(cmd: str) -> str:
-    line = cmd.splitlines()[0] if cmd.splitlines() else ""
-    m = _INLINE.search(line)
-    if m:
-        line = line[: m.end()] + "[…]"
-    line = _URL_CRED.sub(r"\1[REDACTED]\2", line)
-    line = _ENV_CRED.sub(r"\1[REDACTED]", line)
-    return line[:CMD_LIMIT]
+    lines = cmd.splitlines()
+    out, expect_prog = [], True
+    for tok in _TOK.findall(lines[0] if lines else ""):
+        if tok in _SEP:
+            out.append(tok)
+            expect_prog = True
+            continue
+        if '"' in tok or "'" in tok:
+            continue  # quoted = a value
+        if expect_prog:
+            if _ASSIGN.match(tok):
+                continue  # VAR=value prefix
+            name = tok.rstrip("/").rsplit("/", 1)[-1]
+            if _PROG.match(name):
+                out.append(name)
+            expect_prog = False
+        elif tok.startswith("-"):
+            name = tok.split("=", 1)[0]
+            if _FLAG.match(name):
+                out.append(name)
+        elif _WORD.match(tok):
+            out.append(tok)
+    return " ".join(out)[:CMD_LIMIT]
 
 
 def sanitize(data: dict) -> dict:

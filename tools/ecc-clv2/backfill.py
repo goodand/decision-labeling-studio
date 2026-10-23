@@ -129,7 +129,7 @@ def _claude_lines(fh):
         if d["type"] == "assistant":
             for b in content if isinstance(content, list) else []:
                 if isinstance(b, dict) and b.get("type") == "tool_use":
-                    yield ("tool", when, sess, cwd, b.get("name", "unknown"), b.get("input") or {})
+                    yield ("tool", when, sess, cwd, b.get("name", "unknown"), b.get("input") or {}, b.get("id", ""))
             continue
         if d.get("toolUseResult") is not None:
             continue
@@ -178,7 +178,7 @@ def _codex_lines(fh):
                     inp["command"] = p["input"]  # raw command line; apply_patch bodies are file content and stay out
                 if isinstance(inp.get("command"), list):
                     inp["command"] = " ".join(map(str, inp["command"]))
-                yield ("tool", when, sess, cwd, CODEX_TOOLS.get(name, f"codex:{name}"), inp)
+                yield ("tool", when, sess, cwd, CODEX_TOOLS.get(name, f"codex:{name}"), inp, p.get("call_id", ""))
 
 
 # Statuses that are NOT settled decisions; the learner would otherwise treat them as rules.
@@ -278,7 +278,7 @@ class Run:
             meta = self.projects.resolve(cwd)
             c = self.counts[meta[0]]
             if kind == "prompt":
-                text = item[4]
+                text = item[4].encode("utf-8", "replace").decode("utf-8")  # lone surrogates cannot be written
                 if not is_human_prompt(text):
                     c["prompt_injected"] += 1
                     continue
@@ -346,8 +346,11 @@ class Run:
             (STORE / "repeated_instructions.jsonl").write_text(  # derived: rewritten whole each run
                 "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in recs), "utf-8")
             self.files["repeated_instructions"] = len(recs)
-            if self.use_state:
-                self.state_path.write_text(json.dumps(self.state, indent=1), "utf-8")
+            if self.use_state:  # merge with what another run may have written meanwhile (we hold the lock)
+                disk = json.loads(self.state_path.read_text("utf-8")) if self.state_path.exists() else {}
+                self.state_path.write_text(json.dumps({**disk, **self.state}, indent=1), "utf-8")
+                if self.repeat_path.exists() and not self.rebuild_repeat:
+                    self.repeat.merge(ri.Index.from_json(self.repeat_path.read_text("utf-8")))
                 self.repeat_path.write_text(self.repeat.to_json(), "utf-8")
 
     def report(self):
@@ -378,7 +381,7 @@ def item_origin(item) -> str:
     kind, when, sess, cwd = item[:4]
     body = json.dumps([kind, when, sess, cwd] + [x if isinstance(x, (str, dict, list)) else str(x) for x in item[4:]],
                       sort_keys=True, ensure_ascii=False)
-    return hashlib.sha256(body.encode("utf-8")).hexdigest()[:20]
+    return hashlib.sha256(body.encode("utf-8", "surrogatepass")).hexdigest()[:20]
 
 
 def written_origins() -> set:

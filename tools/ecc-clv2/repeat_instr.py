@@ -16,8 +16,12 @@ MIN_SESSIONS = 3   # tier-2 tunable: how many sessions make an instruction
 MAX_N = 6
 MAX_WORDS = 80     # per prompt; long pastes are not instructions
 MAX_WORD_LEN = 40
-_KEY_PREFIX = ("akia", "sk_", "sk-", "ghp_", "gho_", "xox", "aiza", "ya29", "eyj")   # common credential prefixes
-_KEY_SHAPE = re.compile(r"^(?=.*[a-z])(?=.*\d)[a-z0-9_-]{12,}$")                     # long letter+digit blobs
+# Credential formats (lower-cased): AWS, Stripe/OpenAI-style, GitHub, Slack, Google, JWT; plus any long
+# letter+digit blob. Kept narrow so ordinary words like gpt4turbo2024 or sk_learn survive (round 3).
+_KEY_SHAPE = re.compile(r"^(akia[0-9a-z]{16}|sk[_-](?:live|test|proj)?[_-]?[0-9a-z]{16,}|gh[pousr]_[0-9a-z]{30,}"
+                        r"|xox[abprs]-[0-9a-z-]{10,}|aiza[0-9a-z_-]{30,}|ya29[0-9a-z_-]{20,}|eyj[0-9a-z_-]{20,}"
+                        r"|(?=.*[_-])(?=(?:.*\d){4})(?=(?:.*[a-z]){4})[0-9a-z_-]{16,}"
+                        r"|(?=(?:.*\d){4})(?=(?:.*[a-z]){4})[0-9a-z_-]{24,})$")
 JOSA = ("에서는", "으로는", "에게", "에서", "으로", "까지", "부터", "처럼", "보다", "이나", "이랑",
         "은", "는", "이", "가", "을", "를", "의", "에", "도", "로", "와", "과", "만", "랑")
 _TOKEN = re.compile(r"\[[^\]\s]+\]|\w+", re.UNICODE)   # keeps [url]/[경로]/[문서파일] placeholders whole
@@ -53,7 +57,7 @@ def words(text: str) -> list:
             if w.endswith(j) and len(w) - len(j) >= 2:
                 w = w[: -len(j)]
                 break
-        if len(w) <= MAX_WORD_LEN and not w.startswith(_KEY_PREFIX) and not _KEY_SHAPE.match(w):
+        if len(w) <= MAX_WORD_LEN and not _KEY_SHAPE.match(w):
             out.append(w)  # keys, hashes, pasted blobs are not words of an instruction
     return out[:MAX_WORDS]
 
