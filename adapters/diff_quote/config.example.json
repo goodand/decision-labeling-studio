@@ -1,0 +1,9 @@
+{
+  "_doc": "차별점 인용 검수. agent가 의견서·결과서에서 뽑은 차별점 인용이 그 사업의 차별점으로 맞는지 사람이 인용마다 판정한다. 실제 값은 .local/diff-quote/config.json에 복사해 쓴다.",
+  "inputs": {
+    "quotes": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/harness/differentiation_quotes_001/quotes.json",
+    "rows": "D:/dev_eval_team/jh_dev/program_mapping_nlp_v1/step1/rows.json"
+  },
+  "question": "agent가 차별점으로 인용한 문장이 그 사업의 차별점으로 맞는가? (맞음 / 틀림 / 판단불가, 틀림·판단불가는 이유 필수)",
+  "about_labels": {"subject": "대상 사업", "comparison": "비교 사업", "both": "양쪽"}
+}
