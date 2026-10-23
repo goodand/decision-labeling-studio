@@ -133,7 +133,9 @@ class DecisionLogs(Base):
             {"id": "S-1", "status": "explicit_choice", "user_quote": "이게 가독성이 좋은데", "decision": "A 화면을 기준으로 쓴다."},
             {"id": "S-2", "status": "deferred", "decision": "설치 스크립트는 보류. " + "x" * 400}]}, ensure_ascii=False), "utf-8")
         (d / "dds.json").write_text(json.dumps({"recorded_on": "2026-10-14", "decisions": [
-            {"id": "D-1", "status": "accepted", "decision": "곡선 커넥터 사용", "evidence": ["e1"]}]}), "utf-8")
+            {"id": "D-1", "status": "accepted", "decision": "곡선 커넥터 사용", "evidence": ["e1"]},
+            {"id": "D-2", "status": "superseded", "decision": "직선 커넥터 사용"},
+            {"id": "D-3", "status": "under_consideration", "decision": "대각선 검토 중"}]}), "utf-8")
         (d / "other.json").write_text(json.dumps({"schema": "x", "cases": [{"id": "c"}]}), "utf-8")
         run = backfill.Run(False, "", True)
         for f in sorted(d.glob("*.json")):
@@ -147,7 +149,22 @@ class DecisionLogs(Base):
         self.assertLessEqual(len(recs[2]["decision"]), 300)
         self.assertEqual(recs[0]["timestamp"], "2026-10-14T00:00:00Z")
         self.assertEqual(run.counts["global"]["decision"], 3)
+        self.assertEqual(run.counts["global"]["decision_skipped"], 2)  # superseded / under_consideration are not rules
         self.assertEqual(len(self.records("observations")), 0)
+
+
+class ForcedProject(Base):
+    def test_project_root_overrides_cwd_lookup(self):
+        root = self.tmp / "my-proj"
+        root.mkdir()
+        run = backfill.Run(False, "", True, str(root))
+        run.process(self.codex / next(self.codex.glob("*.jsonl")).name, backfill.read_codex)
+        run.flush()
+        reg = json.loads((self.store / "projects.json").read_text("utf-8"))
+        (pid, meta), = reg.items()
+        self.assertEqual((meta["name"], meta["root"], meta["remote"]), ("my-proj", str(root.resolve()), ""))
+        self.assertTrue((self.store / "projects" / pid / "corrections.jsonl").exists())
+        self.assertFalse((self.store / "corrections.jsonl").exists())  # nothing fell into global
 
 
 class StateAndDryRun(Base):
@@ -164,10 +181,11 @@ class StateAndDryRun(Base):
         self.assertEqual(run.counts["global"]["correction"], 1)
 
     def test_cli_entrypoint(self):
-        r = subprocess.run([sys.executable, "-I", str(_ECC / "backfill.py"), "--dry-run", "--no-state", str(self.claude)],
+        r = subprocess.run([sys.executable, "-I", str(_ECC / "backfill.py"), "--dry-run", "--no-state", "--regex", str(self.claude)],
                            env=dict(os.environ, ECC_CLV2_STORE_WIN=str(self.store)), capture_output=True, text=True, timeout=60)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn("DRY RUN", r.stdout)
+        self.assertIn("detector: regex", r.stdout)
         self.assertIn("corrections=    1", r.stdout)
 
 

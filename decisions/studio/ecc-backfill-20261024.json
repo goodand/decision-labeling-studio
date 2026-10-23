@@ -20,6 +20,18 @@
       "status": "explicit_request",
       "user_quote": "claude에서 정리한 decision json도 활용하면 좋을 것 같은데",
       "decision": "backfill --decisions로 decisions/**/*.json(studio·dds 형식)을 읽어 user_decision 레코드로 넣는다. 사람이 확정한 기록이므로 정정 감지기를 거치지 않고, learn_now 프롬프트는 이를 확정된 사실(관측 3건 가중)로 취급하며 이에 어긋나는 instinct를 내지 않게 한다."
+    },
+    {
+      "id": "STUDIO-ECC-010",
+      "status": "explicit_request",
+      "user_quote": "test용 sample이 필요한 것이라면 'diagram-design-system' 할 때의 session을 먼저 sample로 삼으면 좋을 것 같네",
+      "decision": "첫 실측 샘플은 DDS Codex 세션(사람 세션 1개, 서브에이전트 스레드 10개는 제외)과 decisions/dds로 한다. 실제 저장소가 아닌 샘플 전용 저장소에 써서 확인한다. 이 세션의 cwd는 git이 아니어서 --project-root로 프로젝트를 지정한다."
+    },
+    {
+      "id": "STUDIO-ECC-011",
+      "status": "observed_from_sample",
+      "user_quote": "",
+      "decision": "샘플에서 발견: (1) 상태가 superseded/explored_not_adopted/under_consideration/unresolved인 결정 5건이 확정 규칙으로 들어갈 뻔함 → UNSETTLED는 제외하고 건수만 보고. (2) Kiwi 서버가 실행 중간에 올라오면서 같은 입력의 정정 수가 2→4로 바뀜 → backfill은 시작 시 감지기를 하나로 고정(Kiwi를 띄워 기다리고, 안 되면 끝까지 정규식; --regex로 강제 가능)."
     }
   ]
 }

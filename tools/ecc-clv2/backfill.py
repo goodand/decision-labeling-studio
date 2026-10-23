@@ -14,7 +14,7 @@ lines, and injected prompts (text starting with "<": task notifications, command
 Sources:  ~/.claude/projects/<cwd-slug>/*.jsonl   (Claude Code; nested */subagents/ are skipped)
           ~/.codex/sessions/**/rollout-*.jsonl     (Codex)
           <repo>/decisions/**/*.json              (curated decision logs, via --decisions; bypass the detector)
-Usage:    python backfill.py [--dry-run] [--since YYYY-MM-DD] [--source claude|codex] [--decisions DIR] [--no-state] [path ...]
+Usage:    python backfill.py [--dry-run] [--since YYYY-MM-DD] [--source claude|codex] [--decisions DIR] [--project-root DIR] [--no-state] [path ...]
 State:    <store>/backfill_state.json remembers lines done per file, so re-runs only add new lines.
 """
 import argparse, hashlib, json, os, re, subprocess, sys, time
@@ -67,10 +67,21 @@ class Projects:
     """cwd -> (id, name, root, remote); 'global' when the cwd is gone or not in a git repo."""
     GLOBAL = ("global", "global", "", "")
 
-    def __init__(self):
+    def __init__(self, force_root: str = ""):
         self.cache, self.seen = {}, {}
+        self.forced = self.path_project(force_root) if force_root else None
+
+    @staticmethod
+    def path_project(root: str):
+        """A non-git folder named explicitly, like detect-project.sh's CLAUDE_PROJECT_DIR 'env-nogit' case:
+        identity is the hash of the resolved path."""
+        root = os.path.realpath(os.path.expanduser(root))
+        return (hashlib.sha256(root.encode("utf-8")).hexdigest()[:12], os.path.basename(root), root, "")
 
     def resolve(self, cwd: str):
+        if self.forced:
+            self.seen[self.forced[0]] = self.forced
+            return self.forced
         if cwd in self.cache:
             return self.cache[cwd]
         meta = self.GLOBAL
@@ -169,10 +180,15 @@ def _codex_lines(fh):
                 yield ("tool", when, sess, cwd, CODEX_TOOLS.get(name, f"codex:{name}"), inp)
 
 
+# Statuses that are NOT settled decisions; the learner would otherwise treat them as rules.
+UNSETTLED = {"superseded", "explored_not_adopted", "under_consideration", "unresolved", "rejected", "proposed", "open"}
+
+
 def read_decisions(path: Path):
     """Curated decision logs (decisions/**/*.json): already human-confirmed, so they bypass the
     correction detector. Accepts the studio shape {decisions:[{id,status,user_quote,decision}]} and
-    the dds shape {decisions:[{id,status,decision,...}]}; other layouts yield nothing."""
+    the dds shape {decisions:[{id,status,decision,...}]}; other layouts yield nothing.
+    Entries whose status is in UNSETTLED are counted but not yielded as decisions."""
     try:
         doc = json.loads(path.read_text("utf-8"))
     except (OSError, ValueError):
@@ -185,6 +201,9 @@ def read_decisions(path: Path):
         if not isinstance(e, dict) or not e.get("decision"):
             continue
         when = str(e.get("recorded_on") or day)
+        if str(e.get("status", "")).lower() in UNSETTLED:
+            yield ("decision_unsettled", "", "", str(path.parent))
+            continue
         yield ("decision", when + "T00:00:00Z" if re.fullmatch(r"\d{4}-\d{2}-\d{2}", when) else "", f"decision:{path.stem}",
                str(path.parent), {"decision_id": str(e.get("id", "")), "status": str(e.get("status", "")),
                                   "user_quote": str(e.get("user_quote") or ""), "decision": str(e["decision"])})
@@ -213,9 +232,10 @@ def is_human_prompt(text: str) -> bool:
 
 # ---- run ----------------------------------------------------------------------------------------------
 class Run:
-    def __init__(self, dry: bool, since: str, use_state: bool):
+    def __init__(self, dry: bool, since: str, use_state: bool, project_root: str = ""):
         self.dry, self.since, self.use_state = dry, since or "", use_state
-        self.projects = Projects()
+        self.projects = Projects(project_root)
+        self.detector = "default (Kiwi if up, else regex)"
         self.counts = defaultdict(Counter)  # project_id -> counters
         self.files = Counter()
         self.state_path = STORE / "backfill_state.json"
@@ -247,6 +267,8 @@ class Run:
                     rec["timestamp"] = ts(when)
                     self.buf[meta[0]]["corrections"].append(rec)
                     c["correction"] += 1
+            elif kind == "decision_unsettled":
+                c["decision_skipped"] += 1
             elif kind == "decision":
                 self.buf[meta[0]]["corrections"].append(decision_record(when, sess, cwd, item[4], meta))
                 c["decision"] += 1
@@ -291,10 +313,35 @@ class Run:
         for pid, c in sorted(self.counts.items(), key=lambda kv: -kv[1]["prompt"]):
             tot.update(c)
             rows.append(f"{self.projects.seen[pid][1][:28]:28} {pid:12} prompts={c['prompt']:6} corrections={c['correction']:5} "
-                        f"decisions={c['decision']:4} tool_uses={c['tool_use']:7} injected={c['prompt_injected']:6}")
-        print(f"files: {dict(self.files)}   mode: {'DRY RUN' if self.dry else 'written to ' + str(STORE)}")
+                        f"decisions={c['decision']:4} (unsettled skipped {c['decision_skipped']}) "
+                        f"tool_uses={c['tool_use']:7} injected={c['prompt_injected']:6}")
+        print(f"files: {dict(self.files)}   mode: {'DRY RUN' if self.dry else 'written to ' + str(STORE)}"
+              f"   detector: {self.detector}")
         print("\n".join(rows[:40]) + (f"\n... {len(rows) - 40} more projects" if len(rows) > 40 else ""))
         print(f"TOTAL prompts={tot['prompt']} corrections={tot['correction']} decisions={tot['decision']} tool_uses={tot['tool_use']} injected={tot['prompt_injected']}")
+
+
+def pin_detector(wait: float = 20.0) -> str:
+    """Use ONE detector for the whole run. capture_correction falls back to regex while the Kiwi
+    server is down and wakes it in the background, so a run that starts cold would switch from
+    regex to Kiwi midway and classify the same text differently (seen on the DDS sample: 2 vs 4).
+    Start Kiwi and wait for it; if it never answers, pin regex for every line instead."""
+    import socket, kiwi_server
+    def up():
+        try:
+            socket.create_connection((kiwi_server.HOST, kiwi_server.PORT), timeout=0.3).close()
+            return True
+        except OSError:
+            return False
+    if not up():
+        cc._start_server_detached()
+        deadline = time.monotonic() + wait
+        while not up() and time.monotonic() < deadline:
+            time.sleep(0.2)
+    if up():
+        return "kiwi"
+    cc.is_correction = cc.is_correction_regex  # never touch the server again in this run
+    return "regex (Kiwi server unavailable)"
 
 
 def iter_files(paths, source):
@@ -318,13 +365,17 @@ def main(argv):
     ap.add_argument("--no-state", action="store_true", help="ignore and do not write backfill_state.json")
     ap.add_argument("--decisions", nargs="*", default=[], metavar="PATH",
                     help="curated decision logs (files or dirs of *.json, e.g. <repo>/decisions); read in addition to paths")
+    ap.add_argument("--project-root", default="", metavar="DIR",
+                    help="file every record under this project (for logs whose cwd is not a git repo or no longer exists)")
+    ap.add_argument("--regex", action="store_true", help="use the regex detector only (no Kiwi server)")
     ap.add_argument("--max-files", type=int, default=0, help="stop after this many files (newest first); 0 = all")
     a = ap.parse_args(argv)
     if hasattr(os, "nice"):
         os.nice(19)  # a full replay reads GBs; never compete with the user's foreground work
     defaults = [r for r, s in ((CLAUDE_ROOT, "claude"), (CODEX_ROOT, "codex")) if a.source in ("all", s)]
     paths = a.paths if (a.paths or a.decisions) else defaults  # --decisions alone replays only the decision logs
-    run = Run(a.dry_run, a.since, not a.no_state)
+    run = Run(a.dry_run, a.since, not a.no_state, a.project_root)
+    run.detector = pin_detector() if not a.regex else (setattr(cc, "is_correction", cc.is_correction_regex) or "regex")
     todo = sorted(iter_files(paths, a.source), key=lambda fr: -fr[0].stat().st_mtime)
     for d in a.decisions:
         d = Path(d).expanduser()
