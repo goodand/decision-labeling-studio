@@ -53,5 +53,5 @@ body.layout-2 #a .meta,body.layout-2 #b .meta{display:flex;flex-direction:column
 #judge .choices{display:flex;flex-wrap:nowrap;gap:6px;white-space:nowrap;font-size:13px}#judge label.c{margin:0}#judge label.c input{margin:0 2px 0 0}
 #judge .actions{display:flex;gap:6px;margin-top:6px}#judge button.primary{background:#1d1f20;color:#fff;border-color:#1d1f20}
 #legend{font-size:12px;color:#5f6368;line-height:1.8}#legend .lg{margin-left:6px}#legend .lg:first-child{margin-left:0}#legend .lg{display:inline-block;width:12px;height:12px;margin-right:3px;vertical-align:-2px;border-radius:2px}
-#legend .lg.hl{background:#ffd23f66;border:2px solid #e08a00}#legend .lg.sh{background:#7dd3fc55;border:1px solid #0284c7}#legend .lg.tab-bad{background:#fff;border:1px solid #b42318}#legend .lg{box-sizing:border-box;margin-right:4px}
+#legend .lg-hl{background:#ffd23f66;border:2px solid #e08a00}#legend .lg-sh{background:#7dd3fc55;border:1px solid #0284c7}#legend .lg-bad{background:#fff;border:1px solid #b42318}#legend .lg{box-sizing:border-box;margin-right:4px}
 #list small.done{color:#247b50}

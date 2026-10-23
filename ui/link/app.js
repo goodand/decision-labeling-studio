@@ -143,7 +143,7 @@ function renderJudge() {
     el('p', { className: 'muted', textContent: `모든 탭(구획)을 판정해야 사업이 완료된다. 지금 ${segDone(b)}/${tabsOf(b).length}탭 판정. 다른 구획은 B의 탭을 눌러 바꾼다.` }),
     derivedBox(b),
     votes[b.id] ? el('p', { className: 'muted', textContent: `이전 방식 기록(사람이 직접 입력한 사업 전체 판정, 보존만 함): ${votes[b.id].choice} · ${votes[b.id].saved_at}` }) : null,
-    el('p', { id: 'legend', className: 'muted', title: '원본 위 표시의 뜻' }, el('i', { className: 'lg hl' }), '확정 위치 ', el('i', { className: 'lg sh' }), '검색·출현 후보(확정 아님) ', el('i', { className: 'lg tab-bad' }), '위치 확인 불가 탭'),
+    el('p', { id: 'legend', className: 'muted', title: '원본 위 표시의 뜻' }, el('i', { className: 'lg lg-hl' }), '확정 위치 ', el('i', { className: 'lg lg-sh' }), '검색·출현 후보(확정 아님) ', el('i', { className: 'lg lg-bad' }), '위치 확인 불가 탭'),
     el('p', { className: 'muted keys', textContent: '단축키: 1~4 선택지 · Enter 저장 후 다음 · [ ] 구획 탭 이동 · j/k 사업 이동 (입력칸 밖에서)' }),
     el('p', { className: 'muted', textContent: '판정은 연결 결과 파일과 별도의 votes 파일에만 저장된다.' })].filter(Boolean)); // 빈 줄(null)이 'null' 글자로 보이지 않게
 }
