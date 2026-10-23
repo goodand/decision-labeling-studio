@@ -38,6 +38,13 @@ try {
       out.panes[side] = { header_px: Math.round(R(view).top - R(sec).top), view_top: Math.round(R(view).top), view_h: Math.round(R(view).height), search_w: Math.round(R(sec.querySelector('.psearch input')).width), overlaps: pairs, clipped_buttons: clipped };
     }
     out.page_scroll_w = document.documentElement.scrollWidth; out.vw = innerWidth;
+    // 검수 편의(Nielsen 점검 2026-10-22): 저장 후 다음, 범례, 선택지 한 줄, 목록의 판정 진행 표시
+    const jb = [...document.querySelectorAll('#judge button')].map(b => b.textContent.trim());
+    out.ux = { save_next: jb.includes('저장 후 다음'), legend: !!q('#legend'),
+      choices_one_row: (() => { const t = [...document.querySelectorAll('#judge label.c')].map(l => Math.round(R(l).top)); return t.length > 0 && new Set(t).size === 1; })(),
+      list_progress_first: (() => { const sm = q('#items button small'); return !!sm && /^판정/.test(sm.textContent.trim()); })(),
+      shortcut_hint: !!q('#judge .keys'),
+      choices_fit: (() => { const c = q('#judge .choices'); return !!c && R(c).right <= R(q('#judge')).right - 8 && c.scrollWidth <= c.clientWidth + 1; })() };
     return out; })()`);
   if (png) { const shot = await send('Page.captureScreenshot', { format: 'png' }); fs.writeFileSync(png, Buffer.from(shot.data, 'base64')); }
   const fails = [];
@@ -50,6 +57,7 @@ try {
   if (Math.abs(m.panes.a.view_top - m.panes.b.view_top) > 2) fails.push(`A·B 원본 위쪽 어긋남: ${m.panes.a.view_top} vs ${m.panes.b.view_top}`);
   if (Math.abs(m.panes.a.view_h - m.panes.b.view_h) > 2) fails.push(`A·B 원본 높이 다름: ${m.panes.a.view_h} vs ${m.panes.b.view_h}`);
   if (m.page_scroll_w > m.vw) fails.push('가로 스크롤 생김');
+  for (const [k, v] of Object.entries(m.ux || {})) if (!v) fails.push('검수 편의 없음: ' + k);
   console.log(JSON.stringify(m, null, 1));
   console.log(fails.length ? 'FAIL\n- ' + fails.join('\n- ') : 'PASS');
   process.exitCode = fails.length ? 1 : 0;

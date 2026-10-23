@@ -37,7 +37,7 @@ function renderList() {
   });
   $('items').replaceChildren(...(shown.length ? [] : [el('p', { className: 'none', textContent: '조건에 맞는 사업 없음' })]), ...shown.map(b => el('button', { type: 'button', className: b.id === ui.b ? 'on' : '', onclick: () => open(b.id) },
     `${b.id} ${b.search_name}`,
-    el('small', { textContent: `표기 ${b.mentions.length} · 구획 ${b.segments.length} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length} · 판정 ${segDone(b)}/${tabsOf(b).length}탭${derived[b.id] && derived[b.id].result ? ' → ' + derived[b.id].result : ''}` }))));
+    el('small', { className: complete(b) ? 'done' : '', textContent: `판정 ${segDone(b)}/${tabsOf(b).length}탭${derived[b.id] && derived[b.id].result ? ' → ' + derived[b.id].result : complete(b) ? '' : ' (미완료)'} · 위치 A ${okCount(b.mentions)}/${b.mentions.length} B ${okCount(b.segments)}/${b.segments.length}` }))));
 }
 
 function locLine(L, shown, pane) {
@@ -95,7 +95,7 @@ function choiceSet(key, title) {
   const note = el('textarea', { placeholder: '부분일치·판단불가는 어느 연도·범위·구획인지 적는다', value: v.note || '' });
   const msg = el('div', { className: v.choice ? 'saved' : '', textContent: v.choice ? `저장됨: ${v.choice} · ${v.saved_at}` : '' });
   const radios = Object.entries(data.choices).map(([val, label]) => el('label', { className: 'c' }, el('input', { type: 'radio', name, value: val, checked: v.choice === val }), ' ' + label));
-  const save = el('button', { type: 'button', textContent: '저장', onclick: async () => {
+  const doSave = async (advance) => {
     const choice = (document.querySelector(`input[name="${CSS.escape(name)}"]:checked`) || {}).value;
     if (!choice) { msg.className = 'err'; msg.textContent = '선택지를 고르세요'; return; }
     if (data.note_required_for.includes(choice) && !note.value.trim()) { msg.className = 'err'; msg.textContent = choice + '는 설명이 필요합니다'; note.focus(); return; }
@@ -104,8 +104,12 @@ function choiceSet(key, title) {
     const out = await res.json();
     if (!res.ok) { msg.className = 'err'; msg.textContent = '저장 실패: ' + out.error; return; }
     votes[key] = out; await refreshDerived(); msg.className = 'saved'; msg.textContent = `저장됨: ${out.choice} · ${out.saved_at}`; renderList(); if (sid) showBTabsOnly(); renderJudge(); // 계산된 사업 전체 결과를 바로 갱신
-  } });
-  return el('fieldset', {}, el('legend', { textContent: title }), radios, note, el('div', {}, save), msg);
+    if (advance) gotoNextUnjudged();
+  };
+  const save = el('button', { type: 'button', textContent: '저장', onclick: () => doSave(false) });
+  const saveNext = el('button', { type: 'button', className: 'primary', textContent: '저장 후 다음', title: 'Enter', onclick: () => doSave(true) });
+  choiceSet.current = { doSave, note };
+  return el('fieldset', {}, el('legend', { textContent: title }), el('div', { className: 'choices' }, radios), note, el('div', { className: 'actions' }, saveNext, save), msg);
 }
 function renderBTabs() {
   const b = biz(), cur = tabOfSeg(b, b.segments[ui.seg].id);
@@ -139,6 +143,8 @@ function renderJudge() {
     el('p', { className: 'muted', textContent: `모든 탭(구획)을 판정해야 사업이 완료된다. 지금 ${segDone(b)}/${tabsOf(b).length}탭 판정. 다른 구획은 B의 탭을 눌러 바꾼다.` }),
     derivedBox(b),
     votes[b.id] ? el('p', { className: 'muted', textContent: `이전 방식 기록(사람이 직접 입력한 사업 전체 판정, 보존만 함): ${votes[b.id].choice} · ${votes[b.id].saved_at}` }) : null,
+    el('p', { id: 'legend', className: 'muted', title: '원본 위 표시의 뜻' }, el('i', { className: 'lg hl' }), '확정 위치 ', el('i', { className: 'lg sh' }), '검색·출현 후보(확정 아님) ', el('i', { className: 'lg tab-bad' }), '위치 확인 불가 탭'),
+    el('p', { className: 'muted keys', textContent: '단축키: 1~4 선택지 · Enter 저장 후 다음 · [ ] 구획 탭 이동 · j/k 사업 이동 (입력칸 밖에서)' }),
     el('p', { className: 'muted', textContent: '판정은 연결 결과 파일과 별도의 votes 파일에만 저장된다.' })].filter(Boolean)); // 빈 줄(null)이 'null' 글자로 보이지 않게
 }
 
@@ -161,6 +167,25 @@ setLayout(new URLSearchParams(location.search).get('layout') === '1' ? 1 : 2); /
 $('layout').onclick = () => setLayout(document.body.classList.contains('layout-1') ? 2 : 1);
 for (const side of ['a', 'b']) { $(side + '-open').onclick = () => openSource(side, 'file'); $(side + '-dir').onclick = () => openSource(side, 'directory'); }
 
+// 저장 후 다음: 같은 사업의 미판정 탭 → 없으면 다음 미완료 사업(목록 순)
+function gotoNextUnjudged() {
+  const b = biz(), tabs = tabsOf(b), cur = tabOfSeg(b, b.segments[ui.seg].id), i = tabs.indexOf(cur);
+  const nextTab = [...tabs.slice(i + 1), ...tabs.slice(0, i)].find(t => !tabState(b, t.id).choice);
+  if (nextTab) { ui.seg = b.segments.findIndex(x => x.id === nextTab.members[0]); showB(); renderJudge(); return; }
+  const order = data.businesses.map(x => x.id), k = order.indexOf(b.id);
+  const nb = [...order.slice(k + 1), ...order.slice(0, k)].map(id => data.businesses.find(x => x.id === id)).find(x => !complete(x));
+  if (nb) open(nb.id); else { const d = $('judge').querySelector('.derived'); if (d) d.insertAdjacentElement('afterend', el('p', { className: 'saved', textContent: '모든 사업의 판정이 끝났다.' })); }
+}
+function stepBusiness(d) { const order = data.businesses.map(x => x.id), k = order.indexOf(ui.b), n = order[(k + d + order.length) % order.length]; open(n); }
+function stepTab(d) { const b = biz(), tabs = tabsOf(b), i = tabs.indexOf(tabOfSeg(b, b.segments[ui.seg].id)), t = tabs[(i + d + tabs.length) % tabs.length]; ui.seg = b.segments.findIndex(x => x.id === t.members[0]); showB(); renderJudge(); }
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'textarea' || tag === 'input' || tag === 'select' || e.ctrlKey || e.metaKey || e.altKey) return;
+  const n = '1234'.indexOf(e.key);
+  if (n >= 0) { const r = document.querySelectorAll('#judge input[type=radio]')[n]; if (r) { r.checked = true; e.preventDefault(); } }
+  else if (e.key === 'Enter') { if (choiceSet.current) { e.preventDefault(); choiceSet.current.doSave(true); } }
+  else if (e.key === 'j') stepBusiness(1); else if (e.key === 'k') stepBusiness(-1);
+  else if (e.key === ']') stepTab(1); else if (e.key === '[') stepTab(-1);
+});
 function open(id) { ui.b = id; ui.mention = 0; ui.seg = 0; history.replaceState(null, '', '#' + id); renderList(); renderJudge(); showA(); showB(); }
 addEventListener('hashchange', () => { const id = location.hash.slice(1); if (id !== ui.b && data.businesses.some(b => b.id === id)) open(id); });
 open(data.businesses.some(b => b.id === location.hash.slice(1)) ? location.hash.slice(1) : data.businesses[0].id);

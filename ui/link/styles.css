@@ -49,3 +49,9 @@ body.layout-2 #a .meta,body.layout-2 #b .meta{display:flex;flex-direction:column
 .native-text-run::selection{background:rgba(45,120,230,.4);color:transparent} /* legacy.css 그대로 */
 @media(max-width:1100px){.pview{height:75vh;flex:none}} /* 좁은 화면(1열)에서도 원본은 고정 높이 안에서 스크롤 */
 .merged-note{font-size:12px;color:#1d4f91;background:#eef5ff;border-radius:4px;padding:2px 6px;margin:2px 0}.tab.sub{font-size:11px;padding:2px 6px;border-style:dashed}
+/* 검수 편의(2026-10-22): 선택지 한 줄, 주 버튼 하나, 범례, 목록 진행 강조 */
+#judge .choices{display:flex;flex-wrap:nowrap;gap:6px;white-space:nowrap;font-size:13px}#judge label.c{margin:0}#judge label.c input{margin:0 2px 0 0}
+#judge .actions{display:flex;gap:6px;margin-top:6px}#judge button.primary{background:#1d1f20;color:#fff;border-color:#1d1f20}
+#legend{font-size:12px;color:#5f6368;line-height:1.8}#legend .lg{margin-left:6px}#legend .lg:first-child{margin-left:0}#legend .lg{display:inline-block;width:12px;height:12px;margin-right:3px;vertical-align:-2px;border-radius:2px}
+#legend .lg.hl{background:#ffd23f66;outline:2px solid #e08a00;outline-offset:-2px}#legend .lg.sh{background:#7dd3fc55;outline:1px solid #0284c7;outline-offset:-1px}#legend .lg.tab-bad{background:#fff;outline:1px solid #b42318;outline-offset:-1px}
+#list small.done{color:#247b50}
