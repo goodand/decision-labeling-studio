@@ -73,5 +73,25 @@ class ObserveMetaHook(unittest.TestCase):
             self.assertNotIn("SECRET BODY", f.read_text("utf-8"))
 
 
+
+class PinnedDetector(unittest.TestCase):
+    def test_server_refuses_to_serve_an_unpinned_kiwi(self):
+        """kiwi_server.serve() must exit non-zero (not silently serve) when the installed Kiwi is not PIN."""
+        import kiwi_server
+        with mock.patch.object(kiwi_server, "identity", return_value={**kiwi_server.PIN, "kiwipiepy": "0.0.0"}):
+            with self.assertRaises(SystemExit) as cm:
+                kiwi_server.serve()
+        self.assertIn("0.0.0", str(cm.exception))
+
+    def test_backfill_refuses_unpinned_server(self):
+        """backfill must not classify with a Kiwi other than the one the rules were verified against."""
+        import backfill
+        with mock.patch.object(backfill, "_server_up", return_value=True), \
+             mock.patch.object(backfill, "_server_identity", return_value={"kiwipiepy": "0.0.0"}):
+            with self.assertRaises(SystemExit) as cm:
+                backfill.pin_detector(wait=0.1)
+        self.assertIn("PIN", str(cm.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

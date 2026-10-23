@@ -326,22 +326,36 @@ def pin_detector(wait: float = 20.0) -> str:
     server is down and wakes it in the background, so a run that starts cold would switch from
     regex to Kiwi midway and classify the same text differently (seen on the DDS sample: 2 vs 4).
     Start Kiwi and wait for it; if it never answers, pin regex for every line instead."""
-    import socket, kiwi_server
-    def up():
-        try:
-            socket.create_connection((kiwi_server.HOST, kiwi_server.PORT), timeout=0.3).close()
-            return True
-        except OSError:
-            return False
-    if not up():
+    import kiwi_server
+    if not _server_up():
         cc._start_server_detached()
         deadline = time.monotonic() + wait
-        while not up() and time.monotonic() < deadline:
+        while not _server_up() and time.monotonic() < deadline:
             time.sleep(0.2)
-    if up():
-        return "kiwi"
+    if _server_up():
+        ident = _server_identity()
+        if ident != kiwi_server.PIN:
+            sys.exit(f"backfill: running Kiwi {ident} is not the PIN {kiwi_server.PIN}; use the pinned venv or --regex")
+        return "kiwi " + kiwi_server.PIN["kiwipiepy"]
     cc.is_correction = cc.is_correction_regex  # never touch the server again in this run
     return "regex (Kiwi server unavailable)"
+
+
+def _server_up() -> bool:
+    import socket, kiwi_server
+    try:
+        socket.create_connection((kiwi_server.HOST, kiwi_server.PORT), timeout=0.3).close()
+        return True
+    except OSError:
+        return False
+
+
+def _server_identity() -> dict:
+    import socket, kiwi_server
+    with socket.create_connection((kiwi_server.HOST, kiwi_server.PORT), timeout=2) as s:
+        s.sendall(b'{"op":"ping"}\n')
+        r = json.loads(s.makefile("rb").readline().decode("utf-8"))
+    return {k: v for k, v in r.items() if k != "ok"}
 
 
 def iter_files(paths, source):

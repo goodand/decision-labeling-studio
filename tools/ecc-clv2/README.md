@@ -23,7 +23,9 @@
 
 ## 요구사항
 
-- Windows 또는 macOS, Python 3.12 이상, `kiwipiepy` 0.24 (`pip install kiwipiepy`), Claude Code CLI(`claude`)
+- Windows 또는 macOS, Python 3.12 이상, Claude Code CLI(`claude`)
+- **Kiwi 고정(STUDIO-ECC-016)**: `kiwipiepy==0.24.1` + `kiwipiepy_model==0.24.0`(cong). 라이브러리뿐 아니라 모델 가중치 해시(`kiwi_server.PIN`)까지 고정한다. 모델이 재학습되면 같은 버전 번호에서도 형태소가 달라지기 때문이다(실측: 0.23.2→0.24.1 차이 847건 중 약 650건이 모델, 약 200건이 라이브러리). 서버는 고정과 다른 Kiwi면 기동을 거부하고, backfill은 중단한다. 고정 세트의 토큰 스냅샷은 `tests/fixtures/kiwi_golden.json`이며, PIN을 바꿀 때만 `kiwi_golden.py`로 다시 만든다.
+- macOS에서는 ecc-clv2 전용 venv를 쓴다: `~/.claude/venvs/ecc-kiwi` (공유 `~/.claude/venvs/kiwi`는 다른 저장소가 0.23.2를 전제하므로 건드리지 않는다)
 - ECC `continuous-learning-v2` 스킬 디렉터리(`observe_meta`·`eval_loop`가 원본 `observe.sh`, `instinct-cli.py`를 호출): `upstream/continuous-learning-v2/`에 사본이 있음(MIT, PROVENANCE.json). 다른 위치를 쓰려면 `ECC_CLV2_SKILL_DIR`
 - bash: Windows는 Git Bash(`ECC_GIT_BASH`, 기본 `C:\Program Files\Git\bin\bash.exe`), macOS는 시스템 bash(`ECC_GIT_BASH`로 바꿀 수 있음)
 
@@ -31,7 +33,7 @@
 
 설치 스크립트(설치본 복사 + 커밋 해시 기록)는 보류 중입니다(결정 STUDIO-ECC-005). 그때까지는 아래를 손으로 설정합니다.
 
-`~/.claude/settings.json`의 `hooks`에 아래를 추가합니다. `PY`는 kiwipiepy가 설치된 python.exe 절대 경로, `L`은 이 폴더(`tools/ecc-clv2`) 절대 경로. 현재 실행 중인 훅은 `~/.claude/ecc-clv2` 사본을 가리키며(결정 STUDIO-ECC-003), 저장소 사본으로 바꾸는 것은 별도 결정입니다.
+`~/.claude/settings.json`의 `hooks`에 아래를 추가합니다. `PY`는 고정 Kiwi가 설치된 python 절대 경로(macOS: `~/.claude/venvs/ecc-kiwi/bin/python`), `L`은 이 폴더(`tools/ecc-clv2`) 절대 경로. 현재 실행 중인 훅은 `~/.claude/ecc-clv2` 사본을 가리키며(결정 STUDIO-ECC-003), 저장소 사본으로 바꾸는 것은 별도 결정입니다.
 
 ```json
 {"hooks": {
@@ -52,7 +54,7 @@ schtasks /Create /F /SC WEEKLY /D SUN /ST 04:00 /TN "\ECC_KiwiWeeklyStop" /TR "P
 
 `PYW`는 `pythonw.exe`. 훅은 서버가 없으면 정규식으로 처리한 뒤 `ECC_KiwiStart` 작업을 실행해 되살립니다(훅의 자식 프로세스는 훅 종료와 함께 죽으므로 Task Scheduler를 씁니다).
 
-macOS에서는 훅 명령의 `PY`에 kiwipiepy가 설치된 `python3` 절대 경로를 넣습니다. Kiwi 서버 상주는 launchd가 맡습니다. `~/Library/LaunchAgents/ECC_KiwiStart.plist`:
+macOS에서는 훅 명령의 `PY`에 `~/.claude/venvs/ecc-kiwi/bin/python`을 넣습니다. Kiwi 서버 상주는 launchd가 맡습니다. `~/Library/LaunchAgents/ECC_KiwiStart.plist`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

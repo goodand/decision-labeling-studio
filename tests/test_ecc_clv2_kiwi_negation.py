@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "ecc-clv2
 import capture_correction as cc  # noqa: E402
 import kiwi_server  # noqa: E402
 
+GOLDEN = Path(__file__).resolve().parent / "fixtures" / "kiwi_golden.json"
 YES = ["그게 아니라 원본 코드를 import 해야지", "결과서는 정답 전용이잖아, 입력 규칙에 섞지 마",
        "그렇게 하지 않는 게 좋겠어", "스크립트 새로 쓰지 말고 재사용해", "그건 틀린 접근이야", "그렇게 하면 안 돼"]
 NO = ["왜 그런지 설명해줘", "진행해", "이건 B 방식으로 가자", "어떤 directory가 더 적절할지 찾아봐", "아니오 결과 파일 보여줘",
@@ -65,6 +66,28 @@ class RegexFallback(unittest.TestCase):
             self.assertTrue(cc.is_correction_regex(t), t)
         for t in NO:
             self.assertFalse(cc.is_correction_regex(t), t)
+
+
+class Identity(unittest.TestCase):
+    def test_ping_reports_version_and_model(self):
+        """A rule over Kiwi is only as stable as Kiwi's version and model, so the server says which it runs."""
+        import json, kiwipiepy
+        wait_port(True)
+        with socket.create_connection((kiwi_server.HOST, kiwi_server.PORT), timeout=2) as s:
+            s.sendall(b'{"op":"ping"}\n')
+            r = json.loads(s.makefile("rb").readline())
+        self.assertEqual(r, {"ok": True, **kiwi_server.identity()})
+        self.assertEqual(kiwi_server.identity(), kiwi_server.PIN)  # running Kiwi is the pinned one (STUDIO-ECC-016)
+
+    def test_golden_tokens_on_fixed_set(self):
+        """A rule over a model is only as stable as the model: freeze its output on the fixed set.
+        Regenerate deliberately (tools/ecc-clv2/kiwi_golden.py) only together with a new PIN."""
+        import json
+        g = json.loads(GOLDEN.read_text("utf-8"))
+        self.assertEqual(g["pin"], kiwi_server.PIN)
+        for text, tokens in g["tokens"].items():
+            self.assertEqual(cc._tokens_from_server(text), tokens, text)
+        self.assertEqual(set(g["tokens"]), set(YES) | set(NO))
 
 
 class Resident(unittest.TestCase):
