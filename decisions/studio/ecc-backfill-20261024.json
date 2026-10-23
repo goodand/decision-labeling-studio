@@ -50,6 +50,12 @@
       "status": "explicit_choice",
       "user_quote": "google-research/harness2 에서도 전체가 아니라 subtree, subflow or architecture, code pattern 중에서는 가장 뛰어난 것이 있겠지",
       "decision": "harness2 전체 도입은 않고, 후보 7개(selection/_distil, library, context 누설 가드, judge 집계, ledger, prompts, spec)를 이득·검증 비용·규칙 적합으로 비교해 context.py 누설 가드만 vendor_h2/leak_guard.py로 발췌(Apache-2.0, SOURCE.txt·LICENSE 동봉). 우리 쪽 보완: 레코드가 메타데이터만인지(콘텐츠 필드 비어 있음, 5000자 초과 없음, parse_error raw 없음) 검사하는 assert_records_metadata_only. learn_now는 분석 파일을 쓰기 전에, eval_loop는 judge 패킷을 보내기 전에 호출하며 걸리면 보내지 않는다. R3의 ANSWER_SIDE는 같은 MARKERS에서 생성. 사용자의 정정 발화와 경로에 정답 쪽 단어가 있는 것은 허용(메타데이터)."
+    },
+    {
+      "id": "STUDIO-ECC-015",
+      "status": "derived_from_dependencies",
+      "user_quote": "실행순서의 결정은 의존성 분석 및 인과추론 기반으로",
+      "decision": "남은 작업의 실행 순서를 의존성 그래프의 위상 정렬로 정한다: 반복 지시 감지기 → 실제 backfill → learn_now 첫 실행 → 2단계 최적화 → 사람 digest 검토 → 3단계 의미·맥락. 간선은 코드 import(AST), 데이터 흐름, '순서를 바꾸면 다시 해야 하는 것'(backfill_state가 읽은 파일을 건너뛰므로 감지기 변경 후엔 전체 재실행; 임계 변경 시 digest 후보가 바뀜)이다. Lean 4.35로 720개 순서 중 이를 지키는 것이 정확히 하나임을 공리 없이 증명(proofs/ecc-order-20261024.lean). 동률이 없으므로 사용자에게 묻지 않는다. graphify는 이 저장소 그래프가 없어 쓰지 못했고, Lean MCP는 연결된 lake 프로젝트가 없어 로컬 lean으로 검증했다."
     }
   ]
 }
