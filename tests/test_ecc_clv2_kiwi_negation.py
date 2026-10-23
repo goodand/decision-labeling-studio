@@ -9,7 +9,10 @@ import kiwi_server  # noqa: E402
 
 YES = ["그게 아니라 원본 코드를 import 해야지", "결과서는 정답 전용이잖아, 입력 규칙에 섞지 마",
        "그렇게 하지 않는 게 좋겠어", "스크립트 새로 쓰지 말고 재사용해", "그건 틀린 접근이야", "그렇게 하면 안 돼"]
-NO = ["왜 그런지 설명해줘", "진행해", "이건 B 방식으로 가자", "어떤 directory가 더 적절할지 찾아봐", "아니오 결과 파일 보여줘"]
+NO = ["왜 그런지 설명해줘", "진행해", "이건 B 방식으로 가자", "어떤 directory가 더 적절할지 찾아봐", "아니오 결과 파일 보여줘",
+      # DDS sample 2026-10-07, false positives (STUDIO-ECC-012): a question, and negation inside an if-clause
+      "그 다음은 뭘 해야해? 내가 결정해줘야 할 것은?", "url을 뭔저 줘야 내가 다른 PC에서 쓸 수 있지?",
+      "이거 작동하는지 확인해주고 작동 안 하면 다시 올려줄래 같은 url이면 더 좋고"]
 
 
 def port_open() -> bool:

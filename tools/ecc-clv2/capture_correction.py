@@ -19,8 +19,26 @@ MARKERS = re.compile(
 DOC_REF = re.compile(r"[^\s\"']*\.(pdf|hwpx?|xlsx?|xlsm)\b", re.I)
 
 
+# Rule D (STUDIO-ECC-012): a correction is asserted, not asked, and not hypothetical. Per sentence:
+# a sentence ending in "?" is a question; negation inside an if-clause ("작동 안 하면 …") is a
+# condition, so only what follows the last 면/으면 counts. Domain rule words still match anywhere.
+_SENT = re.compile(r"[^.?!\n]+[.?!]*")
+_COND_RE = re.compile(r"^.*(?:으면|면)(?=\s)", re.S)
+
+
+def _asserted_parts_text(text: str):
+    for s in _SENT.findall(text):
+        s = s.strip()
+        if s and not s.endswith("?"):
+            yield _COND_RE.sub("", s)
+
+
 def is_correction_regex(text: str) -> bool:
-    return bool(text) and bool(MARKERS.search(text))
+    if not text:
+        return False
+    if DOMAIN_RE.search(text):
+        return True
+    return any(MARKERS.search(part) for part in _asserted_parts_text(text))
 
 
 # Morphological rule (Kiwi tags): negation / prohibition / obligation / "-잖아" reproach, or a
@@ -39,10 +57,27 @@ def _tokens_from_server(text: str, timeout=0.5):
         return json.loads(s.makefile("rb").readline().decode("utf-8"))["tokens"]
 
 
+def _asserted_parts_tokens(tokens):
+    """Split Kiwi tokens into sentences at SF; drop questions; keep only what follows the last
+    connective 면/으면 (EC) in each sentence."""
+    sent = []
+    for f, t in list(tokens) + [(".", "SF")]:
+        sent.append((f, t))
+        if t == "SF":
+            if f != "?":
+                cut = max((i for i, (g, u) in enumerate(sent) if u == "EC" and g in ("면", "으면")), default=-1)
+                yield sent[cut + 1:]
+            sent = []
+
+
 def is_correction_tokens(tokens, text: str = "") -> bool:
-    forms = [(f, t) for f, t in tokens]
     if DOMAIN_RE.search(text):
         return True
+    return any(_rule_hit(part) for part in _asserted_parts_tokens(tokens))
+
+
+def _rule_hit(tokens) -> bool:
+    forms = [(f, t) for f, t in tokens]
     if any(ft in NEG_FORMS for ft in forms):  # a bare "아니오/아니요" answer is IC, not VCN, so it never matches
         return True
     return any(f in END_FORMS for f, t in forms if t.startswith("E")) or \
