@@ -16,7 +16,7 @@ AUTOMATED_MARK = "[ECC-AUTOMATED]"  # learner/judge prompts carry this; never tr
 MARKERS = re.compile(
     r"(아니라|아니고|아니야|말고|하지\s*마|하지마|마라|해야지|해야\s*해|해야\s*한다|잖아|틀렸|틀린|잘못|다시\s*해|"
     r"지\s*않|안\s*(돼|되|된다)|못\s|재사용|덮어쓰|원본|정답\s*전용|섞지)")  # mirrors the Kiwi rule; "왜" dropped (questions)
-DOC_REF = re.compile(r"[^\s\"']*\.(pdf|hwpx?|xlsx?|xlsm)\b", re.I)
+DOC_REF = re.compile(r"[^\s\"']*\.(pdf|hwpx?|xlsx?|xlsm|docx?|pptx?|csv)\b", re.I)
 
 
 # Rule D (STUDIO-ECC-012): a correction is asserted, not asked, and not hypothetical. Per sentence:

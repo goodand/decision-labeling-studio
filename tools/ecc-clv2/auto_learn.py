@@ -96,7 +96,10 @@ def main(argv):
         pdir = STORE / "projects" / pid
         if names and meta["name"] not in names or not (force or (due(pdir) and not cooling_down(pdir))):
             continue
-        learned = learn_now.run(pdir, meta)
+        try:
+            learned = learn_now.run(pdir, meta)
+        except Exception as e:  # missing claude binary, timeout, …: same handling as a refused run
+            learned = f"ERROR {type(e).__name__}: {e}"
         print(meta["name"], "learn ->", learned, flush=True)
         if not learned.startswith("ok"):  # refused/incomplete/leak/skip: the data was not learned, keep it due
             (pdir / ".auto_learn_error.json").write_text(json.dumps(

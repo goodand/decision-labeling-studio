@@ -24,9 +24,9 @@ def sanitize(data: dict) -> dict:
     tool_input = data.get("tool_input") or {}
     safe = {}
     if isinstance(tool_input, dict):
-        safe = {k: tool_input[k] for k in KEEP_INPUT_KEYS if isinstance(tool_input.get(k), str)}
-        if isinstance(tool_input.get("command"), str):
-            safe["command"] = tool_input["command"][:CMD_LIMIT]
+        safe = {k: tool_input[k][:CMD_LIMIT] for k in KEEP_INPUT_KEYS if isinstance(tool_input.get(k), str)}
+        if isinstance(tool_input.get("command"), str):  # first line only: heredoc/inline-script bodies are content
+            safe["command"] = tool_input["command"].split("\n", 1)[0][:CMD_LIMIT]
     out = {k: data[k] for k in ("session_id", "tool_name", "tool_use_id", "cwd", "agent_id") if k in data}
     out["tool_input"] = safe
     out["tool_response"] = ""  # never persist tool output

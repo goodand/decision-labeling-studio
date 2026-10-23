@@ -245,7 +245,8 @@ class Run:
         self.state_path = STORE / "backfill_state.json"
         self.state = json.loads(self.state_path.read_text("utf-8")) if use_state and self.state_path.exists() else {}
         self.buf = defaultdict(lambda: {"corrections": [], "observations": []})
-        self.live, self._skipped_live = live_sessions(), set()  # sessions the live hooks recorded: never replay them (duplicates)
+        self.live, self._skipped_live = live_sessions(), set()
+        self.origins = written_origins()  # sessions the live hooks recorded: never replay them (duplicates)
         self.repeat_path = STORE / "repeat_index.json"  # phrase -> sessions, merged across runs
         self.repeat = ri.Index.from_json(self.repeat_path.read_text("utf-8")) if use_state and self.repeat_path.exists() else ri.Index()
 
@@ -262,9 +263,11 @@ class Run:
             return
         self.files["read"] += 1
         n_items = 0
+        fid = hashlib.sha256(str(path).encode("utf-8")).hexdigest()[:12]
         for item in reader(path):
             n_items += 1
             kind, when, sess, cwd = item[:4]
+            origin = f"{fid}:{n_items}"  # stable while a transcript only grows at the end
             if sess in self.live:
                 if sess not in self._skipped_live:
                     self._skipped_live.add(sess)
@@ -282,17 +285,29 @@ class Run:
                 c["prompt"] += 1
                 self.repeat.add(sess, text)
                 if cc.is_correction(text):
+                    if origin in self.origins:
+                        c["already_written"] += 1
+                        continue
+                    self.origins.add(origin)
                     rec = cc.make_record(sess, cwd, text)
-                    rec.update(timestamp=ts(when), source="backfill")
+                    rec.update(timestamp=ts(when), source="backfill", origin=origin)
                     self.buf[meta[0]]["corrections"].append(rec)
                     c["correction"] += 1
             elif kind == "decision_unsettled":
                 c["decision_skipped"] += 1
             elif kind == "decision":
-                self.buf[meta[0]]["corrections"].append(decision_record(when, sess, cwd, item[4], meta))
+                if origin in self.origins:
+                    c["already_written"] += 1
+                    continue
+                self.origins.add(origin)
+                self.buf[meta[0]]["corrections"].append({**decision_record(when, sess, cwd, item[4], meta), "origin": origin})
                 c["decision"] += 1
             else:
-                self.buf[meta[0]]["observations"].extend(observation_pair(when, sess, item[4], item[5], meta))
+                if origin in self.origins:
+                    c["already_written"] += 1
+                    continue
+                self.origins.add(origin)
+                self.buf[meta[0]]["observations"].extend({**o, "origin": origin} for o in observation_pair(when, sess, item[4], item[5], meta))
                 c["tool_use"] += 1
         self.state[key] = {"size": path.stat().st_size, "items": n_items, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
 
@@ -345,10 +360,25 @@ class Run:
         print(f"TOTAL prompts={tot['prompt']} corrections={tot['correction']} decisions={tot['decision']} tool_uses={tot['tool_use']} injected={tot['prompt_injected']}")
 
 
+def written_origins() -> set:
+    """Origins of records backfill already wrote: the correctness guard (state is only a speed-up)."""
+    out = set()
+    for f in (list(STORE.glob("*.jsonl")) + list(STORE.glob("observations.archive/*.jsonl"))
+              + list(STORE.glob("projects/*/*.jsonl")) + list(STORE.glob("projects/*/observations.archive/*.jsonl"))):
+        for line in f.open(encoding="utf-8", errors="replace"):
+            if '"origin"' in line:
+                try:
+                    out.add(json.loads(line)["origin"])
+                except (ValueError, KeyError):
+                    pass
+    return out
+
+
 def live_sessions() -> set:
     """Session ids in records the live hooks wrote (no "source": "backfill")."""
     out = set()
-    for f in list(STORE.glob("*.jsonl")) + list(STORE.glob("projects/*/*.jsonl")) + list(STORE.glob("projects/*/observations.archive/*.jsonl")):
+    for f in (list(STORE.glob("*.jsonl")) + list(STORE.glob("observations.archive/*.jsonl"))
+              + list(STORE.glob("projects/*/*.jsonl")) + list(STORE.glob("projects/*/observations.archive/*.jsonl"))):
         for line in f.open(encoding="utf-8", errors="replace"):
             try:
                 r = json.loads(line)

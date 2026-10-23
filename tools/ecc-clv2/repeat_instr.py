@@ -15,6 +15,7 @@ import capture_correction as cc  # reuse the hook's own path mask and size cap
 MIN_SESSIONS = 3   # tier-2 tunable: how many sessions make an instruction
 MAX_N = 6
 MAX_WORDS = 80     # per prompt; long pastes are not instructions
+MAX_WORD_LEN = 40
 JOSA = ("에서는", "으로는", "에게", "에서", "으로", "까지", "부터", "처럼", "보다", "이나", "이랑",
         "은", "는", "이", "가", "을", "를", "의", "에", "도", "로", "와", "과", "만", "랑")
 _TOKEN = re.compile(r"\[[^\]\s]+\]|\w+", re.UNICODE)   # keeps [url]/[경로]/[문서파일] placeholders whole
@@ -50,7 +51,8 @@ def words(text: str) -> list:
             if w.endswith(j) and len(w) - len(j) >= 2:
                 w = w[: -len(j)]
                 break
-        out.append(w)
+        if len(w) <= MAX_WORD_LEN:  # keys, hashes, pasted blobs are not words of an instruction
+            out.append(w)
     return out[:MAX_WORDS]
 
 
@@ -94,5 +96,5 @@ class Index:
 def records(idx: Index, min_sessions: int = MIN_SESSIONS) -> list:
     """Same shape family as user_correction so learn_now can read them in the same file list."""
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    return [{"timestamp": now, "event": "user_repeated_instruction", "phrase": r["phrase"],
+    return [{"timestamp": now, "event": "user_repeated_instruction", "phrase": r["phrase"][:cc.MAX_CHARS],
              "sessions": r["sessions"], "text": r["phrase"][:cc.MAX_CHARS]} for r in idx.repeated(min_sessions)]
