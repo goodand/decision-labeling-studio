@@ -252,7 +252,8 @@ class Run:
 
     def process(self, path: Path, reader):
         key = str(path) if not (self.since or self.until) else f"{path}|{self.since}|{self.until}"  # state per window
-        if self.use_state and key in self.state and self.state[key].get("size") == path.stat().st_size:
+        digest = file_digest(path)
+        if self.use_state and key in self.state and self.state[key].get("digest") == digest:
             self.files["unchanged"] += 1
             if not self.rebuild_repeat:
                 return
@@ -263,11 +264,10 @@ class Run:
             return
         self.files["read"] += 1
         n_items = 0
-        fid = hashlib.sha256(str(path).encode("utf-8")).hexdigest()[:12]
         for item in reader(path):
             n_items += 1
             kind, when, sess, cwd = item[:4]
-            origin = f"{fid}:{n_items}"  # stable while a transcript only grows at the end
+            origin = item_origin(item)
             if sess in self.live:
                 if sess not in self._skipped_live:
                     self._skipped_live.add(sess)
@@ -309,7 +309,7 @@ class Run:
                 self.origins.add(origin)
                 self.buf[meta[0]]["observations"].extend({**o, "origin": origin} for o in observation_pair(when, sess, item[4], item[5], meta))
                 c["tool_use"] += 1
-        self.state[key] = {"size": path.stat().st_size, "items": n_items, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+        self.state[key] = {"digest": digest, "items": n_items, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
 
     def flush(self):
         if self.dry:
@@ -320,6 +320,10 @@ class Run:
                 sys.exit("store is locked by a running hook; retry")
             reg_path = STORE / "projects.json"
             reg = json.loads(reg_path.read_text("utf-8")) if reg_path.exists() else {}
+            on_disk = written_origins()  # re-read under the lock: another run may have flushed since we started
+            for parts in self.buf.values():
+                for name in ("corrections", "observations"):
+                    parts[name] = [r for r in parts[name] if r.get("origin") not in on_disk]
             now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
             for pid, parts in self.buf.items():
                 pdir = STORE / "projects" / pid if pid != "global" else STORE
@@ -360,6 +364,23 @@ class Run:
         print(f"TOTAL prompts={tot['prompt']} corrections={tot['correction']} decisions={tot['decision']} tool_uses={tot['tool_use']} injected={tot['prompt_injected']}")
 
 
+def file_digest(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()[:16]
+
+
+def item_origin(item) -> str:
+    """Identity of one record = hash of its content, not of where it was read from, so a copied,
+    rewritten, truncated or re-ordered transcript never yields the same record twice."""
+    kind, when, sess, cwd = item[:4]
+    body = json.dumps([kind, when, sess, cwd] + [x if isinstance(x, (str, dict, list)) else str(x) for x in item[4:]],
+                      sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(body.encode("utf-8")).hexdigest()[:20]
+
+
 def written_origins() -> set:
     """Origins of records backfill already wrote: the correctness guard (state is only a speed-up)."""
     out = set()
@@ -368,9 +389,11 @@ def written_origins() -> set:
         for line in f.open(encoding="utf-8", errors="replace"):
             if '"origin"' in line:
                 try:
-                    out.add(json.loads(line)["origin"])
-                except (ValueError, KeyError):
-                    pass
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                if isinstance(r, dict) and isinstance(r.get("origin"), str):
+                    out.add(r["origin"])
     return out
 
 

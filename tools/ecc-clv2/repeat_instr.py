@@ -16,6 +16,8 @@ MIN_SESSIONS = 3   # tier-2 tunable: how many sessions make an instruction
 MAX_N = 6
 MAX_WORDS = 80     # per prompt; long pastes are not instructions
 MAX_WORD_LEN = 40
+_KEY_PREFIX = ("akia", "sk_", "sk-", "ghp_", "gho_", "xox", "aiza", "ya29", "eyj")   # common credential prefixes
+_KEY_SHAPE = re.compile(r"^(?=.*[a-z])(?=.*\d)[a-z0-9_-]{12,}$")                     # long letter+digit blobs
 JOSA = ("에서는", "으로는", "에게", "에서", "으로", "까지", "부터", "처럼", "보다", "이나", "이랑",
         "은", "는", "이", "가", "을", "를", "의", "에", "도", "로", "와", "과", "만", "랑")
 _TOKEN = re.compile(r"\[[^\]\s]+\]|\w+", re.UNICODE)   # keeps [url]/[경로]/[문서파일] placeholders whole
@@ -51,8 +53,8 @@ def words(text: str) -> list:
             if w.endswith(j) and len(w) - len(j) >= 2:
                 w = w[: -len(j)]
                 break
-        if len(w) <= MAX_WORD_LEN:  # keys, hashes, pasted blobs are not words of an instruction
-            out.append(w)
+        if len(w) <= MAX_WORD_LEN and not w.startswith(_KEY_PREFIX) and not _KEY_SHAPE.match(w):
+            out.append(w)  # keys, hashes, pasted blobs are not words of an instruction
     return out[:MAX_WORDS]
 
 

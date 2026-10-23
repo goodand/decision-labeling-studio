@@ -5,7 +5,7 @@ reads, file contents, prompts) before the hook payload reaches observe.sh, and f
 the observer (which would send observations to the Claude API) off.
 Usage (Claude Code hook): python observe_meta.py pre|post
 """
-import json, os, subprocess, sys
+import json, os, re, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # hooks run with `python -I`: script dir not on path
@@ -18,6 +18,21 @@ OBSERVE = Path(os.environ.get("ECC_CLV2_SKILL_DIR") or next(
     _HERE / "continuous-learning-v2")) / "hooks" / "observe.sh"
 KEEP_INPUT_KEYS = ("file_path", "path", "pattern", "glob", "notebook_path", "url", "subagent_type", "description")
 CMD_LIMIT = 200
+# A command's first line only, and nothing after an inline-script flag: those bodies are content.
+_INLINE = re.compile(r"(\s-(?:c|e|E|exec)\s)|(<<)")
+# Credentials that can sit on the first line: user:pass@ in URLs, and KEY=value for secret-like keys.
+_URL_CRED = re.compile(r"(://[^/\s:@]+:)[^@\s]+(@)")
+_ENV_CRED = re.compile(r"((?:^|\s)(?:[A-Z0-9_]*(?:PASS(?:WORD)?|SECRET|TOKEN|KEY|AUTH)[A-Z0-9_]*)=)(\S+)")
+
+
+def safe_command(cmd: str) -> str:
+    line = cmd.splitlines()[0] if cmd.splitlines() else ""
+    m = _INLINE.search(line)
+    if m:
+        line = line[: m.end()] + "[…]"
+    line = _URL_CRED.sub(r"\1[REDACTED]\2", line)
+    line = _ENV_CRED.sub(r"\1[REDACTED]", line)
+    return line[:CMD_LIMIT]
 
 
 def sanitize(data: dict) -> dict:
@@ -26,7 +41,7 @@ def sanitize(data: dict) -> dict:
     if isinstance(tool_input, dict):
         safe = {k: tool_input[k][:CMD_LIMIT] for k in KEEP_INPUT_KEYS if isinstance(tool_input.get(k), str)}
         if isinstance(tool_input.get("command"), str):  # first line only: heredoc/inline-script bodies are content
-            safe["command"] = tool_input["command"].split("\n", 1)[0][:CMD_LIMIT]
+            safe["command"] = safe_command(tool_input["command"])
     out = {k: data[k] for k in ("session_id", "tool_name", "tool_use_id", "cwd", "agent_id") if k in data}
     out["tool_input"] = safe
     out["tool_response"] = ""  # never persist tool output

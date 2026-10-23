@@ -36,7 +36,15 @@ class Store(unittest.TestCase):
 
     def corrections(self):
         p = backfill.STORE / "corrections.jsonl"
-        return [json.loads(l) for l in p.read_text("utf-8").splitlines()] if p.exists() else []
+        out = []
+        for l in (p.read_text("utf-8").splitlines() if p.exists() else []):
+            try:
+                r = json.loads(l)
+            except ValueError:
+                continue  # corrupt lines planted by test_G
+            if isinstance(r, dict):
+                out.append(r)
+        return out
 
 
 class Idempotent(Store):
@@ -122,6 +130,73 @@ class AutoLearnException(unittest.TestCase):
             auto_learn.main([])
         self.assertEqual(len(calls), 1)
         self.assertIn("FileNotFoundError", (pdir / ".auto_learn_error.json").read_text("utf-8"))
+
+
+class OriginRound2(Store):
+    """Round 2: origin was file-path + position. Content-based origins must survive these."""
+    def test_A_truncate_then_regrow(self):
+        self.run_bf()
+        self.f.write_text(cc_line("S1", 1, "그게 아니라 a") + cc_line("S1", 3, "그게 아니라 X") + cc_line("S1", 4, "그게 아니라 Y"), "utf-8")
+        self.run_bf()
+        texts = sorted(r["text"] for r in self.corrections())
+        self.assertEqual(texts, sorted(["그게 아니라 a", "그게 아니라 b", "그게 아니라 X", "그게 아니라 Y"]))
+
+    def test_B_rewrite_same_size_is_seen(self):
+        self.run_bf()
+        self.f.write_text(cc_line("S1", 1, "그게 아니라 c") + cc_line("S1", 2, "그게 아니라 d"), "utf-8")
+        self.run_bf()
+        self.assertEqual(len(self.corrections()), 4)
+
+    def test_C_copied_file_adds_nothing(self):
+        self.run_bf()
+        (self.src / "g.jsonl").write_text(self.f.read_text("utf-8"), "utf-8")
+        self.run_bf()
+        self.assertEqual(len(self.corrections()), 2)
+
+    def test_D_insert_at_top_keeps_everything_once(self):
+        self.run_bf()
+        self.f.write_text(cc_line("S1", 0, "그게 아니라 Z") + self.f.read_text("utf-8"), "utf-8")
+        self.run_bf()
+        self.assertEqual(sorted(r["text"][-1] for r in self.corrections()), ["Z", "a", "b"])
+
+    def test_E_two_runs_flushed_late_do_not_double(self):
+        r1, r2 = backfill.Run(False, "", True), backfill.Run(False, "", True)
+        for r in (r1, r2):
+            r.process(self.f, backfill.read_claude)
+        r1.flush()
+        r2.flush()
+        self.assertEqual(len(self.corrections()), 2)
+
+    def test_G_corrupt_store_lines_do_not_crash(self):
+        backfill.STORE.mkdir(parents=True)
+        (backfill.STORE / "corrections.jsonl").write_text('"origin"\n{"origin": {"a": 1}}\n["origin"]\nnot json\n', "utf-8")
+        self.run_bf()
+        self.assertEqual(len([r for r in self.corrections() if r.get("source") == "backfill"]), 2)
+
+
+class MetadataRound2(unittest.TestCase):
+    def san(self, cmd):
+        return observe_meta.sanitize({"tool_input": {"command": cmd}})["tool_input"]["command"]
+
+    def test_H1_inline_script_body_is_not_stored(self):
+        self.assertNotIn("SECRET_BODY", self.san("python3 -c \"print('SECRET_BODY')\""))
+
+    def test_H2_H3_cr_and_unicode_line_separators_split(self):
+        self.assertNotIn("SECRET_BODY", self.san("cat > a.py <<'EOF'\rSECRET_BODY\rEOF"))
+        self.assertNotIn("SECRET_BODY", self.san("cat > a.py <<'EOF'\u2028SECRET_BODY\u2028EOF"))
+
+    def test_H4_H5_credentials_in_url_and_env_are_masked(self):
+        self.assertNotIn("Zx9qLm2pW8", self.san("psql postgres://admin:Zx9qLm2pW8@db.local/x"))
+        self.assertNotIn("p@ss!w0rd", self.san("PASSWORD=p@ss!w0rd ./run.sh"))
+        self.assertIn("psql", self.san("psql postgres://admin:Zx9qLm2pW8@db.local/x"))
+
+    def test_I_key_shaped_tokens_never_become_phrases(self):
+        idx = repeat_instr.Index()
+        for s in ("a", "b", "c"):
+            idx.add(s, "AKIAXXXXXXXXXXXXXXXX 이거 항상 기억해줘 sk_live_abc123def456")
+        blob = json.dumps(repeat_instr.records(idx, min_sessions=3), ensure_ascii=False).lower()
+        self.assertNotIn("akia", blob)
+        self.assertNotIn("sk_live", blob)
 
 
 if __name__ == "__main__":
