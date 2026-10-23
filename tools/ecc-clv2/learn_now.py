@@ -19,6 +19,7 @@ PROMPT = """[ECC-AUTOMATED] IMPORTANT: You are running in non-interactive --prin
 
 Read {analysis} and identify patterns for the project {name} (user corrections, error resolutions, repeated workflows, tool preferences).
 Lines with "event": "user_correction" are the user's own corrections: treat each as strong evidence (one correction counts as 3 observations) and prefer instincts that encode the rule the user stated.
+Lines with "event": "user_decision" are decisions the user already confirmed (fields decision_id, status, decision; text = the user's words): treat each as settled (counts as 3 observations) and never propose an instinct that contradicts one.
 If you find 3+ occurrences of the same pattern, you MUST output an instinct block for it.
 
 CRITICAL: Every instinct file MUST use this exact format:

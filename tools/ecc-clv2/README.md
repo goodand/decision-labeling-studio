@@ -16,6 +16,7 @@
 | `eval_loop.py` | 게이트: R1 형식·R2 코드/문서 금지·R3 정답측 규칙 금지·R4 인용 세션 실존·R5 중복 → 통과분만 3회 LLM 판정(모두 accept일 때 active) | 〃 |
 | `auto_learn.py` | 새 관찰 ≥20건일 때 learn→eval→publish. 기본은 규칙 게이트만(LLM 판정은 `ECC_LEARN_SEMANTIC=1`일 때만). 규칙 통과분은 digest로 사람 검토 | `Stop` (async) |
 | `platform_compat.py` | OS 분기를 모은 유일한 파일: 저장소 경로, bash 경로·경로 형식, 파일 잠금(msvcrt/fcntl), Kiwi 서버 깨우기(Task Scheduler/launchd) | — |
+| `backfill.py` | 과거 Claude Code·Codex 세션 기록을 훅과 같은 규칙으로 한 번에 replay(아래 절) | 수동 |
 | `vendor_wr/semantic_review.py` | 판정 계약(accept/reject/manual_review + evidence_ids) — workflow-runner 원본 사본 | — |
 
 실사용 교훈(도메인 규칙)과 메타 교훈(도구 습관)은 분리합니다. 이 패키지가 자동 승격하는 것은 메타 교훈뿐이며, 실사용 교훈은 사람이 확인한 뒤 프로젝트 메모리에 둡니다.
@@ -80,6 +81,27 @@ python -m unittest discover -s tests -p "test_ecc_clv2_*.py"
 ```
 
 ECC 스킬 디렉터리가 없으면 `eval_loop`/`auto_learn` 테스트는 건너뜁니다(`upstream/` 사본이 있으면 실행). Kiwi 테스트는 서버를 띄웠다가 끝에 반드시 내립니다.
+
+## 과거 세션 backfill
+
+훅은 설치 이후 세션만 봅니다. `backfill.py`는 이미 디스크에 있는 기록을 읽어 **훅이 만드는 것과 같은 두 종류의 레코드**를 같은 저장소에 씁니다. 그 뒤 `learn_now.py` / `auto_learn.py --force`를 그대로 돌릴 수 있습니다.
+
+- 입력: `~/.claude/projects/<cwd-slug>/*.jsonl`(Claude Code), `~/.codex/sessions/**/rollout-*.jsonl`(Codex), `--decisions <repo>/decisions`(사람이 확정한 결정 기록 JSON; 감지기를 거치지 않고 `user_decision` 레코드로 들어가며, 학습 프롬프트는 이를 확정된 사실로 취급)
+- 출력: `corrections.jsonl`(정정 발화, `capture_correction` 규칙·300자·문서 경로 가림), `observations.jsonl`(`tool_start`/`tool_complete` 쌍, `observe_meta.sanitize`로 메타데이터만, 출력은 빈 문자열). 타임스탬프는 원래 기록의 시각.
+- 버리는 것: 서브에이전트 기록(`isSidechain`/`agentId`, `*/subagents/*`, Codex `thread_source=subagent`), 자동 실행(`entrypoint=sdk-cli`, `promptSource=sdk`, `sessionKind=bg`, `[ECC-AUTOMATED]`), `isMeta`·compact summary, `<`로 시작하는 주입 프롬프트(task-notification, 명령 echo, environment_context), 어시스턴트 텍스트, 도구 출력, 파일 내용 전부.
+- 프로젝트 식별은 상류 `detect-project.sh`와 같은 규칙(git remote 정규화 → sha256 앞 12자). cwd가 사라졌거나 git 저장소가 아니면 `global`.
+- Codex 도구 이름은 Claude 이름으로 매핑(`exec`/`exec_command`→Bash, `apply_patch`→Edit, `view_image`→Read 등). patch 본문은 저장하지 않음.
+- 멱등: `<store>/backfill_state.json`에 파일별 처리 크기를 기록해 다시 돌려도 새 줄만 추가. 쓰는 동안 `.observe.lock`을 잡아 실행 중인 훅과 겹치지 않음.
+
+```bash
+PY -I L/backfill.py --dry-run                      # 쓰지 않고 프로젝트별 건수만
+PY -I L/backfill.py --dry-run --max-files 300      # 최신 300개 파일로 먼저 확인
+PY -I L/backfill.py --since 2026-09-01             # 실제 기록(날짜 하한)
+PY -I L/backfill.py --source codex                 # 한 쪽만
+PY -I L/backfill.py --decisions REPO/decisions     # 결정 기록만(세션 로그는 읽지 않음)
+```
+
+스스로 `nice 19`로 내려가지만 Claude 기록은 수 GB라 한 번에 하나만 돌리세요(두 개를 동시에 돌리다 과열로 전체 앱이 종료된 적이 있음, 2026-10-24). 실측(2026-10-24, dry-run): Codex 59파일 2초 → 프롬프트 1,042·정정 274·도구 8,185; Claude 17,687파일 12초 → 프롬프트 1,083·정정 315·도구 9,319; 이 저장소 결정 기록 10파일 → 48건. 정정 비율이 약 30%로 높은 것은 감지 규칙이 도메인어만으로도 잡기 때문이며(README 한계 절), 훅과 같은 규칙을 그대로 쓴 결과다.
 
 ## 검증 원칙
 

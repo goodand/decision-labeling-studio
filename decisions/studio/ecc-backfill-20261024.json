@@ -1,0 +1,25 @@
+{
+  "author": "Claude (Fable 5.1)",
+  "recorded_on": "2026-10-24",
+  "recording_method": "From this chat; not artifact approval",
+  "decisions": [
+    {
+      "id": "STUDIO-ECC-007",
+      "status": "explicit_request",
+      "user_quote": "이 system을 기존 claude session 내역들 or codex session 내역들에도 적용 할 수 있는 것 아닌가? … 과거 세션 적용 할 수 있게 자동세션 거르는 등 전처리 작업 진행해",
+      "decision": "tools/ecc-clv2/backfill.py: 과거 Claude Code·Codex 세션 기록을 훅과 동일한 규칙(capture_correction, observe_meta.sanitize)으로 replay해 같은 저장소에 쓴다. 서브에이전트·자동 실행·메타·주입 프롬프트는 버린다. 레코드 형식·프로젝트 ID는 상류 observe.sh/detect-project.sh와 맞춘다. 실제 기록에 대한 실행은 사용자가 한다(이 세션은 dry-run만)."
+    },
+    {
+      "id": "STUDIO-ECC-008",
+      "status": "observed_constraint",
+      "user_quote": "PC 부하 때문인지 발열과 함께 모든 app이 꺼졌었어",
+      "decision": "backfill은 스스로 nice 19로 내려가고 --max-files·진행 표시를 갖는다. Claude 기록(1.9GB)과 Codex를 동시에 돌리지 않는다. README에 기록."
+    },
+    {
+      "id": "STUDIO-ECC-009",
+      "status": "explicit_request",
+      "user_quote": "claude에서 정리한 decision json도 활용하면 좋을 것 같은데",
+      "decision": "backfill --decisions로 decisions/**/*.json(studio·dds 형식)을 읽어 user_decision 레코드로 넣는다. 사람이 확정한 기록이므로 정정 감지기를 거치지 않고, learn_now 프롬프트는 이를 확정된 사실(관측 3건 가중)로 취급하며 이에 어긋나는 instinct를 내지 않게 한다."
+    }
+  ]
+}
