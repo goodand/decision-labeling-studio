@@ -8,7 +8,10 @@ Usage: python learn_now.py [project_name ...]   (no args = all projects with >= 
 import json, os, re, subprocess, sys, tempfile
 from pathlib import Path
 
-STORE = Path.home() / ".claude" / "ecc-homunculus"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import platform_compat as pc  # noqa: E402
+
+STORE = pc.store_dir()
 MODEL, EFFORT = "claude-opus-5-5", "low"
 MAX_LINES, MIN_LINES = 500, 20
 

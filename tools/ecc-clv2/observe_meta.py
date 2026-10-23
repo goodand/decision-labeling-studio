@@ -5,21 +5,19 @@ reads, file contents, prompts) before the hook payload reaches observe.sh, and f
 the observer (which would send observations to the Claude API) off.
 Usage (Claude Code hook): python observe_meta.py pre|post
 """
-import json, msvcrt, os, re, subprocess, sys, time
+import json, os, subprocess, sys
 from pathlib import Path
 
-GIT_BASH = os.environ.get("ECC_GIT_BASH", r"C:\Program Files\Git\bin\bash.exe")
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # hooks run with `python -I`: script dir not on path
+import platform_compat as pc  # noqa: E402
+
+GIT_BASH = pc.bash_path()
 _HERE = Path(__file__).resolve().parent
 OBSERVE = Path(os.environ.get("ECC_CLV2_SKILL_DIR") or next(
     (d for d in (_HERE / "continuous-learning-v2", _HERE / "upstream" / "continuous-learning-v2") if d.exists()),
     _HERE / "continuous-learning-v2")) / "hooks" / "observe.sh"
 KEEP_INPUT_KEYS = ("file_path", "path", "pattern", "glob", "notebook_path", "url", "subagent_type", "description")
 CMD_LIMIT = 200
-
-
-def posix(p: Path) -> str:
-    s = str(p).replace("\\", "/")
-    return "/" + s[0].lower() + s[2:]
 
 
 def sanitize(data: dict) -> dict:
@@ -46,26 +44,15 @@ def main():
     env.setdefault("CLV2_PYTHON_CMD", "python")
     # Pin the store here. Claude Code rewrites settings.json env paths to "C:/...",
     # which observe.sh rejects as non-absolute and then falls back to ~/.local/share.
-    env["CLV2_HOMUNCULUS_DIR"] = os.environ.get("ECC_CLV2_STORE", posix(Path.home() / ".claude" / "ecc-homunculus"))
-    store = Path(re.sub(r"^/([a-z])/", r"\1:/", env["CLV2_HOMUNCULUS_DIR"]))
+    store = pc.store_dir()
+    env["CLV2_HOMUNCULUS_DIR"] = pc.to_bash_path(store)
     store.mkdir(parents=True, exist_ok=True)
-    with open(store / ".observe.lock", "a+b") as guard:  # E5: serialize observe.sh appends (no lock in ECC)
-        deadline = time.monotonic() + 25
-        while True:
-            try:
-                msvcrt.locking(guard.fileno(), msvcrt.LK_NBLCK, 1)
-                break
-            except OSError:
-                if time.monotonic() > deadline:
-                    return 0  # drop one observation rather than block the session
-                time.sleep(0.05)
-        try:
-            subprocess.run([GIT_BASH, posix(OBSERVE), phase],
-                           input=json.dumps(sanitize(data), ensure_ascii=False).encode("utf-8"),
-                           env=env, capture_output=True, timeout=30)
-        finally:
-            guard.seek(0)
-            msvcrt.locking(guard.fileno(), msvcrt.LK_UNLCK, 1)
+    with open(store / ".observe.lock", "a+b") as guard, pc.file_lock(guard, 25) as held:  # E5: serialize observe.sh appends (no lock in ECC)
+        if not held:
+            return 0  # drop one observation rather than block the session
+        subprocess.run([GIT_BASH, pc.to_bash_path(OBSERVE), phase],
+                       input=json.dumps(sanitize(data), ensure_ascii=False).encode("utf-8"),
+                       env=env, capture_output=True, timeout=30)
     return 0
 
 

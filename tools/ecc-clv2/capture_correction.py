@@ -9,7 +9,8 @@ import json, os, re, sys, time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # hooks run with `python -I`: script dir not on path
-STORE = Path(os.environ.get("ECC_CLV2_STORE_WIN", Path.home() / ".claude" / "ecc-homunculus"))
+import platform_compat as pc  # noqa: E402
+STORE = pc.store_dir()
 MAX_CHARS = 300
 AUTOMATED_MARK = "[ECC-AUTOMATED]"  # learner/judge prompts carry this; never treat them as user input
 MARKERS = re.compile(
@@ -71,20 +72,8 @@ START_TASK = os.environ.get("ECC_KIWI_START_TASK", "ECC_KiwiStart")
 
 
 def _start_server_detached():
-    """A child of the hook dies with the hook's Job Object on Windows (cf. ECC #2489), so ask Task
-    Scheduler to start the server; fall back to a detached child where no task exists (tests)."""
-    import subprocess
-    try:
-        if subprocess.run(["schtasks", "/Run", "/TN", START_TASK], capture_output=True, timeout=5).returncode == 0:
-            return
-    except Exception:
-        pass
-    try:
-        subprocess.Popen([sys.executable, "-X", "utf8", "-I", str(Path(__file__).with_name("kiwi_server.py"))],
-                         creationflags=getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0),
-                         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
-    except Exception:
-        pass
+    """Task Scheduler (Windows) / launchd (macOS) job named START_TASK, else a detached child (tests)."""
+    pc.start_detached([sys.executable, "-X", "utf8", "-I", str(Path(__file__).with_name("kiwi_server.py"))], START_TASK)
 
 
 def make_record(session: str, cwd: str, text: str) -> dict:

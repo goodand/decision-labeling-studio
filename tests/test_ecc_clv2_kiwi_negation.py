@@ -35,6 +35,9 @@ def start_server():
 
 
 def setUpModule():
+    import importlib.util
+    if not port_open() and importlib.util.find_spec("kiwipiepy") is None:
+        raise unittest.SkipTest(f"kiwipiepy not installed for {sys.executable} (use the Python that has it)")
     if not port_open():
         start_server()
 

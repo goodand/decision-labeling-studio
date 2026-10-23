@@ -15,17 +15,20 @@
 | `learn_now.py` | 관찰+정정 기록 → Claude(Opus, effort low)로 instinct 추출. 자동 세션은 훅을 끔 | 수동/`auto_learn` |
 | `eval_loop.py` | 게이트: R1 형식·R2 코드/문서 금지·R3 정답측 규칙 금지·R4 인용 세션 실존·R5 중복 → 통과분만 3회 LLM 판정(모두 accept일 때 active) | 〃 |
 | `auto_learn.py` | 새 관찰 ≥20건일 때 learn→eval→publish. 기본은 규칙 게이트만(LLM 판정은 `ECC_LEARN_SEMANTIC=1`일 때만). 규칙 통과분은 digest로 사람 검토 | `Stop` (async) |
+| `platform_compat.py` | OS 분기를 모은 유일한 파일: 저장소 경로, bash 경로·경로 형식, 파일 잠금(msvcrt/fcntl), Kiwi 서버 깨우기(Task Scheduler/launchd) | — |
 | `vendor_wr/semantic_review.py` | 판정 계약(accept/reject/manual_review + evidence_ids) — workflow-runner 원본 사본 | — |
 
 실사용 교훈(도메인 규칙)과 메타 교훈(도구 습관)은 분리합니다. 이 패키지가 자동 승격하는 것은 메타 교훈뿐이며, 실사용 교훈은 사람이 확인한 뒤 프로젝트 메모리에 둡니다.
 
 ## 요구사항
 
-- Windows, Python 3.12, `kiwipiepy` 0.24 (`pip install kiwipiepy`), Claude Code CLI(`claude`)
+- Windows 또는 macOS, Python 3.12 이상, `kiwipiepy` 0.24 (`pip install kiwipiepy`), Claude Code CLI(`claude`)
 - ECC `continuous-learning-v2` 스킬 디렉터리(`observe_meta`·`eval_loop`가 원본 `observe.sh`, `instinct-cli.py`를 호출): `upstream/continuous-learning-v2/`에 사본이 있음(MIT, PROVENANCE.json). 다른 위치를 쓰려면 `ECC_CLV2_SKILL_DIR`
-- Git Bash(`ECC_GIT_BASH`, 기본 `C:\Program Files\Git\bin\bash.exe`)
+- bash: Windows는 Git Bash(`ECC_GIT_BASH`, 기본 `C:\Program Files\Git\bin\bash.exe`), macOS는 시스템 bash(`ECC_GIT_BASH`로 바꿀 수 있음)
 
 ## 설치 (전역 설정 변경은 사용자 승인 후)
+
+설치 스크립트(설치본 복사 + 커밋 해시 기록)는 보류 중입니다(결정 STUDIO-ECC-005). 그때까지는 아래를 손으로 설정합니다.
 
 `~/.claude/settings.json`의 `hooks`에 아래를 추가합니다. `PY`는 kiwipiepy가 설치된 python.exe 절대 경로, `L`은 이 폴더(`tools/ecc-clv2`) 절대 경로. 현재 실행 중인 훅은 `~/.claude/ecc-clv2` 사본을 가리키며(결정 STUDIO-ECC-003), 저장소 사본으로 바꾸는 것은 별도 결정입니다.
 
@@ -48,7 +51,21 @@ schtasks /Create /F /SC WEEKLY /D SUN /ST 04:00 /TN "\ECC_KiwiWeeklyStop" /TR "P
 
 `PYW`는 `pythonw.exe`. 훅은 서버가 없으면 정규식으로 처리한 뒤 `ECC_KiwiStart` 작업을 실행해 되살립니다(훅의 자식 프로세스는 훅 종료와 함께 죽으므로 Task Scheduler를 씁니다).
 
-환경변수: `ECC_CLV2_STORE_WIN`/`ECC_CLV2_STORE`(저장소, 기본 `~/.claude/ecc-homunculus`), `ECC_LEARN_DIGEST`, `ECC_LEARN_HABITS`(출력 메모리 파일), `ECC_KIWI_START_TASK`.
+macOS에서는 훅 명령의 `PY`에 kiwipiepy가 설치된 `python3` 절대 경로를 넣습니다. Kiwi 서버 상주는 launchd가 맡습니다. `~/Library/LaunchAgents/ECC_KiwiStart.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>ECC_KiwiStart</string>
+  <key>ProgramArguments</key><array><string>PY</string><string>-X</string><string>utf8</string><string>-I</string><string>L/kiwi_server.py</string></array>
+  <key>RunAtLoad</key><true/>
+</dict></plist>
+```
+
+`launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/ECC_KiwiStart.plist`로 등록합니다. 서버가 죽으면 훅이 `launchctl kickstart`로 되살립니다. 주 1회 종료가 필요하면 `--stop`을 실행하는 plist를 `StartCalendarInterval`(일요일 04:00)로 하나 더 둡니다. 저장소가 Desktop·Documents 아래에 있으면 처음 실행할 때 macOS 폴더 접근 권한 창이 뜰 수 있습니다.
+
+환경변수: `ECC_CLV2_STORE_WIN`/`ECC_CLV2_STORE`(저장소, 모든 스크립트가 같은 값을 씀, 기본 `~/.claude/ecc-homunculus`), `ECC_LEARN_DIGEST`, `ECC_LEARN_HABITS`(출력 메모리 파일. 비워 두면 원래 Windows PC의 메모리 폴더가 있을 때만 그곳, 없으면 저장소 폴더에 씀), `ECC_KIWI_START_TASK`.
 
 ## 실측값 (2026-10-23, Windows 11)
 

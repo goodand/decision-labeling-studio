@@ -13,9 +13,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import learn_now, eval_loop  # noqa: E402  (reuse, no new logic)
 
 STORE = learn_now.STORE
-_MEM = Path.home() / ".claude" / "projects"  # Claude Code auto-memory root; override per machine via env
-DIGEST = Path(os.environ.get("ECC_LEARN_DIGEST", _MEM / "D--dev-eval-team" / "memory" / "learned-digest.md"))
-HABITS = Path(os.environ.get("ECC_LEARN_HABITS", _MEM / "C--Users-INTEC" / "memory" / "learned-agent-habits.md"))
+_MEM = Path.home() / ".claude" / "projects"  # Claude Code auto-memory root; set the env per machine
+
+
+def _out(env: str, legacy: Path, name: str) -> Path:
+    """env > the original Windows machine's memory file (only where it exists) > the store."""
+    if os.environ.get(env):
+        return Path(os.environ[env])
+    return legacy if legacy.parent.exists() else STORE / name
+
+
+DIGEST = _out("ECC_LEARN_DIGEST", _MEM / "D--dev-eval-team" / "memory" / "learned-digest.md", "learned-digest.md")
+HABITS = _out("ECC_LEARN_HABITS", _MEM / "C--Users-INTEC" / "memory" / "learned-agent-habits.md", "learned-agent-habits.md")
 MIN_NEW = 20
 MAX_HABITS = 15
 

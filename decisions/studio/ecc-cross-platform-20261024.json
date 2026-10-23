@@ -1,0 +1,25 @@
+{
+  "author": "Claude (Opus 5.5)",
+  "recorded_on": "2026-10-24",
+  "recording_method": "From this chat; not artifact approval",
+  "decisions": [
+    {
+      "id": "STUDIO-ECC-004",
+      "status": "explicit_request",
+      "user_quote": "window에서 만든건데 window os와 mac os에서 호한되게 만들 수 있어?",
+      "decision": "tools/ecc-clv2를 Windows와 macOS 양쪽에서 동작하게 고친다. OS별 분기는 platform_compat.py 한 곳에 모은다."
+    },
+    {
+      "id": "STUDIO-ECC-006",
+      "status": "explicit_choice",
+      "user_quote": "지금은 mac사용만 보자 window는 지금 test불가해",
+      "decision": "이번 검증 범위는 macOS만이다(테스트 24개 통과, ~/.claude/venvs/kiwi Python, kiwipiepy 0.23.2). Windows 분기(msvcrt 잠금, Git Bash 경로 변환, schtasks)는 코드만 있고 미검증 상태로 둔다. Windows PC에서 같은 테스트를 돌리기 전에는 Windows 설치본(~/.claude/ecc-clv2)을 이 브랜치로 바꾸지 않는다."
+    },
+    {
+      "id": "STUDIO-ECC-005",
+      "status": "deferred",
+      "user_quote": "설치 스크립트는 기록 해두고 나중에 만들자",
+      "decision": "훅은 저장소가 아니라 설치본(~/.claude/ecc-clv2)을 가리키는 방식(STUDIO-ECC-003 유지)으로 가되, 설치 스크립트(install.py: 복사 + 커밋 해시를 INSTALLED.json에 기록)는 보류한다. 브랜치 전환이 실행 중인 훅을 깨지 않게 하고, 설치본이 저장소의 어느 커밋인지 확인하기 위함."
+    }
+  ]
+}

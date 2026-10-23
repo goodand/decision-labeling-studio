@@ -19,9 +19,11 @@ _spec = importlib.util.spec_from_file_location(
 icli = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(icli)  # reuse ECC originals: parse_instinct_file, _trigger_keywords
 sys.path.insert(0, str(Path(__file__).resolve().parent / "vendor_wr"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import platform_compat as pc  # noqa: E402
 import semantic_review  # workflow-runner judge contract (copy pinned in vendor_wr/SOURCE.txt)
 
-STORE = Path.home() / ".claude" / "ecc-homunculus"
+STORE = pc.store_dir()
 MODEL, EFFORT = "claude-opus-5-5", "low"
 REQUIRED = ("id", "trigger", "confidence", "domain", "source", "scope", "project_id", "project_name")
 DOMAINS = {"code-style", "testing", "git", "debugging", "workflow", "file-patterns"}
