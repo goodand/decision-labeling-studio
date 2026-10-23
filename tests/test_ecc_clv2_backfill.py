@@ -143,7 +143,7 @@ class DecisionLogs(Base):
         run.flush()
         recs = self.records("corrections")
         self.assertEqual([r["decision_id"] for r in recs], ["D-1", "S-1", "S-2"])
-        self.assertTrue(all(r["event"] == "user_decision" for r in recs))
+        self.assertTrue(all(r["event"] == "user_decision" and r["source"] == "backfill" for r in recs))  # never mistaken for live
         self.assertEqual(recs[1]["text"], "이게 가독성이 좋은데")          # user's words when recorded
         self.assertEqual(recs[2]["text"][:7], "설치 스크립트")              # else the decision itself
         self.assertLessEqual(len(recs[2]["decision"]), 300)

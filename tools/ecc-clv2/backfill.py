@@ -222,7 +222,7 @@ def observation_pair(when, sess, name, inp, meta):
 def decision_record(when, sess, cwd, d, meta):
     """Same fields as a user_correction plus the decision itself; text = the user's words when recorded."""
     rec = cc.make_record(sess, cwd, d["user_quote"] or d["decision"])
-    rec.update(timestamp=ts(when), event="user_decision", decision_id=d["decision_id"], status=d["status"],
+    rec.update(timestamp=ts(when), event="user_decision", source="backfill", decision_id=d["decision_id"], status=d["status"],
                decision=" ".join(d["decision"].split())[:cc.MAX_CHARS])
     return rec
 
