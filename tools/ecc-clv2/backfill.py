@@ -242,7 +242,7 @@ def decision_record(when, sess, cwd, d, meta):
 
 def is_human_prompt(text: str) -> bool:
     t = text.lstrip()
-    return bool(t) and not t.startswith("<") and cc.AUTOMATED_MARK not in t
+    return bool(t) and not t.startswith(("<", "[Request interrupted")) and cc.AUTOMATED_MARK not in t
 
 
 # ---- run ----------------------------------------------------------------------------------------------

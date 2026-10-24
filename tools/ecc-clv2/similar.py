@@ -49,6 +49,23 @@ class Index:
         return [(round(s, 3), self.docs[i][0], self.docs[i][1], self.docs[i][2]) for i, s in ranked[:k]]
 
 
+BANDS = [(10, 13), (13, 16), (16, 18), (18, 20), (20, 25), (25, 30), (30, 999)]
+
+
+def choose_threshold(items, target_precision: float, bands=BANDS, positive=("same_instruction",)):
+    """The lowest band edge at which the CUMULATIVE precision of everything at or above it reaches the
+    target: that is exactly the set the learner would receive with MIN_SCORE at that edge. Cumulative, not
+    per-band, so one noisy band of ~10 samples cannot block all bands below it. None if no edge qualifies."""
+    chosen = None
+    for lo, _ in reversed(bands):
+        above = [i for i in items if i["score"] >= lo]
+        if not above:
+            continue
+        if sum(i["label"] in positive for i in above) / len(above) >= target_precision:
+            chosen = lo
+    return chosen
+
+
 def _masked(text: str) -> str:
     return cc.make_record("", "", text)["text"]
 

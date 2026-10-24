@@ -254,5 +254,13 @@ class DesktopAppFormat(Base):
         self.assertEqual(texts, ["그게 아니라 원본을 재사용해", "덮어쓰지 말고 새 폴더에 저장해", "그게 아니라 이건 틀렸어"])
 
 
+
+class InterruptedMarker(unittest.TestCase):
+    def test_request_interrupted_is_not_a_human_prompt(self):
+        self.assertFalse(backfill.is_human_prompt("[Request interrupted by user]"))
+        self.assertFalse(backfill.is_human_prompt("[Request interrupted by user for tool use]"))
+        self.assertTrue(backfill.is_human_prompt("[참고] 이건 사람이 쓴 것"))
+
+
 if __name__ == "__main__":
     unittest.main()

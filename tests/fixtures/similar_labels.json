@@ -1,0 +1,434 @@
+{
+ "about": "Stratified sample (10 per BM25 score band) of similar-prompt pairs from the live store, 2026-10-24. Labels were assigned by an LLM (Claude Opus) and are NOT human-verified; the 7 same_instruction items were shown to the user. Used by tests.test_ecc_clv2_similar.Threshold to derive MIN_SCORE deterministically (STUDIO-ECC-024).",
+ "label_source": "llm:claude-opus-5-5, unverified",
+ "labels": [
+  "same_instruction",
+  "same_topic",
+  "unrelated"
+ ],
+ "positive": null,
+ "target_precision": 0.8,
+ "chosen": null,
+ "items": [
+  {
+   "id": 1,
+   "band": "10-13",
+   "score": 10.005,
+   "label": "unrelated"
+  },
+  {
+   "id": 2,
+   "band": "10-13",
+   "score": 10.298,
+   "label": "same_topic"
+  },
+  {
+   "id": 3,
+   "band": "10-13",
+   "score": 10.669,
+   "label": "unrelated"
+  },
+  {
+   "id": 4,
+   "band": "10-13",
+   "score": 11.003,
+   "label": "same_topic"
+  },
+  {
+   "id": 5,
+   "band": "10-13",
+   "score": 11.257,
+   "label": "unrelated"
+  },
+  {
+   "id": 6,
+   "band": "10-13",
+   "score": 11.448,
+   "label": "unrelated"
+  },
+  {
+   "id": 7,
+   "band": "10-13",
+   "score": 11.775,
+   "label": "unrelated"
+  },
+  {
+   "id": 8,
+   "band": "10-13",
+   "score": 12.058,
+   "label": "unrelated"
+  },
+  {
+   "id": 9,
+   "band": "10-13",
+   "score": 12.306,
+   "label": "same_topic"
+  },
+  {
+   "id": 10,
+   "band": "10-13",
+   "score": 12.7,
+   "label": "unrelated"
+  },
+  {
+   "id": 11,
+   "band": "13-16",
+   "score": 13.008,
+   "label": "unrelated"
+  },
+  {
+   "id": 12,
+   "band": "13-16",
+   "score": 13.153,
+   "label": "same_instruction"
+  },
+  {
+   "id": 13,
+   "band": "13-16",
+   "score": 13.369,
+   "label": "unrelated"
+  },
+  {
+   "id": 14,
+   "band": "13-16",
+   "score": 13.617,
+   "label": "unrelated"
+  },
+  {
+   "id": 15,
+   "band": "13-16",
+   "score": 13.92,
+   "label": "unrelated"
+  },
+  {
+   "id": 16,
+   "band": "13-16",
+   "score": 14.213,
+   "label": "same_topic"
+  },
+  {
+   "id": 17,
+   "band": "13-16",
+   "score": 14.547,
+   "label": "unrelated"
+  },
+  {
+   "id": 18,
+   "band": "13-16",
+   "score": 14.941,
+   "label": "unrelated"
+  },
+  {
+   "id": 19,
+   "band": "13-16",
+   "score": 15.266,
+   "label": "unrelated"
+  },
+  {
+   "id": 20,
+   "band": "13-16",
+   "score": 15.605,
+   "label": "same_instruction"
+  },
+  {
+   "id": 21,
+   "band": "16-18",
+   "score": 16.012,
+   "label": "unrelated"
+  },
+  {
+   "id": 22,
+   "band": "16-18",
+   "score": 16.179,
+   "label": "same_topic"
+  },
+  {
+   "id": 23,
+   "band": "16-18",
+   "score": 16.28,
+   "label": "unrelated"
+  },
+  {
+   "id": 24,
+   "band": "16-18",
+   "score": 16.442,
+   "label": "same_topic"
+  },
+  {
+   "id": 25,
+   "band": "16-18",
+   "score": 16.561,
+   "label": "unrelated"
+  },
+  {
+   "id": 26,
+   "band": "16-18",
+   "score": 16.728,
+   "label": "same_topic"
+  },
+  {
+   "id": 27,
+   "band": "16-18",
+   "score": 16.953,
+   "label": "same_topic"
+  },
+  {
+   "id": 28,
+   "band": "16-18",
+   "score": 17.176,
+   "label": "same_instruction"
+  },
+  {
+   "id": 29,
+   "band": "16-18",
+   "score": 17.376,
+   "label": "same_topic"
+  },
+  {
+   "id": 30,
+   "band": "16-18",
+   "score": 17.663,
+   "label": "unrelated"
+  },
+  {
+   "id": 31,
+   "band": "18-20",
+   "score": 18.023,
+   "label": "same_topic"
+  },
+  {
+   "id": 32,
+   "band": "18-20",
+   "score": 18.126,
+   "label": "unrelated"
+  },
+  {
+   "id": 33,
+   "band": "18-20",
+   "score": 18.326,
+   "label": "unrelated"
+  },
+  {
+   "id": 34,
+   "band": "18-20",
+   "score": 18.532,
+   "label": "same_topic"
+  },
+  {
+   "id": 35,
+   "band": "18-20",
+   "score": 18.685,
+   "label": "same_topic"
+  },
+  {
+   "id": 36,
+   "band": "18-20",
+   "score": 18.903,
+   "label": "unrelated"
+  },
+  {
+   "id": 37,
+   "band": "18-20",
+   "score": 19.127,
+   "label": "same_instruction"
+  },
+  {
+   "id": 38,
+   "band": "18-20",
+   "score": 19.328,
+   "label": "same_topic"
+  },
+  {
+   "id": 39,
+   "band": "18-20",
+   "score": 19.491,
+   "label": "same_instruction"
+  },
+  {
+   "id": 40,
+   "band": "18-20",
+   "score": 19.619,
+   "label": "unrelated"
+  },
+  {
+   "id": 41,
+   "band": "20-25",
+   "score": 20.022,
+   "label": "same_topic"
+  },
+  {
+   "id": 42,
+   "band": "20-25",
+   "score": 20.561,
+   "label": "same_topic"
+  },
+  {
+   "id": 43,
+   "band": "20-25",
+   "score": 20.9,
+   "label": "same_topic"
+  },
+  {
+   "id": 44,
+   "band": "20-25",
+   "score": 21.527,
+   "label": "same_topic"
+  },
+  {
+   "id": 45,
+   "band": "20-25",
+   "score": 22.092,
+   "label": "same_topic"
+  },
+  {
+   "id": 46,
+   "band": "20-25",
+   "score": 22.768,
+   "label": "same_topic"
+  },
+  {
+   "id": 47,
+   "band": "20-25",
+   "score": 22.914,
+   "label": "same_topic"
+  },
+  {
+   "id": 48,
+   "band": "20-25",
+   "score": 23.395,
+   "label": "same_topic"
+  },
+  {
+   "id": 49,
+   "band": "20-25",
+   "score": 23.891,
+   "label": "same_topic"
+  },
+  {
+   "id": 50,
+   "band": "20-25",
+   "score": 24.737,
+   "label": "same_topic"
+  },
+  {
+   "id": 51,
+   "band": "25-30",
+   "score": 25.322,
+   "label": "same_topic"
+  },
+  {
+   "id": 52,
+   "band": "25-30",
+   "score": 25.833,
+   "label": "unrelated"
+  },
+  {
+   "id": 53,
+   "band": "25-30",
+   "score": 26.44,
+   "label": "same_topic"
+  },
+  {
+   "id": 54,
+   "band": "25-30",
+   "score": 26.917,
+   "label": "same_topic"
+  },
+  {
+   "id": 55,
+   "band": "25-30",
+   "score": 27.417,
+   "label": "same_instruction"
+  },
+  {
+   "id": 56,
+   "band": "25-30",
+   "score": 27.702,
+   "label": "same_topic"
+  },
+  {
+   "id": 57,
+   "band": "25-30",
+   "score": 27.922,
+   "label": "same_topic"
+  },
+  {
+   "id": 58,
+   "band": "25-30",
+   "score": 28.603,
+   "label": "unrelated"
+  },
+  {
+   "id": 59,
+   "band": "25-30",
+   "score": 29.322,
+   "label": "unrelated"
+  },
+  {
+   "id": 60,
+   "band": "25-30",
+   "score": 29.671,
+   "label": "same_topic"
+  },
+  {
+   "id": 61,
+   "band": "30-999",
+   "score": 30.015,
+   "label": "same_topic"
+  },
+  {
+   "id": 62,
+   "band": "30-999",
+   "score": 31.954,
+   "label": "same_topic"
+  },
+  {
+   "id": 63,
+   "band": "30-999",
+   "score": 34.762,
+   "label": "same_topic"
+  },
+  {
+   "id": 64,
+   "band": "30-999",
+   "score": 36.289,
+   "label": "same_topic"
+  },
+  {
+   "id": 65,
+   "band": "30-999",
+   "score": 37.956,
+   "label": "same_topic"
+  },
+  {
+   "id": 66,
+   "band": "30-999",
+   "score": 41.534,
+   "label": "same_topic"
+  },
+  {
+   "id": 67,
+   "band": "30-999",
+   "score": 47.039,
+   "label": "same_topic"
+  },
+  {
+   "id": 68,
+   "band": "30-999",
+   "score": 51.55,
+   "label": "same_topic"
+  },
+  {
+   "id": 69,
+   "band": "30-999",
+   "score": 56.698,
+   "label": "same_topic"
+  },
+  {
+   "id": 70,
+   "band": "30-999",
+   "score": 61.418,
+   "label": "same_instruction"
+  }
+ ]
+}

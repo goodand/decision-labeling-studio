@@ -153,5 +153,28 @@ class DerivedRecordsAreNotLive(unittest.TestCase):
         self.assertEqual(backfill.live_sessions(), {"live9"})
 
 
+
+class Threshold(unittest.TestCase):
+    """MIN_SCORE is set from a labeled sample (tests/fixtures/similar_labels.json, STUDIO-ECC-024): the lowest
+    band edge at which the cumulative precision for same_instruction of everything above it reaches TARGET."""
+    def test_min_score_matches_the_labeled_fixture(self):
+        fx = json.loads((Path(__file__).resolve().parent / "fixtures" / "similar_labels.json").read_text("utf-8"))
+        if fx.get("positive") is None:
+            self.skipTest("which labels count as positive is undecided (STUDIO-ECC-024)")
+        self.assertEqual(fx["chosen"], similar.choose_threshold(fx["items"], fx["target_precision"], positive=tuple(fx["positive"])))
+        self.assertEqual(similar.MIN_SCORE, fx["chosen"])
+
+    def test_choose_threshold_rule(self):
+        items = [{"score": 11, "label": "unrelated"}, {"score": 12, "label": "same_instruction"},
+                 {"score": 17, "label": "same_topic"}, {"score": 17.5, "label": "same_instruction"},
+                 {"score": 19, "label": "same_instruction"}, {"score": 21, "label": "same_instruction"},
+                 {"score": 26, "label": "unrelated"}, {"score": 27, "label": "same_instruction"}, {"score": 31, "label": "same_instruction"}]
+        bands = [(10, 13), (13, 16), (16, 18), (18, 20), (20, 25), (25, 30), (30, 999)]
+        # cumulative precision at each edge: >=30 1.0 | >=25 .67 | >=20 .75 | >=18 .80 | >=16 .71 | >=10 .67
+        self.assertEqual(similar.choose_threshold(items, 0.8, bands=bands), 18)   # lowest edge whose cumulative set meets 0.8
+        self.assertEqual(similar.choose_threshold(items, 0.5, bands=bands), 10)
+        self.assertEqual(similar.choose_threshold(items, 1.1, bands=bands), None)
+
+
 if __name__ == "__main__":
     unittest.main()
