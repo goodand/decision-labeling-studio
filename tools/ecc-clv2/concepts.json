@@ -116,6 +116,22 @@
       "side": "input",
       "rank": 4,
       "note": "효과보다 낮으나 투입 중에서는 가장 높은 순위"
+    },
+    "우수한 것의 기준": {
+      "kind": "means",
+      "note": "무엇이 '최고 수준'인지의 기준; 사람의 결정에서 나온다"
+    },
+    "사람의 결정": {
+      "kind": "means",
+      "artifact": "decisions/**/*.json (user_quote, decision), synonyms.json·concepts.json의 approved 항목"
+    },
+    "자연어 표현": {
+      "kind": "means",
+      "note": "사람의 결정을 적절한 자연어로 표현 (decision 필드)"
+    },
+    "사례 매핑": {
+      "kind": "means",
+      "note": "결정에 사례를 매핑 (evidence, 고정 세트)"
     }
   },
   "relations": [
@@ -476,6 +492,90 @@
         }
       ],
       "inferred_by": "llm"
+    },
+    {
+      "type": "means_of",
+      "from": "사람의 의사결정 지원",
+      "to": "최고 수준",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"우수한 것의 기준\"을 잡는데는 Human의 결정, Human의 결정을 적절한 자연어로 표현하고 사례가 매핑 되어야지, \"사람의 의사결정\" 자체는 지원은 \"최고 수준\"에 종속된다고 볼 수 있어"
+        }
+      ]
+    },
+    {
+      "type": "means_of",
+      "from": "우수한 것의 기준",
+      "to": "최고 수준",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"우수한 것의 기준\"을 잡는데는 Human의 결정, Human의 결정을 적절한 자연어로 표현하고 사례가 매핑 되어야지, \"사람의 의사결정\" 자체는 지원은 \"최고 수준\"에 종속된다고 볼 수 있어"
+        }
+      ]
+    },
+    {
+      "type": "depends_on",
+      "from": "우수한 것의 기준",
+      "to": "사람의 결정",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"우수한 것의 기준\"을 잡는데는 Human의 결정, Human의 결정을 적절한 자연어로 표현하고 사례가 매핑 되어야지, \"사람의 의사결정\" 자체는 지원은 \"최고 수준\"에 종속된다고 볼 수 있어"
+        }
+      ]
+    },
+    {
+      "type": "depends_on",
+      "from": "우수한 것의 기준",
+      "to": "자연어 표현",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"우수한 것의 기준\"을 잡는데는 Human의 결정, Human의 결정을 적절한 자연어로 표현하고 사례가 매핑 되어야지, \"사람의 의사결정\" 자체는 지원은 \"최고 수준\"에 종속된다고 볼 수 있어"
+        }
+      ]
+    },
+    {
+      "type": "depends_on",
+      "from": "우수한 것의 기준",
+      "to": "사례 매핑",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"우수한 것의 기준\"을 잡는데는 Human의 결정, Human의 결정을 적절한 자연어로 표현하고 사례가 매핑 되어야지, \"사람의 의사결정\" 자체는 지원은 \"최고 수준\"에 종속된다고 볼 수 있어"
+        }
+      ]
+    },
+    {
+      "type": "depends_on",
+      "from": "우수한 것 선택",
+      "to": "우수한 것의 기준",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"우수한 것의 기준\"을 잡는데는 Human의 결정, Human의 결정을 적절한 자연어로 표현하고 사례가 매핑 되어야지, \"사람의 의사결정\" 자체는 지원은 \"최고 수준\"에 종속된다고 볼 수 있어"
+        }
+      ]
     }
   ],
   "principles": [

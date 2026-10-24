@@ -57,5 +57,23 @@ class Validate(unittest.TestCase):
                 concepts.load(doc(rels), include_proposed=True)
 
 
+class CriteriaOfExcellence(unittest.TestCase):
+    """User 2026-10-24: the criteria for 'excellent' come from human decisions, expressed in apt natural language and
+    mapped to cases; so supporting human decisions is subordinate to 최고 수준 as well."""
+    def test_criteria_chain_is_approved(self):
+        g = concepts.load(concepts.DEFAULT_PATH)                          # approved only
+        self.assertIn("최고 수준", g.purposes("사람의 의사결정 지원"))
+        self.assertIn("검증 비용 절감", g.purposes("사람의 의사결정 지원"))
+        self.assertIn("최고 수준", g.purposes("우수한 것의 기준"))
+        deps = g.out["depends_on"]
+        self.assertEqual(deps["우수한 것의 기준"], {"사람의 결정", "자연어 표현", "사례 매핑"})
+        self.assertIn("우수한 것의 기준", deps["우수한 것 선택"])
+
+    def test_decision_records_implement_the_chain(self):
+        """decisions/*.json carry the human's words (user_quote), the decision in natural language, and evidence."""
+        c = json.loads(concepts.DEFAULT_PATH.read_text("utf-8"))["concepts"]
+        self.assertIn("decisions/", c["사람의 결정"].get("artifact", ""))
+
+
 if __name__ == "__main__":
     unittest.main()
