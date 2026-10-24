@@ -24,7 +24,7 @@ PROMPT = """[ECC-AUTOMATED] IMPORTANT: You are running in non-interactive --prin
 Read {analysis} and identify patterns for the project {name} (user corrections, error resolutions, repeated workflows, tool preferences).
 Lines with "event": "user_correction" are the user's own corrections: treat each as strong evidence (one correction counts as 3 observations) and prefer instincts that encode the rule the user stated.
 Lines with "event": "user_repeated_instruction" are phrases the user wrote in N different sessions ("sessions" field): a standing instruction the agent keeps forgetting; treat each as N observations and prefer an instinct that encodes it.
-Lines with "event": "user_similar_instruction" pair a user prompt ("text", "date") with a similar prompt the user wrote in ANOTHER session ("match_text", "match_date"; BM25 "score"): the same instruction said again in other words; prefer an instinct that states it once.
+Lines with "event": "user_similar_instruction" pair a user prompt ("text", "date") with a RELATED prompt the user wrote in ANOTHER session ("match_text", "match_date"; BM25 "score"). Related means shared words: same topic or the same instruction in other words. Only when both state the same rule does the pair count as a repeat (then as 2 observations); a shared topic alone is not evidence.
 Lines with "event": "user_decision" are decisions the user already confirmed (fields decision_id, status, decision; text = the user's words): treat each as settled (counts as 3 observations) and never propose an instinct that contradicts one.
 If you find 3+ occurrences of the same pattern, you MUST output an instinct block for it.
 

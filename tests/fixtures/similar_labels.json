@@ -6,9 +6,12 @@
   "same_topic",
   "unrelated"
  ],
- "positive": null,
+ "positive": [
+  "same_instruction",
+  "same_topic"
+ ],
  "target_precision": 0.8,
- "chosen": null,
+ "chosen": 18,
  "items": [
   {
    "id": 1,
@@ -430,5 +433,6 @@
    "score": 61.418,
    "label": "same_instruction"
   }
- ]
+ ],
+ "decision": "STUDIO-ECC-024 (user 2026-10-24): tune for 'related prompt' (same_instruction + same_topic), target 0.8 -> MIN_SCORE 18"
 }

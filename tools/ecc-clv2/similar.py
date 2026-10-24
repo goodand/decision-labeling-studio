@@ -3,7 +3,9 @@
 The same instruction comes back in other sessions with different wording; exact n-grams miss it.
 Tokens: the pinned Kiwi server (kiwi_server.PIN) keeping content tags, then human-approved synonyms
 (synonyms.json), then Okapi BM25 over an inverted index. Same input -> same ranking.
-MIN_SCORE is a tier-2 parameter: set from the 2026-10-24 probe (true matches 18-34, a wrong top-1 at 14.5).
+MIN_SCORE is a tier-2 parameter, derived by choose_threshold from a labeled sample (tests/fixtures/similar_labels.json).
+What a pair means: a RELATED earlier prompt (same topic or same instruction), not necessarily the same
+instruction: BM25 measures shared words. In the sample, same_instruction was ~10% of pairs in every score band.
 """
 import json, math, time
 from collections import Counter, defaultdict
@@ -12,7 +14,7 @@ import capture_correction as cc  # pinned Kiwi server client, secret/document ma
 import synonyms as syn_mod
 
 K1, B = 1.5, 0.75
-MIN_SCORE = 16.0
+MIN_SCORE = 18.0  # STUDIO-ECC-024: 'related prompt' reading, cumulative precision 0.8 on tests/fixtures/similar_labels.json
 CONTENT_TAGS = ("NNG", "NNP", "SL", "XR", "VV", "VA")
 
 
