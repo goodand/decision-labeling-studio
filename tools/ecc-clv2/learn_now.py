@@ -17,12 +17,14 @@ STORE = pc.store_dir()
 MODEL, EFFORT = "claude-opus-5-5", "low"
 MAX_LINES, MIN_LINES = 500, 20
 MAX_REPEATED = 60  # tier-2 tunable: repeated-instruction lines get their own budget (top by sessions)
+MAX_SIMILAR = 60   # tier-2 tunable: BM25 similar-instruction pairs, top by score
 
 PROMPT = """[ECC-AUTOMATED] IMPORTANT: You are running in non-interactive --print mode. Do NOT write files. Output each instinct file's full content between a line '<<<INSTINCT>>>' and a line '<<<END>>>'; the caller saves them. Read the whole file (all lines).
 
 Read {analysis} and identify patterns for the project {name} (user corrections, error resolutions, repeated workflows, tool preferences).
 Lines with "event": "user_correction" are the user's own corrections: treat each as strong evidence (one correction counts as 3 observations) and prefer instincts that encode the rule the user stated.
 Lines with "event": "user_repeated_instruction" are phrases the user wrote in N different sessions ("sessions" field): a standing instruction the agent keeps forgetting; treat each as N observations and prefer an instinct that encodes it.
+Lines with "event": "user_similar_instruction" pair a user prompt ("text", "date") with a similar prompt the user wrote in ANOTHER session ("match_text", "match_date"; BM25 "score"): the same instruction said again in other words; prefer an instinct that states it once.
 Lines with "event": "user_decision" are decisions the user already confirmed (fields decision_id, status, decision; text = the user's words): treat each as settled (counts as 3 observations) and never propose an instinct that contradicts one.
 If you find 3+ occurrences of the same pattern, you MUST output an instinct block for it.
 
@@ -69,6 +71,9 @@ def run(project_dir: Path, meta: dict) -> str:
     rep = STORE / "repeated_instructions.jsonl"  # cross-session instructions (backfill/repeat_instr), store-wide
     reps = [l for l in (rep.read_text("utf-8").splitlines() if rep.exists() else []) if l.strip()]
     reps = sorted(reps, key=lambda l: -json.loads(l).get("sessions", 0))[:MAX_REPEATED]  # own budget, never crowds out
+    sim = STORE / "similar_instructions.jsonl"  # BM25 pairs across sessions (backfill/similar), store-wide
+    sims = [l for l in (sim.read_text("utf-8").splitlines() if sim.exists() else []) if l.strip()]
+    reps += sorted(sims, key=lambda l: -json.loads(l).get("score", 0))[:MAX_SIMILAR]
     if len(lines) < MIN_LINES:
         return f"skip ({len(lines)} lines)"
     try:  # tripwire: refuse before anything is written or sent

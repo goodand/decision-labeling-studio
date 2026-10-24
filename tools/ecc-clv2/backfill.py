@@ -26,6 +26,7 @@ import capture_correction as cc  # noqa: E402  (correction rule, record shape, a
 import observe_meta  # noqa: E402  (metadata-only input filter)
 import platform_compat as pc  # noqa: E402
 import repeat_instr as ri  # noqa: E402  (cross-session repeated instructions)
+import similar  # noqa: E402  (BM25 similar instructions across sessions, pinned Kiwi tokens)
 
 STORE = pc.store_dir()
 MAX_FILE_SIZE_MB = 10  # same rotation as observe.sh
@@ -258,7 +259,10 @@ class Run:
         self.state = json.loads(self.state_path.read_text("utf-8")) if use_state and self.state_path.exists() else {}
         self.buf = defaultdict(lambda: {"corrections": [], "observations": []})
         self.live, self._skipped_live = live_sessions(), set()
-        self.origins = written_origins()  # sessions the live hooks recorded: never replay them (duplicates)
+        self.origins = written_origins()
+        self.prompt_path = STORE / "prompt_index.json"  # origin -> [session, date, masked text]: BM25 corpus
+        self.prompts = json.loads(self.prompt_path.read_text("utf-8")) if self.prompt_path.exists() else {}
+        self.similar_tokenize, self.similar_min_score = similar.kiwi_tokens, similar.MIN_SCORE  # sessions the live hooks recorded: never replay them (duplicates)
         self.repeat_path = STORE / "repeat_index.json"  # phrase -> sessions, merged across runs
         self.repeat = ri.Index.from_json(self.repeat_path.read_text("utf-8")) if use_state and self.repeat_path.exists() else ri.Index()
 
@@ -296,6 +300,7 @@ class Run:
                     continue
                 c["prompt"] += 1
                 self.repeat.add(sess, text)
+                self.prompts[origin] = [sess, ts(when)[:10], cc.make_record(sess, cwd, text)["text"]]
                 if cc.is_correction(text):
                     if origin in self.origins:
                         c["already_written"] += 1
@@ -358,6 +363,20 @@ class Run:
             write_atomic(STORE / "repeated_instructions.jsonl",  # derived: rewritten whole each run
                          "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in recs))
             self.files["repeated_instructions"] = len(recs)
+            if self.prompt_path.exists() and not self.dry:  # merge with what another run wrote meanwhile
+                self.prompts = {**json.loads(self.prompt_path.read_text("utf-8")), **self.prompts}
+            write_atomic(self.prompt_path, json.dumps(self.prompts, ensure_ascii=False))
+            if self.similar_tokenize is None:
+                self.files["similar_instructions"] = "skipped (no pinned Kiwi)"
+            else:
+                docs = sorted({tuple(v) for v in self.prompts.values()}, key=lambda d: (d[1], d[0], d[2]))
+                try:
+                    sims = similar.pairs(docs, tokenize=self.similar_tokenize, min_score=self.similar_min_score)
+                except OSError:  # pinned Kiwi server not reachable: keep the old file, never switch tokenizer
+                    self.files["similar_instructions"] = "skipped (Kiwi server unreachable)"
+                else:
+                    write_atomic(STORE / "similar_instructions.jsonl", "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in sims))
+                    self.files["similar_instructions"] = len(sims)
             if self.use_state:  # merge with what another run may have written meanwhile (we hold the lock)
                 disk = json.loads(self.state_path.read_text("utf-8")) if self.state_path.exists() else {}
                 write_atomic(self.state_path, json.dumps({**disk, **self.state}, indent=1))
@@ -507,6 +526,8 @@ def main(argv):
     if a.rebuild_repeat and not a.dry_run:
         run.repeat = ri.Index()  # start the index over; the derived file is rewritten from it
     run.detector = pin_detector() if not a.regex else (setattr(cc, "is_correction", cc.is_correction_regex) or "regex")
+    if not run.detector.startswith("kiwi"):
+        run.similar_tokenize = None  # BM25 needs the pinned Kiwi tokens; never switch tokenizer silently
     todo = sorted(iter_files(paths, a.source), key=lambda fr: -fr[0].stat().st_mtime)
     for d in a.decisions:
         d = Path(d).expanduser()
