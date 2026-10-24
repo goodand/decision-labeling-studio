@@ -107,14 +107,14 @@
       "rank": 2
     },
     "차이 명확화": {
-      "kind": "core_value",
-      "side": "effect",
-      "rank": 3
+      "kind": "retired_core_value",
+      "retired_on": "2026-10-24",
+      "note": "핵심 가치에서 제외됨 (사용자, 2026-10-24); 기록 보존용"
     },
     "전체 시간": {
       "kind": "core_value",
       "side": "input",
-      "rank": 4,
+      "rank": 3,
       "note": "효과보다 낮으나 투입 중에서는 가장 높은 순위"
     },
     "우수한 것의 기준": {
@@ -468,14 +468,21 @@
       "type": "means_of",
       "from": "비교 검증",
       "to": "차이 명확화",
-      "status": "proposed",
+      "status": "rejected",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "선택지들과 비교하여 무엇이 우수하고 무엇이 부족한지 를 검증해야"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"핵심 가치\"에서 \"차이 명확화\"를 제외할께"
         }
       ],
-      "inferred_by": "llm"
+      "inferred_by": "llm",
+      "rejected_by": "human",
+      "rejected_on": "2026-10-24",
+      "note": "target removed from core values"
     },
     {
       "type": "means_of",
@@ -647,13 +654,17 @@
       ]
     },
     {
-      "text": "핵심 가치: 효과(일관성, 최고 수준, 차이 명확화) > 투입(전체 시간)",
+      "text": "핵심 가치: 효과(일관성, 최고 수준) > 투입(전체 시간)",
       "status": "approved",
       "approved_by": "human",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "핵심 가치, 곧 최상위 목적 에 가까운 것들을 몇 개 뽑는다면 * 효과 * 일관성 * 최고 수준 * 차이 명확화 * 투입 * 전체 시간 : 효과 보다는 투입 관점이기 때문에 상대적으로 낮으나 투입 중에서는 가장 높은 순위"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"핵심 가치\"에서 \"차이 명확화\"를 제외할께"
         }
       ]
     }

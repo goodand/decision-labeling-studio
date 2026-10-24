@@ -32,9 +32,9 @@ class Validate(unittest.TestCase):
         self.assertNotIn("사람의 의사결정 지원", g.purposes("검증 비용 절감"))
         self.assertIn("전체 시간", g.purposes("검증 비용 절감"))
         vals = concepts.core_values(concepts.DEFAULT_PATH)
-        self.assertEqual([v["name"] for v in vals], ["일관성", "최고 수준", "차이 명확화", "전체 시간"])
-        self.assertEqual({v["side"] for v in vals[:3]}, {"effect"})
-        self.assertEqual(vals[3]["side"], "input")
+        self.assertEqual([v["name"] for v in vals], ["일관성", "최고 수준", "전체 시간"])   # 차이 명확화 removed (STUDIO-ECC-032)
+        self.assertEqual({v["side"] for v in vals[:2]}, {"effect"})
+        self.assertEqual(vals[2]["side"], "input")
 
     def test_values_served_by_a_concept_are_ranked(self):
         g = concepts.load(concepts.DEFAULT_PATH, include_proposed=True)
@@ -110,6 +110,16 @@ class ConsistencyByFixing(unittest.TestCase):
         g = concepts.load(concepts.DEFAULT_PATH)
         self.assertIn("일관성", g.out["means_of"]["고정과 통제"])
         self.assertEqual(g.values_served("고정과 통제", concepts.core_values(concepts.DEFAULT_PATH))[0], "일관성")
+
+
+class DifferenceClarityRemoved(unittest.TestCase):
+    def test_difference_clarity_is_no_longer_a_core_value(self):
+        """User 2026-10-24: '핵심 가치'에서 '차이 명확화'를 제외."""
+        d = json.loads(concepts.DEFAULT_PATH.read_text("utf-8"))
+        self.assertNotIn("차이 명확화", [v["name"] for v in concepts.core_values(concepts.DEFAULT_PATH)])
+        self.assertEqual(d["concepts"]["차이 명확화"]["kind"], "retired_core_value")       # kept for history
+        live = {(r["from"], r["to"]) for r in d["relations"] if r["status"] in ("approved", "proposed")}
+        self.assertFalse([e for e in live if e[1] == "차이 명확화"])
 
 
 if __name__ == "__main__":
