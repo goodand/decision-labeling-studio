@@ -112,6 +112,12 @@
       "status": "explicit_choice",
       "user_quote": "MIN_SCORE 임계값부터 데이터로 조정해 … '관련 프롬프트' 기준으로 MIN_SCORE=18(정밀도 0.8)로 정해",
       "decision": "BM25 쌍은 '관련 프롬프트'(같은 주제 또는 같은 지시)로 읽고 MIN_SCORE=18로 고정. 근거: 점수 구간 7개×10개 층화 표본(70쌍, Opus 라벨·사람 미검증)에서 '같은 지시' 정밀도는 모든 구간 약 10%로 평평(BM25는 단어 겹침만 측정) → 그 기준으로는 어떤 임계값도 목표 미달; '관련' 누적 정밀도는 18에서 0.83, 20에서 0.90. 선택 규칙은 similar.choose_threshold(누적 정밀도가 목표 이상인 최저 구간 경계), 고정 세트 tests/fixtures/similar_labels.json이 18을 재현. 학습 프롬프트는 '관련'으로 고쳐 같은 규칙을 둘 다 말할 때만 반복으로 세게 함. 부수 수정: '[Request interrupted by user]' 하네스 문구를 사람 프롬프트에서 제외."
+    },
+    {
+      "id": "STUDIO-ECC-025",
+      "status": "explicit_request",
+      "user_quote": "방금 얘기한 것들 중에서만 유사어, 상위개념/하위개념 만 json으로 만들어도 충분히 유용할꺼야",
+      "decision": "이번 세션의 원칙들로 synonyms.json에 proposed 묶음 5개(SYN-002~006: More READ, 적대적 검증, line by line patch, 구현 비용, 상위개념 설명)를 추가하고, concepts.json(ecc-concepts/v1)에 개념 25개와 관계 23개(is_a·means_of·depends_on·responsibility)를 모두 proposed로 기록. 개념마다 kind(purpose·means·responsibility·property·cost)로 목적·수단·책임을 분리. concepts.py가 형식·순환을 검증하고 상위개념·목적을 추이적으로 조회. 승인 전에는 아무것도 적용되지 않음."
     }
   ]
 }

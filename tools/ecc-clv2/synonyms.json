@@ -5,15 +5,146 @@
     {
       "id": "SYN-001",
       "canonical": "객관식 질문",
-      "terms": ["객관식", "폐쇄형"],
+      "terms": [
+        "객관식",
+        "폐쇄형"
+      ],
       "status": "approved",
       "proposed_by": "llm",
       "approved_by": "human",
       "approved_on": "2026-10-24",
       "evidence": [
-        {"date": "2026-09-05", "quote": "내가 결정하기 쉽게 폐쇄형 질문을 해라, 선택지를 달라"},
-        {"date": "2026-10-07", "quote": "그 다음에 애매한 것들만 나에게 상위개념, 장단점 설명 먼저 하고 객관식 질문해라"},
-        {"date": "2026-10-24", "quote": "객관식, 폐쇄형 도 같은 의미로 사용했는데 그것도 검색해봐"}
+        {
+          "date": "2026-09-05",
+          "quote": "내가 결정하기 쉽게 폐쇄형 질문을 해라, 선택지를 달라"
+        },
+        {
+          "date": "2026-10-07",
+          "quote": "그 다음에 애매한 것들만 나에게 상위개념, 장단점 설명 먼저 하고 객관식 질문해라"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "객관식, 폐쇄형 도 같은 의미로 사용했는데 그것도 검색해봐"
+        }
+      ]
+    },
+    {
+      "id": "SYN-002",
+      "canonical": "More READ",
+      "terms": [
+        "more read",
+        "상세하게 read",
+        "더 읽기"
+      ],
+      "status": "proposed",
+      "proposed_by": "llm",
+      "evidence": [
+        {
+          "date": "2026-08-22",
+          "quote": "상세하게 READ하면 위험을 낮출 수 있는 것"
+        },
+        {
+          "date": "2026-08-24",
+          "quote": "More READ해서 위험 요소를 더 안전화 해라"
+        },
+        {
+          "date": "2026-10-23",
+          "quote": "More READ, 위험한 것은 More READ해서 해결방법을 모색해라"
+        }
+      ]
+    },
+    {
+      "id": "SYN-003",
+      "canonical": "적대적 검증",
+      "terms": [
+        "적대적 검증",
+        "adversarial verification",
+        "adversarial validation",
+        "adversarial validification"
+      ],
+      "status": "proposed",
+      "proposed_by": "llm",
+      "evidence": [
+        {
+          "date": "2026-08-30",
+          "quote": "Test code는 작성 후 적대적 검증을 돌린다"
+        },
+        {
+          "date": "2026-10-07",
+          "quote": "adversarial validification with (Haiku, xhigh)"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "적대적 검증도 하고 있어? 적대적 검증으로는 가장 낮은 model을 추전하기도 해"
+        }
+      ]
+    },
+    {
+      "id": "SYN-004",
+      "canonical": "line by line patch",
+      "terms": [
+        "line by line patch",
+        "line by line",
+        "줄 단위 패치"
+      ],
+      "status": "proposed",
+      "proposed_by": "llm",
+      "evidence": [
+        {
+          "date": "2026-09-04",
+          "quote": "handoff를 line by line으로 patch 해야 할 것 같네"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "예외적으로 꼭 필요한 경우에는 line by line patch로만"
+        }
+      ]
+    },
+    {
+      "id": "SYN-005",
+      "canonical": "구현 비용",
+      "terms": [
+        "구현 비용",
+        "실행 비용",
+        "agent 구현 속도",
+        "프로그램 실행 속도"
+      ],
+      "status": "proposed",
+      "proposed_by": "llm",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "구현 비용은 많이 들어도 무관해"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "PC 프로그램 실행 속도, Agent속도가 아무리 빨라도 Human이 병목이면 어쩔 수 없어"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "다른 규칙 기반 프로그램 실행 등 , agent의 구현 속도는 무시해도 된다"
+        }
+      ]
+    },
+    {
+      "id": "SYN-006",
+      "canonical": "상위개념 설명",
+      "terms": [
+        "상위개념 설명",
+        "상위 개념으로 설명",
+        "상위개념"
+      ],
+      "status": "proposed",
+      "proposed_by": "llm",
+      "evidence": [
+        {
+          "date": "2026-07-31",
+          "quote": "못 하는 개념은 상위 개념으로 설명하는 것을 시도"
+        },
+        {
+          "date": "2026-10-07",
+          "quote": "나에게 상위개념, 장단점 설명 먼저 하고 객관식 질문해라"
+        }
       ]
     }
   ]
