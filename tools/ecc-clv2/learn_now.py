@@ -87,7 +87,7 @@ def run(project_dir: Path, meta: dict) -> str:
         f.write("\n".join(lines[-MAX_LINES:] + reps) + "\n")
     prompt = PROMPT.format(analysis=f".observer-tmp/{Path(path).name}", name=meta["name"], pid=meta["id"],
                            instincts="instincts/personal")
-    env = dict(os.environ, ECC_SKIP_OBSERVE="1", ECC_HOOK_PROFILE="minimal")
+    env = pc.learner_env(dict(os.environ, ECC_SKIP_OBSERVE="1", ECC_HOOK_PROFILE="minimal"))
     try:
         r = subprocess.run(["claude", "--model", MODEL, "--effort", EFFORT, "--max-turns", "40", "--print",
                             "--allowedTools", "Read", "--settings", '{"disableAllHooks":true}'],  # no self-observation

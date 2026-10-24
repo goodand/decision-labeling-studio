@@ -33,6 +33,16 @@ def store_dir() -> Path:
     return Path(from_bash_path(v)) if v else DEFAULT_STORE
 
 
+LEARNER_CONFIG_DEFAULT = Path.home() / ".claude-ecc"
+
+
+def learner_env(env: dict) -> dict:
+    """The learner/judge `claude -p` runs under its own config dir when it exists (ECC_CLAUDE_CONFIG_DIR,
+    default ~/.claude-ecc): a separate (e.g. personal) login that never touches the main session's."""
+    cfg = Path(os.environ.get("ECC_CLAUDE_CONFIG_DIR") or LEARNER_CONFIG_DEFAULT).expanduser()
+    return dict(env, CLAUDE_CONFIG_DIR=str(cfg)) if cfg.is_dir() else env
+
+
 def bash_path() -> str:
     if os.environ.get("ECC_GIT_BASH"):
         return os.environ["ECC_GIT_BASH"]

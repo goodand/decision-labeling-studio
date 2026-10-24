@@ -95,7 +95,7 @@ def judge(text, evidence):
                         "--tools", "", "--json-schema", json.dumps(JUDGE_SCHEMA),
                         "--settings", '{"disableAllHooks":true}'],  # judge sessions must not be observed/captured
                        input=prompt.encode("utf-8"), capture_output=True, timeout=300, shell=(os.name == "nt"),
-                       env=dict(os.environ, ECC_SKIP_OBSERVE="1"))
+                       env=pc.learner_env(dict(os.environ, ECC_SKIP_OBSERVE="1")))
     except (subprocess.SubprocessError, OSError) as e:  # timeout/launch failure -> stays candidate
         return {"error": f"{type(e).__name__}: {e}"[:300]}
     try:

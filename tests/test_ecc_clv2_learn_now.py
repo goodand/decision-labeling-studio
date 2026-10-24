@@ -42,5 +42,34 @@ class DuplicateIds(unittest.TestCase):
         self.assertNotIn("duplicate", r)
 
 
+
+class LearnerAccount(unittest.TestCase):
+    """2026-10-24: the CLI's default login is a team org that disables `claude -p`. The learner (and judge)
+    run under their own config dir when one exists, so a personal login never touches the main session."""
+    def setUp(self):
+        self.pdir = Path(tempfile.mkdtemp())
+        (self.pdir / "observations.jsonl").write_text("\n".join([json.dumps(OBS)] * 25), "utf-8")
+        self.cfg = Path(tempfile.mkdtemp()) / "claude-ecc"
+
+    def env_seen(self):
+        seen = {}
+        def fake(cmd, **kw):
+            seen.update(kw.get("env") or {})
+            return mock.Mock(stdout=b'{"status":"analysis_complete"}', stderr=b"", returncode=0)
+        with mock.patch.object(learn_now.subprocess, "run", fake):
+            learn_now.run(self.pdir, {"id": "p", "name": "n"})
+        return seen
+
+    def test_uses_learner_config_dir_when_it_exists(self):
+        self.cfg.mkdir()
+        with mock.patch.dict(os.environ, {"ECC_CLAUDE_CONFIG_DIR": str(self.cfg)}):
+            self.assertEqual(self.env_seen().get("CLAUDE_CONFIG_DIR"), str(self.cfg))
+
+    def test_falls_back_to_the_default_login_when_absent(self):
+        with mock.patch.dict(os.environ, {"ECC_CLAUDE_CONFIG_DIR": str(self.cfg)}):
+            env = self.env_seen()
+        self.assertEqual(env.get("CLAUDE_CONFIG_DIR"), os.environ.get("CLAUDE_CONFIG_DIR"))
+
+
 if __name__ == "__main__":
     unittest.main()
