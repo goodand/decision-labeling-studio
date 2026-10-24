@@ -138,5 +138,20 @@ class LiveSessionIndexes(unittest.TestCase):
         self.assertFalse(corr.exists() and "live1" in corr.read_text("utf-8"))   # no record replayed for the live session
 
 
+
+class DerivedRecordsAreNotLive(unittest.TestCase):
+    def test_similar_and_repeat_records_never_mark_a_session_live(self):
+        """First real run: similar_instructions.jsonl rows carry "session", so 20 past sessions looked live and
+        would have stopped receiving records. Only what the live hooks write counts as live."""
+        import backfill
+        tmp = Path(tempfile.mkdtemp())
+        backfill.STORE = tmp / "store"
+        backfill.STORE.mkdir(parents=True)
+        (backfill.STORE / "similar_instructions.jsonl").write_text(
+            json.dumps({"event": "user_similar_instruction", "session": "old1", "match_session": "old2"}) + "\n", "utf-8")
+        (backfill.STORE / "observations.jsonl").write_text(json.dumps({"event": "tool_start", "session": "live9"}) + "\n", "utf-8")
+        self.assertEqual(backfill.live_sessions(), {"live9"})
+
+
 if __name__ == "__main__":
     unittest.main()

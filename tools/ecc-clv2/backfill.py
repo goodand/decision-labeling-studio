@@ -442,6 +442,9 @@ def written_origins() -> set:
     return out
 
 
+LIVE_EVENTS = {"tool_start", "tool_complete", "user_correction"}  # what the live hooks write
+
+
 def live_sessions() -> set:
     """Session ids in records the live hooks wrote (no "source": "backfill")."""
     out = set()
@@ -452,7 +455,8 @@ def live_sessions() -> set:
                 r = json.loads(line)
             except ValueError:
                 continue
-            if isinstance(r, dict) and r.get("session") and r.get("source") != "backfill":
+            if (isinstance(r, dict) and r.get("session") and r.get("source") != "backfill"
+                    and r.get("event") in LIVE_EVENTS):  # derived files (similar pairs, …) also carry "session"
                 out.add(r["session"])
     return out
 
