@@ -235,13 +235,19 @@
       "type": "means_of",
       "from": "규칙 먼저, 의미는 마지막",
       "to": "검증 비용 절감",
-      "status": "proposed",
+      "status": "approved",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "Semantic한 것 은 Human 검증이 필요한데 그게 가장 시간이 많이 걸려 그래서 그것을 가장 마지막에 해야 하는 것이야"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"규칙 먼저, 의미는 마지막\"은 검증을 효율적으로 하기 위함이야"
         }
-      ]
+      ],
+      "approved_by": "human",
+      "approved_on": "2026-10-24"
     },
     {
       "type": "means_of",
@@ -501,14 +507,20 @@
       "type": "means_of",
       "from": "규칙 먼저, 의미는 마지막",
       "to": "일관성",
-      "status": "proposed",
+      "status": "rejected",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "규칙 기반으로 판정 가능한 것을 먼저 수정하고"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"규칙 먼저, 의미는 마지막\"은 검증을 효율적으로 하기 위함이야"
         }
       ],
-      "inferred_by": "llm"
+      "inferred_by": "llm",
+      "rejected_by": "human",
+      "rejected_on": "2026-10-24"
     },
     {
       "type": "means_of",

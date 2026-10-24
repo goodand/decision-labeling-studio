@@ -87,5 +87,15 @@ class UserCorrections20261024(unittest.TestCase):
         self.assertIn(("시각화", "차이 명확화"), rejected)
 
 
+class RuleFirstIsForVerification(unittest.TestCase):
+    def test_rule_first_serves_verification_not_consistency(self):
+        """User: '규칙 먼저, 의미는 마지막' is for efficient verification."""
+        g = concepts.load(concepts.DEFAULT_PATH)
+        self.assertEqual(g.out["means_of"]["규칙 먼저, 의미는 마지막"], {"검증 비용 절감"})
+        self.assertIn("전체 시간", g.purposes("규칙 먼저, 의미는 마지막"))
+        rels = json.loads(concepts.DEFAULT_PATH.read_text("utf-8"))["relations"]
+        self.assertIn(("규칙 먼저, 의미는 마지막", "일관성"), {(r["from"], r["to"]) for r in rels if r["status"] == "rejected"})
+
+
 if __name__ == "__main__":
     unittest.main()
