@@ -32,6 +32,18 @@ class Graph:
     def purposes(self, concept):  # what this is a means to, transitive (through is_a too)
         return self._reach(("means_of", "is_a"), concept)
 
+    def values_served(self, concept, values) -> list:
+        """Core values this concept serves (transitively), highest rank first (effect values before input)."""
+        reach = self.purposes(concept) | {concept}
+        return [v["name"] for v in values if v["name"] in reach]
+
+
+def core_values(path=DEFAULT_PATH) -> list:
+    """Top purposes, ordered by rank (1 = highest)."""
+    cons = json.loads(Path(path).read_text("utf-8"))["concepts"]
+    vals = [{"name": n, **c} for n, c in cons.items() if c.get("kind") == "core_value"]
+    return sorted(vals, key=lambda v: v["rank"])
+
 
 def validate(doc) -> list:
     if not isinstance(doc, dict) or doc.get("schema") != "ecc-concepts/v1":
@@ -47,6 +59,9 @@ def validate(doc) -> list:
                 raise ValueError(f"undeclared concept {r.get(end)!r}")
         if r["status"] == "approved" and (r.get("approved_by") != "human" or not r.get("evidence")):
             raise ValueError(f"{r['from']}->{r['to']}: approval needs approved_by 'human' and evidence")
+    ranks = [c.get("rank") for c in cons.values() if c.get("kind") == "core_value"]
+    if any(not isinstance(r, int) for r in ranks) or len(set(ranks)) != len(ranks):
+        raise ValueError("core values need distinct integer ranks")
     g = Graph([r for r in doc["relations"] if r["status"] != "rejected" and r["type"] == "is_a"])
     for c in cons:
         if c in g.ancestors(c):

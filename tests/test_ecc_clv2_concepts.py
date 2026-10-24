@@ -23,7 +23,23 @@ class Validate(unittest.TestCase):
         g = concepts.load(concepts.DEFAULT_PATH, include_proposed=True)
         self.assertIn("결정론적", g.ancestors("규칙 기반"))
         self.assertIn("검증 비용 절감", g.purposes("TDD"))
-        self.assertIn("사람의 의사결정 지원", g.purposes("TDD"))          # transitive: TDD -> 검증 비용 절감 -> 지원
+        self.assertIn("전체 시간", g.purposes("TDD"))                     # transitive up to the input value
+
+    def test_user_stated_hierarchy_is_approved(self):
+        """User 2026-10-24: 의사결정 지원 is a means of 검증 비용 절감 (not the reverse); core values rank effect > input."""
+        g = concepts.load(concepts.DEFAULT_PATH)                          # approved only
+        self.assertIn("검증 비용 절감", g.purposes("사람의 의사결정 지원"))
+        self.assertNotIn("사람의 의사결정 지원", g.purposes("검증 비용 절감"))
+        self.assertIn("전체 시간", g.purposes("검증 비용 절감"))
+        vals = concepts.core_values(concepts.DEFAULT_PATH)
+        self.assertEqual([v["name"] for v in vals], ["일관성", "최고 수준", "차이 명확화", "전체 시간"])
+        self.assertEqual({v["side"] for v in vals[:3]}, {"effect"})
+        self.assertEqual(vals[3]["side"], "input")
+
+    def test_values_served_by_a_concept_are_ranked(self):
+        g = concepts.load(concepts.DEFAULT_PATH, include_proposed=True)
+        served = g.values_served("고정과 통제", concepts.core_values(concepts.DEFAULT_PATH))
+        self.assertEqual(served[0], "일관성")                              # effect values rank above the input value
 
     def test_only_approved_by_default(self):
         g = concepts.load(doc([{"type": "is_a", "from": "A", "to": "B", "status": "proposed", "evidence": EV}]))
