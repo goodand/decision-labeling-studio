@@ -284,10 +284,15 @@ class Run:
             n_items += 1
             kind, when, sess, cwd = item[:4]
             origin = item_origin(item)
-            if sess in self.live:
+            if sess in self.live:  # records come from the live hooks; the derived indexes still need the prompt
                 if sess not in self._skipped_live:
                     self._skipped_live.add(sess)
                     self.files["live_session_skipped"] += 1
+                if kind == "prompt":
+                    text = item[4].encode("utf-8", "replace").decode("utf-8")
+                    if is_human_prompt(text):
+                        self.repeat.add(sess, text)
+                        self.prompts[origin] = [sess, ts(when)[:10], cc.make_record(sess, cwd, text)["text"]]
                 continue
             if (self.since and ts(when) < self.since) or (self.until and ts(when) >= self.until):
                 continue

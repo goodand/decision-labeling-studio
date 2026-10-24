@@ -111,5 +111,32 @@ class BackfillWiring(unittest.TestCase):
         self.assertEqual(run.files["similar_instructions"], "skipped (no pinned Kiwi)")
 
 
+
+class LiveSessionIndexes(unittest.TestCase):
+    def test_live_session_prompts_feed_indexes_but_write_no_records(self):
+        """Found on the first real run: the live guard skipped the whole session, so its prompts never reached the
+        BM25 corpus or the repeat index. Indexes are keyed by origin (no duplicates); only records are guarded."""
+        import backfill
+        tmp = Path(tempfile.mkdtemp())
+        backfill.STORE = tmp / "store"
+        backfill.STORE.mkdir(parents=True)
+        (backfill.STORE / "observations.jsonl").write_text(json.dumps({"session": "live1", "event": "tool_start"}) + "\n", "utf-8")
+        src = tmp / "src"
+        src.mkdir()
+        for sess, text in [("live1", "그게 아니라 test code 작성 후 적대적 검증"), ("old2", "test code 작성 후 적대적 검증 돌린다")]:
+            line = {"type": "user", "sessionId": sess, "timestamp": "2026-10-20T00:00:00Z", "cwd": "/none",
+                    "isSidechain": False, "entrypoint": "cli", "message": {"role": "user", "content": text}}
+            (src / f"{sess}.jsonl").write_text(json.dumps(line, ensure_ascii=False) + "\n", "utf-8")
+        run = backfill.Run(False, "", True)
+        run.similar_tokenize, run.similar_min_score = TOK, 0.1
+        for f in sorted(src.glob("*.jsonl")):
+            run.process(f, backfill.read_claude)
+        run.flush()
+        sims = [json.loads(l) for l in (backfill.STORE / "similar_instructions.jsonl").read_text("utf-8").splitlines()]
+        self.assertIn(("live1", "old2"), {(r["session"], r["match_session"]) for r in sims})
+        corr = backfill.STORE / "corrections.jsonl"
+        self.assertFalse(corr.exists() and "live1" in corr.read_text("utf-8"))   # no record replayed for the live session
+
+
 if __name__ == "__main__":
     unittest.main()
