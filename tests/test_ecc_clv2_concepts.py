@@ -97,5 +97,12 @@ class RuleFirstIsForVerification(unittest.TestCase):
         self.assertIn(("규칙 먼저, 의미는 마지막", "일관성"), {(r["from"], r["to"]) for r in rels if r["status"] == "rejected"})
 
 
+class ExcellenceSelection(unittest.TestCase):
+    def test_choosing_the_best_serves_top_quality(self):
+        """User: '최고 수준'을 위해서 '우수한 것 선택'이 맞다."""
+        g = concepts.load(concepts.DEFAULT_PATH)
+        self.assertIn("최고 수준", g.out["means_of"]["우수한 것 선택"])
+
+
 if __name__ == "__main__":
     unittest.main()

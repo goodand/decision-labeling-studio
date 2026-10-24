@@ -443,14 +443,20 @@
       "type": "means_of",
       "from": "우수한 것 선택",
       "to": "최고 수준",
-      "status": "proposed",
+      "status": "approved",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "기존의 것, 새 것, 외부에 있는 것 까지 모두 비교해서 가장 좋은 것을 선택 할 것"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"최고 수준\"을 위해서 \"우수한 것 선택\"이 맞고"
         }
       ],
-      "inferred_by": "llm"
+      "inferred_by": "llm",
+      "approved_by": "human",
+      "approved_on": "2026-10-24"
     },
     {
       "type": "means_of",
