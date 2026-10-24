@@ -283,13 +283,15 @@
       "type": "means_of",
       "from": "장단점 설명",
       "to": "사람의 의사결정 지원",
-      "status": "proposed",
+      "status": "approved",
       "evidence": [
         {
           "date": "2026-10-24",
-          "quote": "나한테 결정을 요청하기 전에 항상 상위개념 설명, 장단점 설명 을 하라고"
+          "quote": "\"장단점 설명\"은 \"사람의 의사결정 지원\"을 위한 것이고"
         }
-      ]
+      ],
+      "approved_by": "human",
+      "approved_on": "2026-10-24"
     },
     {
       "type": "means_of",
@@ -307,13 +309,16 @@
       "type": "means_of",
       "from": "시각화",
       "to": "사람의 의사결정 지원",
-      "status": "proposed",
+      "status": "approved",
       "evidence": [
         {
           "date": "2026-10-24",
-          "quote": "시각화 가능한 것은 Agent도 IMAGE READ하고 Human도 보여줄 것"
+          "quote": "\"시각화\"는 \"사람의 의사결정 지원\"을 위한 것일 때도 있고, \"최고 수준\"을 위한 것일 수 있어"
         }
-      ]
+      ],
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "note": "맥락에 따라: 결정을 도울 때"
     },
     {
       "type": "means_of",
@@ -458,27 +463,39 @@
       "type": "means_of",
       "from": "장단점 설명",
       "to": "차이 명확화",
-      "status": "proposed",
+      "status": "rejected",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "상위개념, 장단점 설명 객관식 질문"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"장단점 설명\"은 \"사람의 의사결정 지원\"을 위한 것이고"
         }
       ],
-      "inferred_by": "llm"
+      "inferred_by": "llm",
+      "rejected_by": "human",
+      "rejected_on": "2026-10-24"
     },
     {
       "type": "means_of",
       "from": "시각화",
       "to": "차이 명확화",
-      "status": "proposed",
+      "status": "rejected",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "시각화 가능한 것은 Agent도 IMAGE READ하고 Human도 보여줄 것"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"시각화\"는 \"사람의 의사결정 지원\"을 위한 것일 때도 있고, \"최고 수준\"을 위한 것일 수 있어"
         }
       ],
-      "inferred_by": "llm"
+      "inferred_by": "llm",
+      "rejected_by": "human",
+      "rejected_on": "2026-10-24"
     },
     {
       "type": "means_of",
@@ -574,6 +591,21 @@
         {
           "date": "2026-10-24",
           "quote": "\"우수한 것의 기준\"을 잡는데는 Human의 결정, Human의 결정을 적절한 자연어로 표현하고 사례가 매핑 되어야지, \"사람의 의사결정\" 자체는 지원은 \"최고 수준\"에 종속된다고 볼 수 있어"
+        }
+      ]
+    },
+    {
+      "type": "means_of",
+      "from": "시각화",
+      "to": "최고 수준",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "note": "맥락에 따라: 결과물의 수준을 높일 때",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"시각화\"는 \"사람의 의사결정 지원\"을 위한 것일 때도 있고, \"최고 수준\"을 위한 것일 수 있어"
         }
       ]
     }

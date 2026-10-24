@@ -75,5 +75,17 @@ class CriteriaOfExcellence(unittest.TestCase):
         self.assertIn("decisions/", c["사람의 결정"].get("artifact", ""))
 
 
+class UserCorrections20261024(unittest.TestCase):
+    def test_pros_cons_and_visualization_links(self):
+        """User: 장단점 설명 is for 사람의 의사결정 지원; 시각화 is for 사람의 의사결정 지원 or for 최고 수준 (context)."""
+        g = concepts.load(concepts.DEFAULT_PATH)                          # approved only
+        self.assertIn("사람의 의사결정 지원", g.out["means_of"]["장단점 설명"])
+        self.assertEqual(g.out["means_of"]["시각화"], {"사람의 의사결정 지원", "최고 수준"})
+        rels = json.loads(concepts.DEFAULT_PATH.read_text("utf-8"))["relations"]
+        rejected = {(r["from"], r["to"]) for r in rels if r["status"] == "rejected"}
+        self.assertIn(("장단점 설명", "차이 명확화"), rejected)
+        self.assertIn(("시각화", "차이 명확화"), rejected)
+
+
 if __name__ == "__main__":
     unittest.main()
