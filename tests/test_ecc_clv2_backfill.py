@@ -225,5 +225,34 @@ class StateAndDryRun(Base):
         self.assertIn("corrections=    1", r.stdout)
 
 
+
+class DesktopAppFormat(Base):
+    """Found 2026-10-24 by comparing this session's own human messages: the Claude desktop app records a human
+    turn with promptSource "sdk" + origin.kind "human", and a message sent mid-turn as an attachment of type
+    queued_command. backfill dropped both, so every desktop-app human message was missing."""
+    def lines(self):
+        env = {"sessionId": "d1", "timestamp": "2026-10-23T10:00:00.000Z", "cwd": "/none", "isSidechain": False,
+               "entrypoint": "claude-desktop"}
+        return [
+            {**env, "type": "user", "promptSource": "sdk", "origin": {"kind": "human"},
+             "message": {"role": "user", "content": "그게 아니라 원본을 재사용해"}},
+            {**env, "type": "attachment", "attachment": {"type": "queued_command", "prompt": "덮어쓰지 말고 새 폴더에 저장해",
+                                                        "commandMode": "prompt", "origin": {"kind": "human"}, "humanTurn": True}},
+            {**env, "type": "user", "promptSource": "sdk", "origin": {"kind": "human"},
+             "message": {"role": "user", "content": "<system-reminder>x</system-reminder>\n그게 아니라 이건 틀렸어"}},
+            {**env, "type": "user", "promptSource": "sdk", "message": {"role": "user", "content": "그게 아니라 자동 실행"}},
+            {**env, "entrypoint": "sdk-cli", "type": "user", "promptSource": "sdk", "origin": {"kind": "human"},
+             "message": {"role": "user", "content": "그게 아니라 claude -p 실행"}},
+            {**env, "type": "attachment", "attachment": {"type": "queued_command", "prompt": "그게 아니라 시스템",
+                                                        "commandMode": "prompt", "origin": {"kind": "peer"}, "humanTurn": False}},
+        ]
+
+    def test_desktop_human_turns_and_queued_messages_are_read(self):
+        f = self.tmp / "desk.jsonl"
+        f.write_text("".join(json.dumps(l, ensure_ascii=False) + "\n" for l in self.lines()), "utf-8")
+        texts = [it[4] for it in backfill.read_claude(f) if it[0] == "prompt"]
+        self.assertEqual(texts, ["그게 아니라 원본을 재사용해", "덮어쓰지 말고 새 폴더에 저장해", "그게 아니라 이건 틀렸어"])
+
+
 if __name__ == "__main__":
     unittest.main()

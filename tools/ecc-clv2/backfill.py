@@ -118,9 +118,18 @@ def _claude_lines(fh):
             d = json.loads(line)
         except ValueError:
             continue
-        if d.get("type") not in ("user", "assistant") or d.get("isSidechain") or d.get("agentId"):
+        if d.get("isSidechain") or d.get("agentId"):
             continue
-        if d.get("entrypoint") == "sdk-cli" or d.get("promptSource") == "sdk" or d.get("sessionKind") == "bg":
+        human = (d.get("origin") or {}).get("kind") == "human"  # desktop app: promptSource "sdk" but origin human
+        if d.get("entrypoint") == "sdk-cli" or d.get("sessionKind") == "bg" or (d.get("promptSource") == "sdk" and not human):
+            continue
+        if d.get("type") == "attachment":  # a message the human sent mid-turn (desktop app)
+            a = d.get("attachment") or {}
+            if (a.get("type") == "queued_command" and a.get("commandMode", "prompt") == "prompt"
+                    and (a.get("humanTurn") or (a.get("origin") or {}).get("kind") == "human") and isinstance(a.get("prompt"), str)):
+                yield ("prompt", a.get("timestamp") or d.get("timestamp", ""), d.get("sessionId", ""), d.get("cwd", ""), a["prompt"])
+            continue
+        if d.get("type") not in ("user", "assistant"):
             continue
         if d.get("isMeta") or d.get("isCompactSummary"):
             continue
@@ -138,7 +147,10 @@ def _claude_lines(fh):
                 continue
             content = " ".join(b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == "text")
         if isinstance(content, str):
-            yield ("prompt", when, sess, cwd, content)
+            yield ("prompt", when, sess, cwd, _LEAD_REMINDER.sub("", content))
+
+
+_LEAD_REMINDER = re.compile(r"^(?:\s*<system-reminder>.*?</system-reminder>)+\s*", re.S)  # harness text before the human's
 
 
 def read_codex(path: Path):
