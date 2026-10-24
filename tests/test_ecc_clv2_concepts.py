@@ -104,5 +104,13 @@ class ExcellenceSelection(unittest.TestCase):
         self.assertIn("최고 수준", g.out["means_of"]["우수한 것 선택"])
 
 
+class ConsistencyByFixing(unittest.TestCase):
+    def test_fixing_and_control_serves_consistency(self):
+        """User: '고정과 통제'도 '일관성'을 위한 것이 맞다."""
+        g = concepts.load(concepts.DEFAULT_PATH)
+        self.assertIn("일관성", g.out["means_of"]["고정과 통제"])
+        self.assertEqual(g.values_served("고정과 통제", concepts.core_values(concepts.DEFAULT_PATH))[0], "일관성")
+
+
 if __name__ == "__main__":
     unittest.main()

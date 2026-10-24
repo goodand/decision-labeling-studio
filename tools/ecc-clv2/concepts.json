@@ -430,14 +430,20 @@
       "type": "means_of",
       "from": "고정과 통제",
       "to": "일관성",
-      "status": "proposed",
+      "status": "approved",
       "evidence": [
         {
           "date": "2026-10-24",
           "quote": "일관성을 위하여 고정하고, 고정한 것을 통해서 일관적으로 되도록 통제 할 것"
+        },
+        {
+          "date": "2026-10-24",
+          "quote": "\"고정과 통제\"도 \"일관성\"을 위한 것이 맞고"
         }
       ],
-      "inferred_by": "llm"
+      "inferred_by": "llm",
+      "approved_by": "human",
+      "approved_on": "2026-10-24"
     },
     {
       "type": "means_of",

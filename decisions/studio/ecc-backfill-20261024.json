@@ -148,6 +148,12 @@
       "status": "explicit_choice",
       "user_quote": "\"최고 수준\"을 위해서 \"우수한 것 선택\"이 맞고",
       "decision": "승인: 우수한 것 선택 → 최고 수준. 남은 제안: 고정과 통제 → 일관성, 비교 검증 → 차이 명확화."
+    },
+    {
+      "id": "STUDIO-ECC-031",
+      "status": "explicit_choice",
+      "user_quote": "\"고정과 통제\"도 \"일관성\"을 위한 것이 맞고",
+      "decision": "승인: 고정과 통제 → 일관성. 남은 제안: 비교 검증 → 차이 명확화."
     }
   ]
 }
