@@ -94,6 +94,12 @@
       "status": "explicit_choice",
       "user_quote": "이거는 개인 계정 요금제야, 그래서 허락을 받지 않아도 되는데 차라리 claude code logout을 해서 다시 login해 … 기본 로그인을 logout하고 개인 계정으로 다시 로그인할게",
       "decision": "학습기 거부 원인은 CLI가 team 조직으로 로그인돼 있던 것. 사용자가 기본 로그인을 logout 후 개인 계정(max)으로 재로그인. 별도 로그인 폴더(~/.claude-ecc, platform_compat.learner_env)는 구현만 하고 쓰지 않음. 첫 실행: learn_now가 decision-labeling-studio 프로젝트에서 50초 만에 instinct 후보 6개 생성, 규칙 게이트 R1~R5 전부 통과(LLM 판정 꺼짐) → 모두 candidate로 digest에 올라가 사람 검토 대기."
+    },
+    {
+      "id": "STUDIO-ECC-022",
+      "status": "explicit_choice",
+      "user_quote": "LLM이 유사어 사전이나 Ontology를 관리하면 그것은 규칙 기반으로 찾을 수 있게 되잖아 … 그렇게 하자 … LLM이 동의어 후보를 갖고 오면 내가 결정했을 때 등록 하면 되겠네",
+      "decision": "유사어는 JSON 동의어 표(tools/ecc-clv2/synonyms.json, ecc-synonyms/v1)로 관리한다. LLM은 proposed만 추가, 사용자가 결정하면 approved로 등록(approved_by human, 근거 원문 필수), 검색·반복 감지에는 approved만 규칙으로 적용. 첫 묶음 SYN-001 {객관식, 폐쇄형}은 사용자 확인으로 승인. 계층(상위개념)이 필요해지면 concept-gate-taxonomy로 옮길 수 있음(동의어 관계는 그쪽에 없어 추가 필요)."
     }
   ]
 }
