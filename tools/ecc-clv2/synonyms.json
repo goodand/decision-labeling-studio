@@ -1,0 +1,20 @@
+{
+  "schema": "ecc-synonyms/v1",
+  "about": "Synonym groups for matching repeated instructions. An LLM may add status 'proposed'; only a human sets 'approved'; only approved groups are applied (STUDIO-ECC-022). The first term is the canonical token.",
+  "groups": [
+    {
+      "id": "SYN-001",
+      "canonical": "객관식 질문",
+      "terms": ["객관식", "폐쇄형"],
+      "status": "approved",
+      "proposed_by": "llm",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {"date": "2026-09-05", "quote": "내가 결정하기 쉽게 폐쇄형 질문을 해라, 선택지를 달라"},
+        {"date": "2026-10-07", "quote": "그 다음에 애매한 것들만 나에게 상위개념, 장단점 설명 먼저 하고 객관식 질문해라"},
+        {"date": "2026-10-24", "quote": "객관식, 폐쇄형 도 같은 의미로 사용했는데 그것도 검색해봐"}
+      ]
+    }
+  ]
+}

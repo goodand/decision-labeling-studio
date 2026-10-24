@@ -11,6 +11,7 @@ import json, re, time, unicodedata
 from collections import defaultdict
 
 import capture_correction as cc  # reuse the hook's own path mask and size cap
+import synonyms  # human-approved synonym groups, applied by rule
 
 MIN_SESSIONS = 3   # tier-2 tunable: how many sessions make an instruction
 MAX_N = 6
@@ -64,11 +65,12 @@ def words(text: str) -> list:
 
 
 class Index:
-    def __init__(self):
+    def __init__(self, synonyms=None):
         self.phrases = defaultdict(set)  # phrase -> {session ids}
+        self.syn = synonyms if synonyms is not None else _default_synonyms()
 
     def add(self, session: str, text: str):
-        ws = words(text)
+        ws = [self.syn.canon(w) for w in words(text)]
         for n in range(1, MAX_N + 1):  # n=1 too: 장단점·시각화 recur with different neighbours
             for i in range(len(ws) - n + 1):
                 gram = ws[i:i + n]
@@ -98,6 +100,16 @@ class Index:
         for p, sess in json.loads(s).items():
             idx.phrases[p] = set(sess)
         return idx
+
+
+_SYN = None
+
+
+def _default_synonyms():
+    global _SYN
+    if _SYN is None:
+        _SYN = synonyms.load()
+    return _SYN
 
 
 def records(idx: Index, min_sessions: int = MIN_SESSIONS) -> list:
