@@ -107,9 +107,8 @@
       "rank": 2
     },
     "차이 명확화": {
-      "kind": "retired_core_value",
-      "retired_on": "2026-10-24",
-      "note": "핵심 가치에서 제외됨 (사용자, 2026-10-24); 기록 보존용"
+      "kind": "means",
+      "note": "핵심 가치에서 제외(STUDIO-ECC-032) 후 의사결정 지원의 수단으로 (STUDIO-ECC-033)"
     },
     "전체 시간": {
       "kind": "core_value",
@@ -132,6 +131,13 @@
     "사례 매핑": {
       "kind": "means",
       "note": "결정에 사례를 매핑 (evidence, 고정 세트)"
+    },
+    "의사결정 지원": {
+      "kind": "purpose",
+      "note": "사람(Human)과 에이전트(Agent) 공통"
+    },
+    "에이전트의 의사결정 지원": {
+      "kind": "purpose"
     }
   },
   "relations": [
@@ -637,6 +643,48 @@
         {
           "date": "2026-10-24",
           "quote": "\"시각화\"는 \"사람의 의사결정 지원\"을 위한 것일 때도 있고, \"최고 수준\"을 위한 것일 수 있어"
+        }
+      ]
+    },
+    {
+      "type": "means_of",
+      "from": "차이 명확화",
+      "to": "의사결정 지원",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"차이 명확화\"도 \"의사결정\"을 위해서 사용될 때가 많고, 이거는 Human뿐 아니라 Agent도 마찬가지일꺼야"
+        }
+      ]
+    },
+    {
+      "type": "is_a",
+      "from": "사람의 의사결정 지원",
+      "to": "의사결정 지원",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"차이 명확화\"도 \"의사결정\"을 위해서 사용될 때가 많고, 이거는 Human뿐 아니라 Agent도 마찬가지일꺼야"
+        }
+      ]
+    },
+    {
+      "type": "is_a",
+      "from": "에이전트의 의사결정 지원",
+      "to": "의사결정 지원",
+      "status": "approved",
+      "approved_by": "human",
+      "approved_on": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-24",
+          "quote": "\"차이 명확화\"도 \"의사결정\"을 위해서 사용될 때가 많고, 이거는 Human뿐 아니라 Agent도 마찬가지일꺼야"
         }
       ]
     }

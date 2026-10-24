@@ -117,9 +117,16 @@ class DifferenceClarityRemoved(unittest.TestCase):
         """User 2026-10-24: '핵심 가치'에서 '차이 명확화'를 제외."""
         d = json.loads(concepts.DEFAULT_PATH.read_text("utf-8"))
         self.assertNotIn("차이 명확화", [v["name"] for v in concepts.core_values(concepts.DEFAULT_PATH)])
-        self.assertEqual(d["concepts"]["차이 명확화"]["kind"], "retired_core_value")       # kept for history
-        live = {(r["from"], r["to"]) for r in d["relations"] if r["status"] in ("approved", "proposed")}
-        self.assertFalse([e for e in live if e[1] == "차이 명확화"])
+        self.assertEqual(d["concepts"]["차이 명확화"]["kind"], "means")                   # now a means (STUDIO-ECC-033)
+
+
+class DecisionSupportForHumanAndAgent(unittest.TestCase):
+    def test_difference_clarity_serves_decisions_of_humans_and_agents(self):
+        """User: '차이 명확화'도 '의사결정'을 위해서 사용될 때가 많고, Human뿐 아니라 Agent도 마찬가지."""
+        g = concepts.load(concepts.DEFAULT_PATH)
+        self.assertIn("의사결정 지원", g.out["means_of"]["차이 명확화"])
+        self.assertIn("의사결정 지원", g.ancestors("사람의 의사결정 지원"))
+        self.assertIn("의사결정 지원", g.ancestors("에이전트의 의사결정 지원"))
 
 
 if __name__ == "__main__":
