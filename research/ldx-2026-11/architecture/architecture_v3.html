@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 아키텍처 v3</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --line:#d0d7de; --bg:#fff; --reuse:#ddf4ff; --glue:#fff8c5; --danger:#cf222e; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 36px; background:var(--bg); color:var(--ink); font-family:"Malgun Gothic",sans-serif; font-size:15px; width:1600px; }
+  h1 { font-size:26px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 16px; }
+  .row { display:flex; gap:14px; align-items:stretch; }
+  .layer { border:1.5px solid var(--line); border-radius:10px; padding:14px; margin-bottom:6px; position:relative; }
+  .layer > .tag { position:absolute; top:-11px; left:14px; background:var(--bg); padding:0 6px; font-weight:700; font-size:14px; }
+  .box { flex:1; border:1.5px solid #8c959f; border-radius:8px; padding:9px 11px; }
+  .box b { display:block; font-size:16px; margin-bottom:4px; }
+  .box ul { margin:4px 0 0; padding-left:18px; } .box li { margin:2px 0; font-size:14px; }
+  .reuse { background:var(--reuse); } .glue { background:var(--glue); }
+  .ext { border:1.5px dashed #8c959f; background:#f6f8fa; color:var(--mute); }
+  .arrow { text-align:center; color:var(--mute); font-size:13px; margin:2px 0 8px; } .arrow span { font-size:22px; color:var(--ink); }
+  .owned { flex:1; border:2px solid #1a7f37; border-radius:10px; padding:12px 14px; background:#f0fff4; }
+  .source { flex:1; border:3px dashed var(--danger); border-radius:10px; padding:12px 14px; background:#fff5f5; }
+  .owned h3,.source h3 { margin:0 0 6px; font-size:16px; } .source h3 { color:var(--danger); }
+  .legend { margin-top:12px; color:var(--mute); font-size:13px; display:flex; gap:20px; }
+  .k { display:inline-block; width:14px; height:14px; border-radius:3px; vertical-align:-2px; margin-right:5px; border:1px solid #8c959f; }
+  code { font-family:Consolas,monospace; font-size:13px; background:#eaeef2; padding:0 4px; border-radius:4px; }
+</style></head><body>
+<h1>ldx 아키텍처 v3 — 재사용 코드 + 접착 코드, 기능마다 최소 구성</h1>
+<p class="sub">의존은 위→아래 한 방향. 파란 상자 = 이미 돌아가는 남의 코드(재사용), 노란 상자 = ldx가 직접 짜는 접착 코드, 회색 점선 = 설계상 자리만 둔 확장(지금은 안 만듦). 원본(빨간 점선)은 <b>복사·읽기만</b> 하고 Datasette·검색·쿼리는 <b>.ldx 안 사본만</b> 연다.</p>
+
+<div class="layer"><span class="tag">① 사용자 접점</span>
+<div class="row">
+  <div class="box reuse"><b>사람: Datasette 웹 화면 (재사용)</b><ul><li>표 보기·필터·SQL·FTS 검색, <code>datasette-search-all</code>로 모든 시트 검색</li><li>실행: <code>datasette -i .ldx/data/*.db</code> (사본만)</li></ul></div>
+  <div class="box glue"><b>ldx 플러그인 (접착)</b><ul><li>대조 화면 <code>/-/ldx/compare</code> (SC2) — register_routes 훅</li><li>상단 배너: 못 읽은 파일·읽은 비율 (SC5)</li></ul></div>
+  <div class="box reuse"><b>에이전트: ldx CLI (typer)</b><ul><li><code>source add · scan · show · search · compare · query · export</code></li><li>성공 stdout JSON 1개, 실패 stderr + 종료 코드</li></ul></div>
+  <div class="box ext"><b>확장 자리</b><ul><li>MCP 서버, 프로파일·차트 화면</li></ul></div>
+</div></div>
+<div class="arrow"><span>↓</span> 웹 플러그인과 CLI는 같은 명령 함수를 부른다</div>
+
+<div class="layer"><span class="tag">② 명령 (단일 진실: commands.py) — 모든 반환은 결과 봉투</span>
+<div class="row">
+  <div class="box glue"><b>commands.py + types.py</b><ul><li>결과 봉투 <code>{ok, data, truncated, total_rows, limitations[], read_completeness}</code></li><li>오류 종류·종료 코드 표 하나</li></ul></div>
+  <div class="box ext"><b>확장 자리</b><ul><li><code>total_rows_exact</code>, jsonl·csv·table 출력</li></ul></div>
+</div></div>
+<div class="arrow"><span>↓</span></div>
+
+<div class="layer"><span class="tag">③ 기능 (최소 구성)</span>
+<div class="row">
+  <div class="box glue"><b>scan (SC3·SC1)</b><ul><li>폴더 순회 → (size, mtime_ns) 바뀐 파일만</li><li>SQLite: <b>항상 사본</b>(본체+부속 파일 복사 → 사본에서 체크포인트·journal=delete)</li><li>엑셀: 바이트를 메모리로 → <b>python-calamine</b> → <b>sqlite-utils</b>로 시트별 표 + <code>_행</code></li><li>잠김·손상 → limitation</li></ul></div>
+  <div class="box glue"><b>search (SC4)</b><ul><li><b>SQLite FTS5 trigram</b> (sqlite-utils <code>enable_fts</code>)</li><li>FTS 없는 표는 검색 대상에서 빼고 limitation (Datasette가 조용히 무시하므로)</li><li>띄어쓰기 변이: <b>kiwipiepy</b>로 질의 정규화 후 재검색</li></ul></div>
+  <div class="box glue"><b>compare (SC2)</b><ul><li>사업명으로 소스마다 검색 → 소스별 행을 원래 열 이름·값 그대로 나란히</li><li>합치기·정규화 없음 (A16)</li></ul></div>
+  <div class="box reuse"><b>query (SC6)</b><ul><li><b>Datasette</b> <code>validate_sql_select</code> + 한 문장 + <code>query_only</code></li><li>등록된 사본만 (A05)</li></ul></div>
+  <div class="box glue"><b>export (SC1·A17)</b><ul><li><code>.ldx/exports/</code>에 새 이름, 같은 이름 있으면 거부</li><li>SC7 <code>--location-only</code>: 셀 원문 필드 제거</li></ul></div>
+</div>
+<div class="row" style="margin-top:10px">
+  <div class="box ext"><b>확장 자리</b><ul><li>스냅샷 생략(비WAL·부속 파일 없음·안전 경로면 <code>immutable=1</code> 직접), 내용 해시·세대 번호(P1·P2), 자동 감시, 문자 n-gram, fuzzy, 열 대응표, 2.2GB용 증분 변환</li></ul></div>
+</div></div>
+<div class="arrow"><span>↓</span> 쓰기는 .ldx 안에만 · 원본은 읽기만</div>
+
+<div class="row">
+  <div class="owned"><h3>.ldx/ (ldx 소유, 쓰기 허용)</h3><ul>
+    <li><code>catalog.db</code> — sources, files(size, mtime_ns, status, 사본 경로), tables, columns</li>
+    <li><code>data/</code> — SQLite 사본·엑셀 변환 DB (안전한 내부 ID 파일명, <code>#</code>·<code>'</code> 없음) + FTS 표</li>
+    <li><code>exports/</code> · <code>tmp/</code> (TMP·TEMP·cwd 지정) · <code>logs/</code></li></ul></div>
+  <div class="source"><h3>원본 영역 (쓰기·새 항목 생성 금지)</h3><ul>
+    <li>budget_sme(두 판)·budget_all·budget2026.all .sqlite, 공고 마스터·평가셋 .xlsx, CSV</li>
+    <li>접근은 <b>파일 복사(읽기)</b>와 <b>바이트 읽기</b>뿐. sqlite3·DuckDB·Datasette로 원본을 직접 열지 않는다</li>
+    <li>사람은 엑셀로 자유롭게 고친다 → 다음 scan이 반영</li></ul></div>
+</div>
+<div class="legend"><span><i class="k" style="background:var(--reuse)"></i>재사용 코드</span><span><i class="k" style="background:var(--glue)"></i>접착 코드(직접)</span><span><i class="k" style="background:#f6f8fa;border-style:dashed"></i>확장 자리(미구현)</span></div>
+</body></html>

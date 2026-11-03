@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 런타임 워크플로 v2</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --line:#8c959f; --guard:#cf222e; --ok:#1a7f37; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 36px; background:#fff; color:var(--ink);
+         font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif; font-size:15px; width:1640px; }
+  h1 { font-size:26px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 16px; }
+  .lane { border:1.5px solid #d0d7de; border-radius:10px; padding:14px; margin-bottom:14px; }
+  .lane > h2 { font-size:17px; margin:0 0 10px; }
+  .flow { display:flex; align-items:stretch; }
+  .step { flex:1; border:1.5px solid var(--line); border-radius:8px; padding:9px 10px; background:#f6f8fa; min-width:0; }
+  .step .n { display:inline-block; width:24px; height:24px; border-radius:12px; background:var(--ink); color:#fff;
+             text-align:center; line-height:24px; font-weight:700; font-size:13px; margin-right:6px; }
+  .step b { font-size:15.5px; } .step ul { margin:6px 0 0; padding-left:17px; } .step li { margin:2px 0; font-size:13.8px; }
+  .guard { border:2.5px solid var(--guard); background:#fff5f5; }
+  .guard .g { color:var(--guard); font-weight:700; font-size:13px; display:block; margin-top:4px; }
+  .out { border:2px solid var(--ok); background:#f0fff4; }
+  .arr { flex:0 0 26px; display:flex; align-items:center; justify-content:center; font-size:21px; }
+  code { font-family:Consolas,monospace; font-size:12.8px; background:#eaeef2; padding:0 3px; border-radius:4px; }
+  .split { display:flex; gap:14px; } .split > .lane { flex:1; }
+  .note { color:var(--mute); font-size:13.5px; margin-top:8px; }
+</style></head><body>
+<h1>ldx 런타임 워크플로 v2 — 등록부터 결과까지</h1>
+<p class="sub">빨간 테두리 = 원본 불변 장치. 읽기 실패(인코딩·손상·잠김)는 멈추지 않고 <code>limitations[]</code>에 남기고, SQL 가드 거부·원본 불변 위반·카탈로그 잠김은 오류로 즉시 중단한다.</p>
+
+<div class="lane"><h2>A. 적재 경로 — <code>ldx source add &lt;폴더&gt;</code> → <code>ldx scan</code></h2>
+  <div class="flow">
+    <div class="step"><span class="n">1</span><b>소스 등록</b><ul>
+      <li>폴더 경로 기록</li><li>그 안의 <code>.ldx</code>는 스캔 제외</li></ul></div>
+    <div class="arr">→</div>
+    <div class="step"><span class="n">2</span><b>스캔</b><ul>
+      <li>정션·심볼릭 링크 안 따라감</li><li>숨김·<code>~$*.xlsx</code> 제외</li>
+      <li>size · <code>mtime_ns</code></li><li>한도 초과 → 경고</li></ul></div>
+    <div class="arr">→</div>
+    <div class="step"><span class="n">3</span><b>변경 감지</b><ul>
+      <li>size·mtime_ns가 다른 것만 sha256(공유 모드로 열기)</li>
+      <li>신규·변경·삭제만</li><li>열 수 없으면 <code>locked</code></li></ul></div>
+    <div class="arr">→</div>
+    <div class="step guard" style="flex:1.5"><span class="n">4</span><b>파싱 (어댑터)</b><ul>
+      <li>SQLite: WAL → 스냅샷 복사 / 비WAL → <code>as_uri</code>+<code>mode=ro</code>+<code>query_only</code></li>
+      <li>CSV: 인코딩 지정·재시도, 행 단위 거부 기록, <code>empty</code></li>
+      <li>Excel: bytes로 읽기, 시트별 테이블</li>
+      <li>파싱 전후 해시가 다르면 재시도</li></ul>
+      <span class="g">원본 불변 ① 읽기 전용 또는 복사본만 연다</span></div>
+    <div class="arr">→</div>
+    <div class="step"><span class="n">5</span><b>프로파일</b><ul>
+      <li>처음 1,000행 기본</li><li>표본·근사 표시</li><li>unique 정확 계산</li></ul></div>
+    <div class="arr">→</div>
+    <div class="step"><span class="n">6</span><b>카탈로그 기록</b><ul>
+      <li>짧은 쓰기 연결</li><li>잠기면 <code>catalog_busy</code></li></ul></div>
+    <div class="arr">→</div>
+    <div class="step"><span class="n">7</span><b>색인</b><ul>
+      <li>Kiwi 형태소 → BM25</li><li>문자 n-gram (코드·숫자)</li>
+      <li>범위: 이름·상위값·표본 (셀 전체는 시나리오 후 결정)</li></ul></div>
+  </div>
+</div>
+
+<div class="split">
+  <div class="lane" style="flex:0.85"><h2>B. 검색 경로 — <code>ldx search "창업 지원"</code></h2>
+    <div class="flow">
+      <div class="step"><span class="n">8</span><b>질의 전처리</b><ul><li>원문 보존</li><li>형태소·n-gram·자모</li></ul></div>
+      <div class="arr">→</div>
+      <div class="step"><span class="n">9</span><b>Retriever</b><ul><li>BM25 · n-gram</li><li>Fuzzy(cutoff)</li></ul></div>
+      <div class="arr">→</div>
+      <div class="step"><span class="n">10</span><b>RRF</b><ul><li>점수 출처 유지</li><li>결과 없음 허용</li></ul></div>
+      <div class="arr">→</div>
+      <div class="step out"><span class="n">11</span><b>결과</b><ul><li>파일·시트·열·행 — 값</li></ul></div>
+    </div>
+  </div>
+  <div class="lane" style="flex:1.15"><h2>C. 조회 경로 — <code>ldx query --sql "…"</code></h2>
+    <div class="flow">
+      <div class="step guard"><span class="n">12</span><b>읽기 전용 SQL 가드</b><ul>
+        <li>문장 수 = 1</li><li><code>json_serialize_sql</code></li><li>CTE 안 DELETE 등 거부</li></ul>
+        <span class="g">원본 불변 ②</span></div>
+      <div class="arr">→</div>
+      <div class="step guard" style="flex:1.4"><span class="n">13</span><b>엔진 설정 (engine.py, 순서 고정)</b><ul>
+        <li>adapters가 만든 ATTACH 명세 실행(READ_ONLY)</li><li>temp_directory 절대경로</li>
+        <li>external access 끄기 · autoinstall 끄기</li><li>lock_configuration</li></ul>
+        <span class="g">원본 불변 ③ 등록 안 된 파일·확장 설치 차단</span></div>
+      <div class="arr">→</div>
+      <div class="step"><span class="n">14</span><b>실행</b><ul><li>in-memory 연결</li><li>시간·행 제한</li></ul></div>
+      <div class="arr">→</div>
+      <div class="step out"><span class="n">15</span><b>결과</b><ul><li>잘림 표시</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<div class="lane"><h2>D. 공통 출구</h2>
+  <div class="flow">
+    <div class="step out" style="flex:2"><b>결과 봉투 (types.py)</b><ul>
+      <li><code>{ ok, data, truncated, total_rows, total_rows_exact, limitations[], read_completeness }</code></li>
+      <li>CLI는 stdout에 하나, 실패는 stderr + 종료 코드 / 화면은 같은 봉투를 렌더링</li></ul></div>
+    <div class="arr">→</div>
+    <div class="step guard" style="flex:1.6"><span class="n">✓</span><b>명령 전후 검사 (런타임)</b><ul>
+      <li>원본 폴더 목록·부속 파일(<code>-wal</code>/<code>-shm</code>/<code>-journal</code>/<code>.tmp</code>) 비교</li>
+      <li>위반 시 <code>immutability_violation</code> 오류</li></ul>
+      <span class="g">원본 불변 ④ (해시 불변은 사본 테스트에서)</span></div>
+  </div>
+  <p class="note">한도: 기본 행 1,000 · 쿼리 시간 제한 · 파일 수 한도 — 초과 시 잘림 표시·경고. 용어 정의는 docs/glossary/GLOSSARY.md.</p>
+</div>
+</body></html>

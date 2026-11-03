@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 개발 워크플로 v2</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --line:#8c959f; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 36px; background:#fff; color:var(--ink);
+         font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif; font-size:15px; width:1600px; }
+  h1 { font-size:26px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 16px; }
+  .grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px 34px; }
+  .step { border:1.5px solid var(--line); border-radius:9px; padding:11px 12px; background:#f6f8fa; position:relative; }
+  .step h3 { margin:0 0 6px; font-size:16px; }
+  .step .n { display:inline-block; width:26px; height:26px; border-radius:13px; background:var(--ink); color:#fff;
+             text-align:center; line-height:26px; font-weight:700; font-size:14px; margin-right:6px; }
+  .step ul { margin:4px 0 0; padding-left:18px; } .step li { margin:3px 0; font-size:13.8px; }
+  .step .art { margin-top:6px; font-size:13px; }
+  .gate { border:2.5px solid #9a6700; background:#fff8c5; }
+  .exit { color:#9a6700; font-weight:700; font-size:13px; margin-top:6px; display:block; }
+  .step.r::after { content:"→"; position:absolute; right:-27px; top:44%; font-size:22px; }
+  .step.l::after { content:"←"; position:absolute; left:-27px; top:44%; font-size:22px; }
+  .down { text-align:center; font-size:22px; margin:-6px 0; }
+  .st { float:right; font-size:12px; padding:1px 7px; border-radius:10px; background:#eaeef2; color:#57606a; font-weight:400; }
+  .st.done { background:#dafbe1; color:#1a7f37; } .st.now { background:#ddf4ff; color:#0969da; }
+  code { font-family:Consolas,monospace; font-size:12.8px; background:#eaeef2; padding:0 4px; border-radius:4px; }
+  .loops { margin-top:16px; border:1.5px dashed var(--line); border-radius:10px; padding:12px 14px; display:flex; gap:28px; }
+  .loops div { flex:1; } .loops h2 { font-size:16px; margin:0 0 6px; } .loops li { margin:3px 0; font-size:14px; }
+</style></head><body>
+<h1>ldx 개발 워크플로 v2 — 수용 테스트 → 설계 → 설계 검증 → 재구현 가능 테스트 명세 → 코드</h1>
+<p class="sub">노란 상자 = 관문(다음 단계로 가려면 통과해야 하는 검사 기준). 관문에서 실패하면 아래 "관문 실패 시 재작업 단계"를 따른다.</p>
+
+<div class="grid">
+  <div class="step gate r"><h3><span class="n">1</span>사용 시나리오 + 수용 테스트<span class="st">미착수</span></h3><ul>
+    <li>실제 작업 3~5개와 완료 기준</li>
+    <li>수용 테스트 = 사용자 관점 동작·필수 속성, 구현 방식은 적지 않음</li>
+    <li>예: 원본 폴더 불변, CP949 CSV 읽힘, 잘림 표시</li></ul>
+    <div class="art">산출: <code>docs/scenarios.md</code>, <code>tests/acceptance/</code></div>
+    <span class="exit">관문: 속성 목록 고정 + 출처 표기</span></div>
+  <div class="step r"><h3><span class="n">2</span>벤치마킹·재사용<span class="st done">완료*</span></h3><ul>
+    <li>기준표 C1~C8, 9개 후보 채점</li>
+    <li>재사용 기능 단위별 코드·아키텍처·동작·UX 재사용</li>
+    <li>*미확인 항목은 1의 시나리오로 재확인</li></ul>
+    <div class="art">산출: <code>docs/benchmarking/</code>, <code>subflows.yaml</code></div></div>
+  <div class="step r"><h3><span class="n">3</span>설계<span class="st now">v2 초안</span></h3><ul>
+    <li>계층·명령 계약·데이터 흐름</li>
+    <li>1의 속성과 2의 재사용 항목을 입력으로</li>
+    <li>용어는 GLOSSARY.md(모델 다각화 검증)</li></ul>
+    <div class="art">산출: <code>docs/architecture/*.html·png</code></div></div>
+  <div class="step gate"><h3><span class="n">4</span>설계 검증<span class="st now">진행 중</span></h3><ul>
+    <li>정형 설계 검증(모델 검사, TLA+): 대상 = 카탈로그 최신성(스캔 중 변경·GUI/CLI 동시 갱신·중단)</li>
+    <li>다이어그램 적대 검증: PNG → 메인 이미지 평가 → opus 서브에이전트 반례 찾기</li></ul>
+    <div class="art">산출: <code>formal/catalog-freshness/evidence/</code>, <code>adversarial_review_v*.md</code></div>
+    <span class="exit">관문: MC 통과·MC_bug 위반·MC_sanity 위반 로그 3개 + 판정표의 반영/기각 사유</span></div>
+
+  <div class="down" style="grid-column:4">↓</div>
+
+  <div class="step gate l" style="grid-column:4"><h3><span class="n">5</span>재구현 가능 테스트 명세<span class="st">미착수</span></h3><ul>
+    <li>테스트만으로 코드를 다시 구현할 수 있을 만큼: 명령 입출력 JSON·오류 종류·어댑터 동작·엣지 케이스</li>
+    <li>엣지: 한글·CP949·'#' 경로·WAL·2GB·잘림·잠김·정션</li></ul>
+    <span class="exit">관문: 전부 실패로 시작 + 변이 테스트(mutmut) 생존 0 또는 승인 목록</span></div>
+  <div class="step gate l" style="grid-column:3; grid-row:3"><h3><span class="n">6</span>코드</h3><ul>
+    <li>subflows.yaml 항목 이식(출처 표기)</li>
+    <li>types → engine·adapters → core → commands → cli</li></ul>
+    <span class="exit">관문: 테스트 전부 통과 + 사본 원본 해시 불변 + AST 검사(core→web/cli import 0, 원본 열기·ATTACH는 adapters만)</span></div>
+  <div class="step l" style="grid-column:2; grid-row:3"><h3><span class="n">7</span>코드 후 검증</h3><ul>
+    <li>graphify(코드 그래프 시각화·참고)</li>
+    <li>다이어그램을 코드 기준으로 다시 그려 적대 검증</li>
+    <li>재구현 훈련: <code>ldx/</code>를 지우고 테스트만 보고 재작성(표본 모듈)</li></ul></div>
+  <div class="step" style="grid-column:1; grid-row:3"><h3><span class="n">8</span>기록·커밋</h3><ul>
+    <li>로컬 커밋(push는 확인 후)</li>
+    <li>subflows.yaml 상태·결정 기록 갱신</li></ul></div>
+</div>
+
+<div class="loops">
+  <div><h2>관문 실패 시 재작업 단계</h2><ul>
+    <li>4에서 반례 → 3(설계) 수정 후 4 재실행. 1의 속성은 약화 금지, 바꾸면 사유 기록</li>
+    <li>5를 쓰다 설계 구멍 발견 → 3으로</li>
+    <li>6에서 테스트 실패 → 코드 수정. 테스트를 바꿔야 하면 5로 돌아가 사유 기록</li>
+    <li>6의 AST 검사 실패 → 6에서 구조 수정</li>
+    <li>7에서 지적 확인 → 해당 단계(1·3·5·6)</li></ul></div>
+  <div><h2>공통 규칙</h2><ul>
+    <li>모든 실측은 원본이 아니라 사본·합성 파일로</li>
+    <li>판정은 규칙 + 메인 교차 확인(LLM 판정 안 씀)</li>
+    <li>도구: TLA+(jdk4py Java 25, <code>tlc.sh</code>는 PATH 필요) · graphify 0.9.100 · uv.lock · Lean은 이 PC 설치 불가</li></ul></div>
+</div>
+</body></html>

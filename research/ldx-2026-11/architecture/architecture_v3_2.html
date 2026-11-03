@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 아키텍처 v3.2</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --line:#d0d7de; --bg:#fff; --reuse:#ddf4ff; --glue:#fff8c5; --danger:#cf222e; --write:#bc4c00; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px 32px; background:var(--bg); color:var(--ink); font-family:"Malgun Gothic",sans-serif; font-size:14px; width:1600px; }
+  h1 { font-size:24px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 12px; }
+  .row { display:flex; gap:10px; align-items:stretch; }
+  .layer { border:1.5px solid var(--line); border-radius:10px; padding:14px 10px 10px; margin-bottom:6px; position:relative; }
+  .layer > .tag { position:absolute; top:-11px; left:14px; background:var(--bg); padding:0 6px; font-weight:700; font-size:14px; }
+  .box { flex:1; border:1.5px solid #8c959f; border-radius:8px; padding:7px 9px; }
+  .box b { display:block; font-size:15px; margin-bottom:3px; }
+  .box ul { margin:3px 0 0; padding-left:16px; } .box li { margin:1px 0; font-size:13px; }
+  .reuse { background:var(--reuse); } .glue { background:var(--glue); }
+  .w { border:2.5px solid var(--write); } .w > b::after { content:" ✎쓰기"; color:var(--write); font-size:12px; }
+  .ext { border:1.5px dashed #8c959f; background:#f6f8fa; color:var(--mute); }
+  .arrow { text-align:center; color:var(--mute); font-size:13px; margin:2px 0 7px; } .arrow span { font-size:19px; color:var(--ink); }
+  .owned { flex:1; border:2px solid #1a7f37; border-radius:10px; padding:9px 13px; background:#f0fff4; }
+  .source { flex:1; border:3px dashed var(--danger); border-radius:10px; padding:9px 13px; background:#fff5f5; }
+  .owned h3,.source h3 { margin:0 0 5px; font-size:15px; } .source h3 { color:var(--danger); }
+  .legend { margin-top:8px; color:var(--mute); font-size:12.5px; display:flex; gap:16px; flex-wrap:wrap; }
+  .k { display:inline-block; width:14px; height:14px; border-radius:3px; vertical-align:-2px; margin-right:5px; border:1px solid #8c959f; }
+  code { font-family:Consolas,monospace; font-size:12px; background:#eaeef2; padding:0 3px; border-radius:4px; }
+  .note { font-size:12.5px; color:var(--danger); }
+  pre.g { margin:0; font-family:Consolas,monospace; font-size:12.5px; line-height:1.45; }
+</style></head><body>
+<h1>ldx 아키텍처 v3.2 — 판정표 v3.1(Y1~Y18)·실측 F1~F4 반영</h1>
+<p class="sub">파랑 = 재사용 코드, 노랑 = 접착 코드, 주황 굵은 테두리(✎쓰기) = .ldx에 쓰는 모듈, 회색 점선 = 확장 자리. 원본(빨간 점선)은 stat·파일 복사·바이트 읽기만(한 번 읽고 즉시 닫음). 모든 DB 연결은 .ldx 안 사본에 <code>mode=ro&amp;immutable=1</code>.</p>
+
+<div class="layer"><span class="tag">① 사용자 접점</span>
+<div class="row">
+  <div class="box reuse"><b>사람: Datasette 웹 (<code>[web]</code> 선택 설치)</b><ul><li>표 보기·필터·SQL(1초 상한)·FTS, datasette-search-all</li><li class="note">명령 계층 밖: 봉투·Kiwi·짧은 단어 처리·positions-only 미적용 → 배너에 고정 문구로 알림. SC7 DB는 올리지 않음</li></ul></div>
+  <div class="box glue w"><b>serve.py</b><ul><li>catalog가 준 <b>현재 사본 경로 목록</b>으로 Datasette 프로세스 실행</li><li>catalog 세대 번호를 폴링 → 바뀌면 재기동(약 1.2초), 실패 시 이전 목록으로 재기동</li><li>재기동 뒤 <code>catalog.gc_generations()</code></li><li>배너 플러그인: 서버가 실제 연 사본의 <code>snapshot_at</code>, <code>staleness</code>, limitation</li></ul></div>
+  <div class="box glue"><b>cli.py (typer, 인자 처리만)</b><ul><li><code>source add · scan · show · search · compare · query --source · export · serve</code></li><li><code>compare</code> 도움말: "나란히 보여 줌, 합치지 않음"</li><li>stdout JSON 1개 / stderr 오류 + 종료 코드</li></ul></div>
+  <div class="box ext"><b>확장 자리</b><ul><li>MCP 서버, 웹 대조 화면</li><li>상주 Kiwi 정규화</li><li>출력 <code>render(envelope, fmt)</code></li></ul></div>
+</div></div>
+<div class="arrow"><span>↓</span> cli.py만 app.py를 부른다 · serve·배너는 catalog를 읽기 전용(WAL)으로 직접 조회</div>
+
+<div class="layer"><span class="tag">② app.py — 명령 함수(결과 봉투를 돌려줌, 단일 진실의 범위 = ldx 명령)</span>
+<div class="row">
+  <div class="box glue"><b>scan · show · search · compare · query · export 함수</b><ul><li>봉투 <code>{ok, data, truncated, total_rows, total_rows_exact, limitations[], read_ratio, read_scope{files, tables}, snapshot_at}</code></li></ul></div>
+</div></div>
+<div class="arrow"><span>↓</span></div>
+
+<div class="layer"><span class="tag">③ 기능 모듈 (최소 구성)</span>
+<div class="row">
+  <div class="box glue"><b>scan.py</b><ul><li>잠금 파일로 scan끼리 배타</li><li>허용 확장자만 순회(xlsx·xls·csv·sqlite·db), 부속 파일은 본체에 묶음, <code>~$이름</code> 있으면 "열려 있음"</li><li>변경 시그니처: 본체+<code>-wal</code>·<code>-journal</code>(존재·크기·mtime), 같을 때만 앞뒤 64KB 해시</li><li>변경 판별 뒤 디스크 점검(×4 + 남은 세대)</li><li>snapshot → convert → catalog 기록 → gc</li></ul></div>
+  <div class="box glue w"><b>snapshot.py</b><ul><li>부속 파일을 <code>&lt;ID&gt;.db-wal</code>·<code>-journal</code>로 <b>이름 맞춰</b> 복사</li><li>본체+부속 전후 stat 같을 때 채택(재시도)</li><li>사본을 읽기·쓰기로 열어 롤백·체크포인트 → journal=delete → quick_check(손상 감지 보조)</li></ul></div>
+  <div class="box reuse w"><b>convert.py</b><ul><li><b>python-calamine</b>(엑셀, 메모리 바이트) / csv(utf-8-sig→cp949)</li><li><b>sqlite-utils</b>: 시트별 표 + <code>_source_row</code>, 첫 행=머리행, 중복 열 <code>_2</code>, 빈 시트 0행+limitation</li><li>원문 FTS5 trigram(<code>enable_fts</code>)</li><li>SC7 시트 → 별도 DB</li></ul></div>
+  <div class="box glue w"><b>textindex.py</b><ul><li><b>kiwipiepy</b> 묶음 호출(357만 자/초)</li><li>형태소 <b>사이드 표</b> <code>&lt;표&gt;__kw</code>(unicode61 FTS5, rowid 연결), 사용자 표 불변</li><li>질의 정규화도 여기(같은 설정), 세대 메타에 kiwi 버전·옵션</li><li>질의에 한글 있을 때만 로드</li></ul></div>
+</div>
+<div class="row" style="margin-top:8px">
+  <div class="box glue"><b>search.py (+ compare 함수)</b><ul><li>단어별: 형태소마다 [사이드 표 MATCH] OR [3글자↑ 원문 trigram / 미만 LIKE], 단어끼리 AND (<code>quote_fts</code> 재사용)</li><li>FTS 없는 표·WITHOUT ROWID → 제외+limitation</li><li>compare: 정확 일치 먼저, 부분 일치 표시, 소스별 잘림 전달</li></ul></div>
+  <div class="box reuse"><b>query.py</b><ul><li>표준 <b>sqlite3</b>: <code>set_authorizer</code>(SELECT·READ·FUNCTION·RECURSIVE + 읽기 PRAGMA 이름 목록), 한 문장, <code>query_only</code>, 확장 로드 끔</li><li><code>set_progress_handler</code> → <code>query_timeout</code></li><li><code>--source</code>로 사본 하나 지정, SC7 표는 원문 제거</li></ul></div>
+  <div class="box glue w"><b>export.py</b><ul><li><code>.ldx/exports/</code>만, realpath·normcase</li><li><code>.ldx/tmp</code>에 쓰고 <code>os.rename</code>(교체 금지), 있으면 거부</li><li>csv(utf-8-sig, 엑셀로 열림)·sqlite</li></ul></div>
+  <div class="box glue w"><b>catalog.py (WAL)</b><ul><li>경로·스키마·<b>파일 단위 세대</b>의 유일 소유자</li><li>소스별 현재 사본 포인터, 새 세대는 마지막 짧은 트랜잭션</li><li><code>staleness(path)</code>, <code>gc_generations()</code>(참조 0만, 실패 재시도)</li></ul></div>
+  <div class="box ext"><b>확장 자리</b><ul><li><code>reader(path) -&gt; sheets</code></li><li><code>searcher(query, tables) -&gt; hits</code>(n-gram·fuzzy)</li><li>증분 변환, 자동 감시</li></ul></div>
+</div></div>
+<div class="arrow"><span>↓</span> 모든 모듈 → types.py(의존 없음: 봉투·오류 종류 <code>sql_rejected · query_timeout · catalog_busy · source_locked · not_registered · disk_low · source_overlap</code>)</div>
+
+<div class="row">
+  <div class="layer" style="flex:0 0 470px;margin:0"><span class="tag">모듈 의존 그래프</span><pre class="g">cli → app → {scan, search, query, export}
+scan → {snapshot, convert, textindex, catalog}
+search → {textindex, catalog}   query → catalog
+export → {search, query, catalog}
+serve → catalog (읽기·gc)   배너 → catalog(읽기)
+전부 → types (맨 아래, 의존 없음)</pre></div>
+  <div class="owned"><h3>.ldx/ (쓰기 허용, cwd·TMP·TEMP = .ldx/tmp)</h3><ul>
+    <li><code>catalog.db</code>(WAL) · <code>scan.lock</code></li>
+    <li><code>copies/&lt;세대&gt;/&lt;ID&gt;.db</code> — 파일 단위 세대, 이름 고정(점·<code>#</code>·<code>'</code> 없음)</li>
+    <li><code>exports/</code> · <code>tmp/</code> · <code>logs/</code></li>
+    <li><code>source add</code>는 원본 루트와 .ldx가 서로 포함하면 <code>source_overlap</code> 거부</li></ul></div>
+  <div class="source"><h3>원본 영역 (쓰기·새 항목 생성 금지)</h3><ul>
+    <li>budget_sme(두 판)·budget_all·budget2026.all .sqlite, 공고 마스터·평가셋 .xlsx, CSV</li>
+    <li>접근 = stat·파일 복사·바이트 읽기, 한 번 읽고 즉시 닫음. 어떤 DB 엔진으로도 직접 열지 않음</li>
+    <li>Excel이 열고 있으면(<code>~$</code>) 건드리지 않고 다음 scan으로</li></ul></div>
+</div>
+<div class="legend"><span><i class="k" style="background:var(--reuse)"></i>재사용</span><span><i class="k" style="background:var(--glue)"></i>접착</span><span><i class="k" style="border:2.5px solid var(--write)"></i>.ldx에 쓰는 모듈</span><span><i class="k" style="background:#f6f8fa;border-style:dashed"></i>확장 자리</span><span><i class="k" style="border:2px dashed var(--danger)"></i>원본 영역</span>
+<span>의존성: sqlite-utils · python-calamine · kiwipiepy(Apache-2.0) · typer / [web]: datasette 0.65.5 · datasette-search-all 1.1.4 — 제거: duckdb · bm25s · rapidfuzz · openpyxl</span></div>
+</body></html>

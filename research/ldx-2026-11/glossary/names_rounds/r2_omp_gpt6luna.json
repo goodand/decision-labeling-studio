@@ -1,0 +1,162 @@
+[
+ {
+  "status": "succeeded",
+  "output": {
+   "items": [
+    {
+     "id": "N04a",
+     "term": "side_by_side",
+     "explanation": "두 항목이나 화면을 나란히 배치해 보여 주는 방식으로 보입니다."
+    },
+    {
+     "id": "N04b",
+     "term": "compare_side_by_side",
+     "explanation": "두 대상을 나란히 표시해 서로 비교하는 기능이나 옵션으로 보입니다."
+    },
+    {
+     "id": "N12a",
+     "term": "read_ratio",
+     "explanation": "읽은 양이나 읽기 작업의 비율을 나타내는 값으로 보입니다."
+    },
+    {
+     "id": "N12b",
+     "term": "files_read_ratio",
+     "explanation": "전체 파일 중 읽은 파일의 비율을 나타내는 값으로 보입니다."
+    },
+    {
+     "id": "N16a",
+     "term": "hide_cell_text",
+     "explanation": "표 셀 안의 텍스트를 숨기는 옵션으로 보입니다."
+    },
+    {
+     "id": "N16b",
+     "term": "positions_only",
+     "explanation": "값이나 내용을 제외하고 위치 정보만 다루거나 표시하는 모드로 보입니다."
+    },
+    {
+     "id": "N16c",
+     "term": "omit_cell_values",
+     "explanation": "표 셀의 값은 결과에서 제외하는 옵션으로 보입니다."
+    },
+    {
+     "id": "N21a",
+     "term": ".ldx/copies",
+     "explanation": "`.ldx` 아래에 원본의 사본이나 복제본을 저장하는 경로로 보입니다."
+    },
+    {
+     "id": "N21b",
+     "term": ".ldx/snapshots",
+     "explanation": "`.ldx` 아래에 특정 시점의 스냅샷을 저장하는 경로로 보입니다."
+    },
+    {
+     "id": "N21c",
+     "term": ".ldx/source_copies",
+     "explanation": "`.ldx` 아래에 소스 파일의 사본을 저장하는 경로로 보입니다."
+    },
+    {
+     "id": "N14a",
+     "term": "read_status",
+     "explanation": "읽기 작업의 상태나 읽을 수 있는지 여부를 나타내는 값으로 보입니다."
+    },
+    {
+     "id": "N17a",
+     "term": "원본_행번호",
+     "explanation": "원본 데이터에서 해당 항목이 위치한 행 번호를 뜻하는 이름으로 보입니다."
+    },
+    {
+     "id": "N17b",
+     "term": "_source_row",
+     "explanation": "원본 데이터에서 해당 레코드가 나온 행 번호를 나타내는 내부 필드로 보입니다."
+    },
+    {
+     "id": "N17c",
+     "term": "_행번호",
+     "explanation": "행 번호를 나타내는 내부 필드나 변수로 보입니다."
+    }
+   ]
+  },
+  "usage": 1034,
+  "summary": "prompt_result and session_settled received",
+  "session_id": "01a19faf-5ae8-7358-846d-527a468a1d6a"
+ },
+ {
+  "status": "succeeded",
+  "output": {
+   "items": [
+    {
+     "id": "N17c",
+     "term": "_행번호",
+     "explanation": "행 번호를 나타내는 값이나 필드로 보입니다. 앞의 밑줄은 내부용 변수나 열 이름을 구분하기 위한 표기일 수 있습니다."
+    },
+    {
+     "id": "N17b",
+     "term": "_source_row",
+     "explanation": "원본 데이터에서 해당 항목이 나온 행의 번호를 나타내는 값으로 보입니다. 앞의 밑줄은 내부용 필드임을 나타낼 수 있습니다."
+    },
+    {
+     "id": "N17a",
+     "term": "원본_행번호",
+     "explanation": "원본 데이터에서 해당 항목이 위치한 행 번호를 뜻하는 이름으로 보입니다."
+    },
+    {
+     "id": "N14a",
+     "term": "read_status",
+     "explanation": "파일이나 데이터의 읽기 작업이 성공했는지, 또는 어떤 상태인지 나타내는 값으로 보입니다."
+    },
+    {
+     "id": "N21c",
+     "term": ".ldx/source_copies",
+     "explanation": "`.ldx` 아래에 원본 파일의 복사본을 저장하는 디렉터리 경로로 보입니다."
+    },
+    {
+     "id": "N21b",
+     "term": ".ldx/snapshots",
+     "explanation": "`.ldx` 아래에 특정 시점의 파일이나 데이터 상태를 보관하는 스냅샷 디렉터리로 보입니다."
+    },
+    {
+     "id": "N21a",
+     "term": ".ldx/copies",
+     "explanation": "`.ldx` 아래에 파일 복사본을 보관하는 디렉터리 경로로 보입니다."
+    },
+    {
+     "id": "N16c",
+     "term": "omit_cell_values",
+     "explanation": "셀의 값은 결과에서 제외하되, 다른 셀 정보는 유지하는 옵션으로 보입니다."
+    },
+    {
+     "id": "N16b",
+     "term": "positions_only",
+     "explanation": "값이나 내용을 제외하고 위치 정보만 다루거나 출력하는 모드로 보입니다."
+    },
+    {
+     "id": "N16a",
+     "term": "hide_cell_text",
+     "explanation": "셀에 들어 있는 텍스트를 표시하지 않도록 하는 옵션으로 보입니다."
+    },
+    {
+     "id": "N12b",
+     "term": "files_read_ratio",
+     "explanation": "대상 파일 중 읽기에 성공한 파일의 비율을 나타내는 값으로 보입니다."
+    },
+    {
+     "id": "N12a",
+     "term": "read_ratio",
+     "explanation": "전체 대상 중 읽기 작업이 완료되거나 성공한 비율을 나타내는 값으로 보입니다."
+    },
+    {
+     "id": "N04b",
+     "term": "compare_side_by_side",
+     "explanation": "두 항목이나 결과를 나란히 배치해 비교하는 기능 또는 표시 방식으로 보입니다."
+    },
+    {
+     "id": "N04a",
+     "term": "side_by_side",
+     "explanation": "두 항목을 나란히 표시하는 배치 방식으로 보입니다."
+    }
+   ]
+  },
+  "usage": 1103,
+  "summary": "prompt_result and session_settled received",
+  "session_id": "01a19faf-7047-739b-97d9-0185df7d9b0c"
+ }
+]

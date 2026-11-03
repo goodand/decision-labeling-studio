@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 실행 흐름 v3.2</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --reuse:#ddf4ff; --glue:#fff8c5; --danger:#cf222e; }
+  body { margin:0; padding:24px 32px; color:var(--ink); background:#fff; font-family:"Malgun Gothic",sans-serif; font-size:14px; width:1600px; }
+  h1 { font-size:24px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 10px; }
+  .flow { border:1.5px solid #d0d7de; border-radius:10px; padding:8px 11px; margin-bottom:9px; }
+  .flow h2 { font-size:15.5px; margin:0 0 6px; }
+  .steps { display:flex; align-items:stretch; }
+  .s { flex:1; border:1.5px solid #8c959f; border-radius:8px; padding:5px 7px; font-size:12.5px; position:relative; margin-right:22px; }
+  .s:not(:last-child)::after { content:"→"; position:absolute; right:-19px; top:38%; font-size:18px; color:var(--ink); }
+  .s:last-child { margin-right:0; }
+  .reuse { background:var(--reuse); } .glue { background:var(--glue); }
+  .cont { border:2px solid var(--danger); background:#fff5f5; }
+  .stop { border:3px double var(--danger); background:#ffe3e3; font-weight:600; }
+  code { font-family:Consolas,monospace; font-size:11.5px; background:#eaeef2; padding:0 3px; border-radius:3px; }
+</style></head><body>
+<h1>ldx 실행 흐름 v3.2 — 명령별 단계</h1>
+<p class="sub">파랑 = 재사용, 노랑 = 접착. <b>빨강 실선</b> = limitation 기록 후 그 대상만 건너뛰고 계속, <b>빨강 이중선</b> = 명령 중단(오류 봉투·종료 코드). 모든 흐름의 끝은 결과 봉투 하나.</p>
+
+<div class="flow"><h2>source add (SC3, A02)</h2><div class="steps">
+  <div class="s glue">경로 realpath·normcase</div>
+  <div class="s stop">원본 루트와 .ldx가 서로 포함 → <code>source_overlap</code> 중단</div>
+  <div class="s glue">catalog에 소스 등록(짧은 트랜잭션)</div>
+</div></div>
+
+<div class="flow"><h2>scan — 바뀐 파일만 새 세대 사본 (SC3·SC1, A01~A03·A07·A08·A15)</h2><div class="steps">
+  <div class="s glue">cwd·TMP·TEMP=<code>.ldx/tmp</code>, <code>scan.lock</code> 획득(있으면 <code>catalog_busy</code>)</div>
+  <div class="s glue">허용 확장자 순회, 부속 파일은 본체에 묶음, 시그니처(본체+<code>-wal</code>·<code>-journal</code>) 비교</div>
+  <div class="s cont"><code>~$이름</code> 있음·잠김 → "열려 있음"/<code>source_locked</code>, 이전 사본 유지</div>
+  <div class="s stop">디스크 &lt; 바뀐 크기×4 + 남은 세대 → <code>disk_low</code></div>
+  <div class="s glue">snapshot: 부속 파일 이름 맞춰 복사, 전후 stat, 사본 복구·체크포인트·quick_check</div>
+  <div class="s reuse">convert: calamine/csv → sqlite-utils 표 + 원문 FTS / textindex: Kiwi 묶음 → 사이드 표</div>
+  <div class="s cont">손상·인코딩 실패·빈 시트·FTS 불가 표 → limitation</div>
+  <div class="s glue">catalog: 새 세대 포인터 한 트랜잭션, <code>gc_generations()</code>, 봉투(<code>read_ratio</code>·<code>read_scope</code>)</div>
+</div></div>
+
+<div class="flow"><h2>serve — 사람용 화면 (SC1·SC5)</h2><div class="steps">
+  <div class="s glue">catalog에서 현재 사본 경로 목록(SC7 DB 제외)</div>
+  <div class="s reuse">Datasette 프로세스 <code>-i</code> 목록 + search-all + 배너</div>
+  <div class="s glue">catalog 세대 번호 폴링 → 바뀌면 종료·재기동(약 1.2초)</div>
+  <div class="s cont">재기동 실패 → 이전 목록으로 재기동 + 배너 경고</div>
+  <div class="s glue"><code>gc_generations()</code>: 참조 0인 사본만 삭제, 실패는 다음에 재시도</div>
+</div></div>
+
+<div class="flow"><h2>search "질의" [--positions-only] / compare "사업명" (SC4·SC7·SC2, A12·A13·A16)</h2><div class="steps">
+  <div class="s glue">catalog 현재 세대 표 목록 + <code>staleness()</code> → 바뀌었으면 "scan 필요"</div>
+  <div class="s cont">FTS 없음·WITHOUT ROWID 표 → 제외+limitation</div>
+  <div class="s glue">질의를 단어로 나눔 → 한글 있으면 textindex로 형태소(같은 설정)</div>
+  <div class="s reuse">형태소마다 [사이드 표 MATCH] OR [3글자↑ trigram / 미만 LIKE], 단어끼리 AND — 사본 <code>mode=ro&amp;immutable=1</code></div>
+  <div class="s cont">사본 열기 실패 → catalog 다시 읽어 1회 재시도 → limitation</div>
+  <div class="s glue">파일·시트·열·<code>_source_row</code> + 셀 원문(positions-only·SC7이면 제거), truncated</div>
+  <div class="s glue">compare: 소스별 정확 일치 먼저, 부분 일치 표시, 원래 열 이름·값 그대로</div>
+</div></div>
+
+<div class="flow"><h2>query --source S --sql (SC6, A04·A05·A09·A14)</h2><div class="steps">
+  <div class="s glue">S가 등록된 현재 사본인지(아니면 <code>not_registered</code>), <code>staleness()</code></div>
+  <div class="s reuse">sqlite3 <code>mode=ro&amp;immutable=1</code>, <code>query_only</code>, 확장 로드 끔, authorizer(+RECURSIVE·읽기 PRAGMA)</div>
+  <div class="s stop">쓰기·ATTACH·pragma 쓰기·여러 문장 → <code>sql_rejected</code></div>
+  <div class="s stop">시간 상한 초과 → <code>query_timeout</code></div>
+  <div class="s glue">SC7 표 원문 제거, truncated, <code>total_rows_exact</code>, <code>snapshot_at</code></div>
+</div></div>
+
+<div class="flow"><h2>export (SC1, A17)</h2><div class="steps">
+  <div class="s glue">대상 realpath·normcase → <code>.ldx/exports/</code> 안인지</div>
+  <div class="s stop">밖이거나 같은 이름 존재 → 거부</div>
+  <div class="s reuse">csv(utf-8-sig)·sqlite-utils로 <code>.ldx/tmp</code>에 쓰기</div>
+  <div class="s glue"><code>os.rename</code>(교체 없음)으로 새 이름, 봉투에 경로</div>
+</div></div>
+</body></html>

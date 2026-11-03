@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 실행 흐름 v3.1</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --reuse:#ddf4ff; --glue:#fff8c5; --danger:#cf222e; }
+  body { margin:0; padding:26px 34px; color:var(--ink); background:#fff; font-family:"Malgun Gothic",sans-serif; font-size:14.5px; width:1600px; }
+  h1 { font-size:25px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 12px; }
+  .flow { border:1.5px solid #d0d7de; border-radius:10px; padding:9px 12px; margin-bottom:10px; }
+  .flow h2 { font-size:16px; margin:0 0 7px; }
+  .steps { display:flex; align-items:stretch; }
+  .s { flex:1; border:1.5px solid #8c959f; border-radius:8px; padding:6px 8px; font-size:13px; position:relative; margin-right:24px; }
+  .s:not(:last-child)::after { content:"→"; position:absolute; right:-20px; top:38%; font-size:19px; color:var(--ink); }
+  .s:last-child { margin-right:0; }
+  .reuse { background:var(--reuse); } .glue { background:var(--glue); }
+  .cont { border:2px solid var(--danger); background:#fff5f5; }
+  .stop { border:3px double var(--danger); background:#ffe3e3; font-weight:600; }
+  code { font-family:Consolas,monospace; font-size:12px; background:#eaeef2; padding:0 3px; border-radius:3px; }
+</style></head><body>
+<h1>ldx 실행 흐름 v3.1 — 명령별 단계</h1>
+<p class="sub">파랑 = 재사용 코드, 노랑 = 접착 코드. <b>빨강 실선</b> = limitation에 기록하고 그 파일만 건너뛰어 다음으로 계속, <b>빨강 이중선</b> = 명령 중단(오류 봉투·종료 코드). 모든 흐름의 끝은 결과 봉투 하나.</p>
+
+<div class="flow"><h2>scan — 바뀐 파일을 새 세대 사본으로 (SC3·SC1, A01~A03·A07·A08·A15)</h2><div class="steps">
+  <div class="s glue">cwd·TMP·TEMP = <code>.ldx/tmp</code>, catalog 잠금(실패면 <code>catalog_busy</code>)</div>
+  <div class="s stop">디스크 여유 &lt; 대상 크기×2.3 → <code>disk_low</code> 중단</div>
+  <div class="s glue">순회(<code>.ldx</code>·<code>~$*</code>·<code>*.tmp</code> 제외), (size, mtime_ns, 앞뒤 64KB 해시) 비교 → 바뀐 파일만</div>
+  <div class="s glue">snapshot: SQLite 복사 → 전후 stat 같을 때 채택(재시도 3회) → 사본 체크포인트</div>
+  <div class="s reuse">convert: calamine(엑셀) / csv(utf-8-sig→cp949) → sqlite-utils 표 + <code>_source_row</code> + FTS(원문·Kiwi 열)</div>
+  <div class="s cont">잠김·손상·인코딩 실패·작업 중 사본 → <code>read_status</code>·limitation</div>
+  <div class="s glue">catalog에 새 세대 기록(원자적), 봉투(<code>read_ratio</code> 파일·표)</div>
+</div></div>
+
+<div class="flow"><h2>serve — 사람용 화면 (SC1 반영, SC5 배너)</h2><div class="steps">
+  <div class="s glue">catalog의 현재 세대 경로만 모음 (SC7 대상 표 제외)</div>
+  <div class="s reuse">Datasette 프로세스 <code>-i copies/&lt;세대&gt;/*.db</code> + search-all + 배너 플러그인</div>
+  <div class="s glue">scan 완료 신호 → 서버 종료 → 새 세대로 재기동(약 1.2초)</div>
+  <div class="s glue">재기동 후 옛 세대 폴더 삭제(실행 중엔 Windows가 막음)</div>
+</div></div>
+
+<div class="flow"><h2>search "질의" [--positions-only] / compare "사업명" (SC4·SC7·SC2, A12·A13·A16)</h2><div class="steps">
+  <div class="s glue">catalog에서 현재 세대 표 목록, 원본 stat 재확인 → 바뀌었으면 limitation "scan 필요"</div>
+  <div class="s cont">FTS 없는 표 → 제외+limitation</div>
+  <div class="s reuse">질의 &lt; 3글자: LIKE / 이상: FTS5 MATCH(원문 OR Kiwi 정규화 질의) — 사본 <code>immutable=1</code></div>
+  <div class="s glue">파일·시트·열·<code>_source_row</code> + 셀 원문(positions-only면 제거), 한도 초과 → truncated</div>
+  <div class="s glue">compare: 소스별 정확 일치 먼저, 부분 일치 표시, 원래 열 이름·값 그대로(합치지 않음)</div>
+</div></div>
+
+<div class="flow"><h2>query --sql (SC6, A04·A05·A09·A14)</h2><div class="steps">
+  <div class="s glue">대상이 등록·현재 세대 사본인지 catalog로 확인(아니면 <code>not_registered</code>)</div>
+  <div class="s reuse">sqlite3 연결: <code>immutable=1</code>, <code>query_only</code>, 확장 로드 끔, <code>set_authorizer</code>(SELECT·READ·FUNCTION)</div>
+  <div class="s stop">쓰기·ATTACH·pragma·여러 문장 → <code>sql_rejected</code> 중단</div>
+  <div class="s glue">한도 초과 → truncated, <code>total_rows_exact</code>(셀 수 있으면 정확, 아니면 하한)</div>
+</div></div>
+
+<div class="flow"><h2>export (SC1, A17)</h2><div class="steps">
+  <div class="s glue">대상 경로 realpath·normcase → <code>.ldx/exports/</code> 안인지</div>
+  <div class="s stop">밖이거나 같은 이름 존재 → 거부(중단)</div>
+  <div class="s reuse">sqlite-utils / csv로 <code>.ldx/tmp</code>에 쓰기</div>
+  <div class="s glue"><code>x</code> 모드 새 이름으로 rename, 봉투에 경로</div>
+</div></div>
+</body></html>

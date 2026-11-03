@@ -1,0 +1,218 @@
+[
+ [
+  {
+   "id": "N04a",
+   "term": "side_by_side",
+   "explanation": "두 개 이상의 항목을 나란히 배치하여 한눈에 비교할 수 있게 표시하는 방식이다."
+  },
+  {
+   "id": "N04b",
+   "term": "compare_side_by_side",
+   "explanation": "비교 대상들을 옆으로 나란히 배치해 차이를 쉽게 확인하도록 하는 비교 표시 방식이다."
+  },
+  {
+   "id": "N12a",
+   "term": "read_ratio",
+   "explanation": "읽은 양이나 읽은 항목 수가 전체에서 차지하는 비율을 나타내는 값이다."
+  },
+  {
+   "id": "N12b",
+   "term": "files_read_ratio",
+   "explanation": "전체 파일 중 읽기 완료된 파일의 비율을 나타내는 값이다."
+  },
+  {
+   "id": "N16a",
+   "term": "hide_cell_text",
+   "explanation": "표나 그리드의 셀에 있는 텍스트를 화면에서 숨기는 표시 옵션이다."
+  },
+  {
+   "id": "N16b",
+   "term": "positions_only",
+   "explanation": "값 자체보다 위치 정보만 표시하거나 위치 기준으로만 처리하는 옵션을 의미한다."
+  },
+  {
+   "id": "N16c",
+   "term": "omit_cell_values",
+   "explanation": "셀의 값은 표시하지 않고 빈 셀이나 표시 생략 상태로 처리하는 옵션이다."
+  },
+  {
+   "id": "N21a",
+   "term": ".ldx/copies",
+   "explanation": ".ldx 폴더 또는 경로에 저장된 사본을 가리키는 경로 요소이다."
+  },
+  {
+   "id": "N21b",
+   "term": ".ldx/snapshots",
+   "explanation": ".ldx 폴더에 저장된 시점별 스냅샷을 가리키는 경로 요소이다."
+  },
+  {
+   "id": "N21c",
+   "term": ".ldx/source_copies",
+   "explanation": ".ldx 폴더에 저장된 원본 사본을 가리키는 경로 요소이다."
+  },
+  {
+   "id": "N14a",
+   "term": "read_status",
+   "explanation": "읽기 작업의 상태, 예를 들어 대기 중/진행 중/완료/실패 등을 나타내는 상태값이다."
+  },
+  {
+   "id": "N17a",
+   "term": "원본_행번호",
+   "explanation": "원본 데이터에서 해당 행이 있던 번호를 나타내는 열 이름이다."
+  },
+  {
+   "id": "N17b",
+   "term": "_source_row",
+   "explanation": "원본 데이터의 행 번호를 의미하는 내부 필드 이름으로 보인다."
+  },
+  {
+   "id": "N17c",
+   "term": "_행번호",
+   "explanation": "데이터 행의 순서 번호를 의미하는 필드 이름이다."
+  }
+ ],
+ [
+  {
+   "id": "N17c",
+   "term": "_행번호",
+   "explanation": "행 번호를 나타내는 내부 필드입니다."
+  },
+  {
+   "id": "N17b",
+   "term": "_source_row",
+   "explanation": "원본 데이터에서 해당 항목이 있던 행 번호를 나타내는 필드입니다."
+  },
+  {
+   "id": "N17a",
+   "term": "원본_행번호",
+   "explanation": "원본 표나 파일에서 해당 데이터가 있던 행 번호입니다."
+  },
+  {
+   "id": "N14a",
+   "term": "read_status",
+   "explanation": "데이터 읽기 작업의 상태를 나타내는 값입니다."
+  },
+  {
+   "id": "N21c",
+   "term": ".ldx/source_copies",
+   "explanation": ".ldx 파일 안에 있는 원본 복사본을 가리키는 경로 또는 항목입니다."
+  },
+  {
+   "id": "N21b",
+   "term": ".ldx/snapshots",
+   "explanation": ".ldx 파일 안에 있는 특정 시점 상태의 스냅샷을 가리키는 경로 또는 항목입니다."
+  },
+  {
+   "id": "N21a",
+   "term": ".ldx/copies",
+   "explanation": ".ldx 파일 안에 있는 복사본을 가리키는 경로 또는 항목입니다."
+  },
+  {
+   "id": "N16c",
+   "term": "omit_cell_values",
+   "explanation": "셀의 값은 표시하지 않고 생략하는 옵션입니다."
+  },
+  {
+   "id": "N16b",
+   "term": "positions_only",
+   "explanation": "위치 정보만 표시하고 값은 표시하지 않는 옵션입니다."
+  },
+  {
+   "id": "N16a",
+   "term": "hide_cell_text",
+   "explanation": "셀 안의 텍스트를 숨기는 옵션입니다."
+  },
+  {
+   "id": "N12b",
+   "term": "files_read_ratio",
+   "explanation": "전체 파일 중 읽은 파일의 비율입니다."
+  },
+  {
+   "id": "N12a",
+   "term": "read_ratio",
+   "explanation": "전체 데이터 중 읽은 비율입니다."
+  },
+  {
+   "id": "N04b",
+   "term": "compare_side_by_side",
+   "explanation": "두 항목을 나란히 놓고 비교하는 방식입니다."
+  },
+  {
+   "id": "N04a",
+   "term": "side_by_side",
+   "explanation": "나란히 배치하는 방식입니다."
+  }
+ ],
+ [
+  {
+   "id": "N04a",
+   "term": "side_by_side",
+   "explanation": "두 개 이상의 항목을 나란히 배치해 비교하기 쉽게 보여주는 방식입니다. 옆으로 붙여서 차이를 한눈에 파악할 수 있도록 하는 의미를 가집니다."
+  },
+  {
+   "id": "N04b",
+   "term": "compare_side_by_side",
+   "explanation": "여러 항목을 옆으로 나란히 배열하여 차이를 직접 비교하는 작업입니다. 각 항목을 대조해서 확인하는 보기나 기능을 의미합니다."
+  },
+  {
+   "id": "N12a",
+   "term": "read_ratio",
+   "explanation": "읽은 데이터가 전체에서 차지하는 비율입니다. 처리 진행률처럼 읽기 완료 정도를 나타내는 값일 수 있습니다."
+  },
+  {
+   "id": "N12b",
+   "term": "files_read_ratio",
+   "explanation": "전체 파일 중 읽거나 처리한 파일의 비율입니다. 파일 단위 진행률을 나타내는 값을 의미합니다."
+  },
+  {
+   "id": "N16a",
+   "term": "hide_cell_text",
+   "explanation": "표나 셀에 포함된 텍스트 내용을 숨겨 보지 않게 하는 설정입니다. 셀은 보이되 실제 텍스트는 표시되지 않도록 합니다."
+  },
+  {
+   "id": "N16b",
+   "term": "positions_only",
+   "explanation": "값이나 내용 대신 위치 정보만 표시하거나 반환하는 방식입니다. 어떤 항목인지보다 어디 있는지만 나타냅니다."
+  },
+  {
+   "id": "N16c",
+   "term": "omit_cell_values",
+   "explanation": "셀의 값을 생략하고 다른 정보만 남기는 처리입니다. 셀 자체는 유지하되 내용값은 포함하지 않습니다."
+  },
+  {
+   "id": "N21a",
+   "term": ".ldx/copies",
+   "explanation": ".ldx 관련 데이터의 복사본을 모아두는 폴더 또는 항목입니다. 원본과 별도로 만든 복제본을 가리킬 가능성이 큽니다."
+  },
+  {
+   "id": "N21b",
+   "term": ".ldx/snapshots",
+   "explanation": "특정 시점의 .ldx 상태를 저장한 스냅샷을 의미하는 폴더 또는 항목입니다. 과거 버전이나 순간 상태를 보존한 것으로 보입니다."
+  },
+  {
+   "id": "N21c",
+   "term": ".ldx/source_copies",
+   "explanation": "원본에서 만든 .ldx 복사본을 의미하는 폴더 또는 항목입니다. 출처가 되는 데이터의 복제본을 가리킬 가능성이 큽니다."
+  },
+  {
+   "id": "N14a",
+   "term": "read_status",
+   "explanation": "데이터나 파일이 읽혔는지, 읽는 중인지 등을 나타내는 상태입니다. 읽기 처리 진행 상태나 결과를 보여주는 값일 수 있습니다."
+  },
+  {
+   "id": "N17a",
+   "term": "원본_행번호",
+   "explanation": "원본 데이터에서 해당 행을 구분하기 위한 행 번호입니다. 원래 자료의 몇 번째 줄인지를 나타냅니다."
+  },
+  {
+   "id": "N17b",
+   "term": "_source_row",
+   "explanation": "원본 데이터의 행을 가리키는 필드 또는 값입니다. 출처가 되는 자료의 행 번호나 행 식별자를 의미합니다."
+  },
+  {
+   "id": "N17c",
+   "term": "_행번호",
+   "explanation": "데이터의 행을 식별하는 행 번호를 나타내는 필드입니다. 어떤 줄에 해당하는지 구분하기 위해 쓰입니다."
+  }
+ ]
+]

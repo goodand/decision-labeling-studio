@@ -1,0 +1,338 @@
+[
+ [
+  {
+   "id": "N01",
+   "term": "scan",
+   "explanation": "데이터 소스를 검사하여 읽을 수 있는 내용과 상태를 확인하는 작업입니다."
+  },
+  {
+   "id": "N02",
+   "term": "source add",
+   "explanation": "새로운 데이터 소스를 목록에 추가하는 명령입니다."
+  },
+  {
+   "id": "N03",
+   "term": "show",
+   "explanation": "대상 소스나 데이터의 정보와 상태를 화면에 보여주는 명령입니다."
+  },
+  {
+   "id": "N04",
+   "term": "compare",
+   "explanation": "두 개 이상의 데이터, 버전, 또는 상태를 비교하는 작업입니다."
+  },
+  {
+   "id": "N05",
+   "term": "export",
+   "explanation": "데이터를 외부 파일이나 다른 형식으로 내보내는 작업입니다."
+  },
+  {
+   "id": "N06",
+   "term": "ok",
+   "explanation": "요청이 정상적으로 완료되었음을 나타내는 상태입니다."
+  },
+  {
+   "id": "N07",
+   "term": "data",
+   "explanation": "실제 내용을 담은 데이터 행이나 레코드를 말합니다."
+  },
+  {
+   "id": "N08",
+   "term": "truncated",
+   "explanation": "용량이나 표시 한도 때문에 일부만 보이고 나머지는 생략된 상태입니다."
+  },
+  {
+   "id": "N09",
+   "term": "total_rows",
+   "explanation": "확인된 전체 행 수를 나타내는 값입니다."
+  },
+  {
+   "id": "N10",
+   "term": "total_rows_exact",
+   "explanation": "추정이 아닌 정확한 전체 행 수를 나타내는 값입니다."
+  },
+  {
+   "id": "N11",
+   "term": "limitations",
+   "explanation": "처리기능이나 표시에 적용되는 제한 사항이나 주의점을 말합니다."
+  },
+  {
+   "id": "N12",
+   "term": "read_completeness",
+   "explanation": "데이터를 얼마나 완전히 읽을 수 있었는지를 나타내는 정도입니다."
+  },
+  {
+   "id": "N13",
+   "term": "mtime_ns",
+   "explanation": "파일의 마지막 수정 시각을 나노초 단위로 표현한 값입니다."
+  },
+  {
+   "id": "N14",
+   "term": "status",
+   "explanation": "현재 상태나 처리 결과를 나타내는 값입니다."
+  },
+  {
+   "id": "N15",
+   "term": "locked",
+   "explanation": "잠겨 있어 읽기, 쓰기, 또는 변경이 제한된 상태입니다."
+  },
+  {
+   "id": "N16",
+   "term": "location_only",
+   "explanation": "위치나 이름만 확인되고 실제 내용은 읽지 못한 상태를 말합니다."
+  },
+  {
+   "id": "N17",
+   "term": "_행",
+   "explanation": "데이터의 한 줄을 뜻하는 '행'을 나타내는 한국어 표기입니다."
+  },
+  {
+   "id": "N18",
+   "term": "sql_rejected",
+   "explanation": "SQL 요청이 규칙이나 권한 문제로 거부되었음을 나타내는 상태입니다."
+  },
+  {
+   "id": "N19",
+   "term": "catalog_busy",
+   "explanation": "카탈로그가 다른 작업으로 바빠 잠시 재시도해야 하는 상태입니다."
+  },
+  {
+   "id": "N20",
+   "term": "catalog",
+   "explanation": "데이터 소스나 파일을 정리한 목록, 인덱스, 또는 카탈로그를 말합니다."
+  },
+  {
+   "id": "N21",
+   "term": ".ldx/data",
+   "explanation": ".ldx 폴더 안에 있는 데이터 파일 또는 데이터 저장 위치를 가리키는 표기입니다."
+  },
+  {
+   "id": "N22",
+   "term": "types.py",
+   "explanation": "Python에서 데이터 타입이나 타입 정의를 담은 소스 파일입니다."
+  }
+ ],
+ [
+  {
+   "id": "N22",
+   "term": "types.py",
+   "explanation": "Python 모듈 파일 이름으로, 주로 타입 정의나 데이터 구조를 담는 코드 파일입니다."
+  },
+  {
+   "id": "N21",
+   "term": ".ldx/data",
+   "explanation": "LDX가 사용하는 숨김 디렉터리 또는 데이터 저장 경로를 가리키는 이름입니다."
+  },
+  {
+   "id": "N20",
+   "term": "catalog",
+   "explanation": "데이터 소스, 스키마, 메타데이터 등을 모아 둔 인덱스 또는 목록을 뜻합니다."
+  },
+  {
+   "id": "N19",
+   "term": "catalog_busy",
+   "explanation": "카탈로그가 다른 작업으로 인해 일시적으로 잠겨 있어 접근할 수 없는 상태입니다."
+  },
+  {
+   "id": "N18",
+   "term": "sql_rejected",
+   "explanation": "SQL 쿼리가 규칙, 권한, 또는 안전성 검사 때문에 거부되었음을 나타냅니다."
+  },
+  {
+   "id": "N17",
+   "term": "_행",
+   "explanation": "표 데이터의 한 줄(row)을 뜻하는 한국어 필드명 또는 내부 이름으로 보입니다."
+  },
+  {
+   "id": "N16",
+   "term": "location_only",
+   "explanation": "실제 데이터 내용은 없고 경로나 위치 정보만 제공되는 상태를 뜻합니다."
+  },
+  {
+   "id": "N15",
+   "term": "locked",
+   "explanation": "리소스가 잠겨 있어 읽기나 수정이 일시적으로 불가능한 상태입니다."
+  },
+  {
+   "id": "N14",
+   "term": "status",
+   "explanation": "대상 객체나 작업의 현재 상태, 정상/오류 여부를 나타내는 필드입니다."
+  },
+  {
+   "id": "N13",
+   "term": "mtime_ns",
+   "explanation": "마지막 수정 시각을 나노초 단위의 정수로 표현한 값입니다."
+  },
+  {
+   "id": "N12",
+   "term": "read_completeness",
+   "explanation": "데이터가 얼마나 완전하게 읽혔는지를 나타내는 정도나 비율입니다."
+  },
+  {
+   "id": "N11",
+   "term": "limitations",
+   "explanation": "읽기, 내보내기, 비교 등에서 적용되는 제약 조건이나 한계를 설명하는 항목입니다."
+  },
+  {
+   "id": "N10",
+   "term": "total_rows_exact",
+   "explanation": "실제로 정확한 총 행 수를 나타내는 값입니다."
+  },
+  {
+   "id": "N09",
+   "term": "total_rows",
+   "explanation": "데이터의 총 행 수를 나타내지만 근사치일 수도 있는 값입니다."
+  },
+  {
+   "id": "N08",
+   "term": "truncated",
+   "explanation": "데이터가 크기나 개수 제한 때문에 일부만 표시되었거나 잘렸음을 뜻합니다."
+  },
+  {
+   "id": "N07",
+   "term": "data",
+   "explanation": "실제 데이터 내용 또는 데이터 본체를 담는 필드입니다."
+  },
+  {
+   "id": "N06",
+   "term": "ok",
+   "explanation": "작업이 성공했거나 상태가 정상인지를 나타내는 불리언 값입니다."
+  },
+  {
+   "id": "N05",
+   "term": "export",
+   "explanation": "데이터나 메타데이터를 파일 형식으로 내보내는 명령 또는 기능입니다."
+  },
+  {
+   "id": "N04",
+   "term": "compare",
+   "explanation": "두 데이터, 버전, 또는 소스 사이의 차이를 비교하는 기능입니다."
+  },
+  {
+   "id": "N03",
+   "term": "show",
+   "explanation": "특정 대상의 정보나 상태를 화면에 표시하는 명령입니다."
+  },
+  {
+   "id": "N02",
+   "term": "source add",
+   "explanation": "새로운 데이터 소스를 카탈로그에 등록하는 명령입니다."
+  },
+  {
+   "id": "N01",
+   "term": "scan",
+   "explanation": "파일, 디렉터리, 또는 데이터 소스를 탐색해서 메타데이터를 수집하는 동작입니다."
+  }
+ ],
+ [
+  {
+   "id": "N01",
+   "term": "scan",
+   "explanation": "데이터 소스를 탐색하여 파일이나 테이블 목록을 파악하는 명령입니다."
+  },
+  {
+   "id": "N02",
+   "term": "source add",
+   "explanation": "새로운 데이터 소스나 파일을 목록에 등록하는 명령입니다."
+  },
+  {
+   "id": "N03",
+   "term": "show",
+   "explanation": "특정 항목의 세부 정보나 내용을 화면에 보여주는 명령입니다."
+  },
+  {
+   "id": "N04",
+   "term": "compare",
+   "explanation": "두 개 이상의 항목이나 데이터를 비교하는 명령입니다."
+  },
+  {
+   "id": "N05",
+   "term": "export",
+   "explanation": "데이터나 결과를 파일 등 외부 형식으로 내보내는 명령입니다."
+  },
+  {
+   "id": "N06",
+   "term": "ok",
+   "explanation": "요청이 정상적으로 완료되었음을 나타내는 상태값입니다."
+  },
+  {
+   "id": "N07",
+   "term": "data",
+   "explanation": "실제로 다루는 값이나 기록을 의미하는 일반 데이터 필드입니다."
+  },
+  {
+   "id": "N08",
+   "term": "truncated",
+   "explanation": "내용이 길어 중간에 잘려서 전체가 표시되지 않았음을 나타냅니다."
+  },
+  {
+   "id": "N09",
+   "term": "total_rows",
+   "explanation": "읽거나 표시할 대상의 전체 행 수를 나타내는 값입니다."
+  },
+  {
+   "id": "N10",
+   "term": "total_rows_exact",
+   "explanation": "추정이 아닌 정확하게 집계된 전체 행 수를 나타내는 값입니다."
+  },
+  {
+   "id": "N11",
+   "term": "limitations",
+   "explanation": "이 기능이나 결과에서 보장되지 않는 점, 제약 조건을 나열한 항목입니다."
+  },
+  {
+   "id": "N12",
+   "term": "read_completeness",
+   "explanation": "데이터를 얼마나 완전하게 읽었는지의 정도를 나타내는 값입니다."
+  },
+  {
+   "id": "N13",
+   "term": "mtime_ns",
+   "explanation": "파일이나 항목의 마지막 수정 시각을 나노초 단위로 나타낸 값입니다."
+  },
+  {
+   "id": "N14",
+   "term": "status",
+   "explanation": "현재 상태나 처리 결과를 나타내는 일반 상태 필드입니다."
+  },
+  {
+   "id": "N15",
+   "term": "locked",
+   "explanation": "다른 작업이 잠금 중이어서 수정이나 접근이 제한되었음을 나타냅니다."
+  },
+  {
+   "id": "N16",
+   "term": "location_only",
+   "explanation": "실제 내용 대신 위치 정보만 제공되었거나 표시되었음을 나타냅니다."
+  },
+  {
+   "id": "N17",
+   "term": "_행",
+   "explanation": "데이터의 행(row) 수나 행 관련 표시에 쓰이는 내부 필드처럼 보입니다. '몇 행'을 나타낼 가능성이 큽니다."
+  },
+  {
+   "id": "N18",
+   "term": "sql_rejected",
+   "explanation": "SQL 요청이 거부되었거나 실행이 허용되지 않았음을 나타내는 상태입니다."
+  },
+  {
+   "id": "N19",
+   "term": "catalog_busy",
+   "explanation": "카탈로그가 다른 작업으로 바빠서 잠시 접근을 기다리거나 실행할 수 없음을 나타냅니다."
+  },
+  {
+   "id": "N20",
+   "term": "catalog",
+   "explanation": "데이터 소스, 파일, 테이블 등을 정리해 둔 목록이나 인덱스입니다."
+  },
+  {
+   "id": "N21",
+   "term": ".ldx/data",
+   "explanation": "확장자가 .ldx인 인덱스 파일과 data 폴더를 함께 가리키는 경로처럼 보입니다."
+  },
+  {
+   "id": "N22",
+   "term": "types.py",
+   "explanation": "Python 모듈 이름으로, 주로 타입 정의나 타입 관련 코드를 담은 파일입니다."
+  }
+ ]
+]

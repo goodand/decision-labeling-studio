@@ -1,0 +1,129 @@
+terms:
+- id: N04a
+  term: side_by_side
+  cand_of: compare
+  intended: 같은 사업을 여러 소스에서 찾아 행을 나란히 보여 줌(합치지 않음)
+  must: &id001
+  - - 나란히
+    - 옆에
+    - 함께 보여
+    - 병렬
+  must_not: &id002
+  - 차이
+- id: N04b
+  term: compare_side_by_side
+  cand_of: compare
+  intended: 같은 사업을 여러 소스에서 찾아 행을 나란히 보여 줌(합치지 않음)
+  must: *id001
+  must_not: *id002
+- id: N12a
+  term: read_ratio
+  cand_of: read_completeness
+  intended: 대상 중 실제로 읽은 비율(0~1)
+  must: &id003
+  - - 비율
+    - 퍼센트
+    - '%'
+    - 0~1
+    - 0과 1
+    - 몇 %
+    - 분수
+  must_not: &id004
+  - 독서
+  - 책
+  - 진도
+- id: N12b
+  term: files_read_ratio
+  cand_of: read_completeness
+  intended: 대상 중 실제로 읽은 비율(0~1)
+  must: *id003
+  must_not: *id004
+- id: N16a
+  term: hide_cell_text
+  cand_of: location_only
+  intended: 셀 원문 없이 위치(파일·시트·행)만 반환
+  must: &id005
+  - - 위치
+  - - 제외
+    - 숨
+    - 빼
+    - 없이 반환
+    - 생략
+    - 가리
+  must_not: &id006
+  - 아직
+  - 확보
+  - gps
+  - 지리
+  - 좌표
+  - 지도
+  - 주소
+- id: N16b
+  term: positions_only
+  cand_of: location_only
+  intended: 셀 원문 없이 위치(파일·시트·행)만 반환
+  must: *id005
+  must_not: *id006
+- id: N16c
+  term: omit_cell_values
+  cand_of: location_only
+  intended: 셀 원문 없이 위치(파일·시트·행)만 반환
+  must: *id005
+  must_not: *id006
+- id: N21a
+  term: .ldx/copies
+  cand_of: .ldx/data
+  intended: ldx가 만든 원본 사본과 엑셀 변환 DB 보관 폴더
+  must: &id007
+  - - 사본
+    - 복사
+    - 복제
+    - 스냅샷
+    - 원본
+  must_not: &id008 []
+- id: N21b
+  term: .ldx/snapshots
+  cand_of: .ldx/data
+  intended: ldx가 만든 원본 사본과 엑셀 변환 DB 보관 폴더
+  must: *id007
+  must_not: *id008
+- id: N21c
+  term: .ldx/source_copies
+  cand_of: .ldx/data
+  intended: ldx가 만든 원본 사본과 엑셀 변환 DB 보관 폴더
+  must: *id007
+  must_not: *id008
+- id: N14a
+  term: read_status
+  cand_of: status
+  intended: 파일 읽기 상태(ok·locked·error)
+  must:
+  - - 읽
+    - 처리
+    - 잠
+    - 오류
+    - 성공
+    - 실패
+  must_not: []
+- id: N17a
+  term: 원본_행번호
+  cand_of: _행
+  intended: 원래 엑셀 시트의 행 번호
+  must: &id009
+  - - 행
+  - - 번호
+    - 위치
+    - 인덱스
+  must_not: &id010 []
+- id: N17b
+  term: _source_row
+  cand_of: _행
+  intended: 원래 엑셀 시트의 행 번호
+  must: *id009
+  must_not: *id010
+- id: N17c
+  term: _행번호
+  cand_of: _행
+  intended: 원래 엑셀 시트의 행 번호
+  must: *id009
+  must_not: *id010

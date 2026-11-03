@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 아키텍처 v2</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --line:#d0d7de; --bg:#ffffff;
+          --iface:#ddf4ff; --contract:#fff8c5; --core:#dafbe1; --adapt:#fbefff; --engine:#ffebe9; --danger:#cf222e; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 36px; background:var(--bg); color:var(--ink);
+         font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif; font-size:15px; width:1600px; }
+  h1 { font-size:26px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 16px; }
+  .row { display:flex; gap:14px; align-items:stretch; }
+  .layer { border:1.5px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:6px; position:relative; }
+  .layer > .tag { position:absolute; top:-11px; left:14px; background:var(--bg); padding:0 6px; font-weight:700; font-size:14px; }
+  .box { flex:1; border:1.5px solid #8c959f; border-radius:8px; padding:9px 11px; background:#fff; }
+  .box b { display:block; font-size:16px; margin-bottom:4px; }
+  .box ul { margin:4px 0 0; padding-left:18px; } .box li { margin:2px 0; font-size:14.3px; }
+  .iface .box { background:var(--iface); } .contract .box { background:var(--contract); }
+  .core .box { background:var(--core); } .adapt .box { background:var(--adapt); } .engine { background:var(--engine) !important; }
+  .arrow { text-align:center; color:var(--mute); font-size:13px; margin:2px 0 8px; } .arrow span { font-size:22px; color:var(--ink); }
+  .zones { display:flex; gap:14px; margin-top:4px; }
+  .owned { flex:1; border:2px solid #1a7f37; border-radius:10px; padding:12px 14px; background:#f0fff4; }
+  .source { flex:1.2; border:3px dashed var(--danger); border-radius:10px; padding:12px 14px; background:#fff5f5; }
+  .owned h3, .source h3 { margin:0 0 6px; font-size:16px; } .source h3 { color:var(--danger); }
+  .legend { margin-top:12px; color:var(--mute); font-size:13px; display:flex; gap:20px; flex-wrap:wrap; }
+  .k { display:inline-block; width:14px; height:14px; border-radius:3px; vertical-align:-2px; margin-right:5px; border:1px solid #8c959f; }
+  code { font-family:Consolas,monospace; font-size:13px; background:#eaeef2; padding:0 4px; border-radius:4px; }
+  .actor { flex:0 0 220px; border:1.5px solid #8c959f; border-radius:8px; padding:9px 11px; background:#fff; text-align:center; }
+  .actor b { display:block; }
+  .side { flex:0 0 300px; border:1.5px dashed #8c959f; border-radius:8px; padding:9px 11px; background:#f6f8fa; }
+  .side b { display:block; margin-bottom:4px; } .side li { font-size:14px; }
+</style></head><body>
+<h1>ldx 전체 아키텍처 v2 (MVP, 혼자 쓰는 경량 도구)</h1>
+<p class="sub">의존은 위→아래 한 방향. <code>types.py</code>는 의존이 없어 모든 층이 가져다 쓴다. 원본은 빨간 점선 영역이며 ldx는 이 영역에 쓰지도, 새 파일을 만들지도 않는다(원본 불변).</p>
+
+<div class="row" style="margin-bottom:8px">
+  <div class="actor"><b>사람 (본인)</b>브라우저</div><div style="flex:1"></div>
+  <div class="actor"><b>AI 에이전트</b>셸에서 <code>ldx …</code></div>
+</div>
+<div class="arrow"><span>↓</span></div>
+
+<div class="row">
+<div style="flex:1">
+<div class="layer iface"><span class="tag">① 인터페이스 — 기능 로직 없음</span>
+  <div class="row">
+    <div class="box"><b>web/ — 사람용 화면</b><ul>
+      <li>localhost 전용, Origin 검사</li>
+      <li>열 카드(품질·분포) + 그리드 + 전체 검색</li>
+      <li>화면 기술 미정 (재사용 기능 단위 17)</li></ul></div>
+    <div class="box"><b>cli.py — 에이전트용 (Typer)</b><ul>
+      <li>성공: stdout에 결과 봉투 JSON 하나</li>
+      <li>실패: stderr <code>{ok:false, error:{kind,message,hint}}</code> + 종료 코드</li>
+      <li><code>source add|list|remove · scan · search · query · profile · show · doctor</code></li></ul></div>
+  </div>
+</div>
+<div class="arrow"><span>↓</span></div>
+<div class="layer contract"><span class="tag">② 명령 계약 (commands.py) — 단일 진실</span>
+  <div class="row">
+    <div class="box"><b>명령별 계약 + 실행 연결부</b><ul>
+      <li>이름 · 입력/출력 스키마 · 예시 · core 함수 연결</li>
+      <li>부수효과 선언: <code>writes_owned</code>, <code>network</code>, <code>launches_process</code> (원본 쓰기 항목은 존재하지 않음)</li>
+      <li>실제 강제는 AST 검사 테스트(개발 워크플로 ⑥)</li></ul></div>
+  </div>
+</div>
+<div class="arrow"><span>↓</span></div>
+<div class="layer core"><span class="tag">③ 핵심 로직 (core) — UI import 금지</span>
+  <div class="row">
+    <div class="box"><b>catalog.py</b><ul>
+      <li>파일·테이블·열 자산, 내부 ID = 상대경로+시트 해시</li>
+      <li>증분 갱신: size·mtime_ns 먼저, 바뀐 것만 sha256</li>
+      <li>쓰기 연결은 명령마다 짧게, 잠기면 <code>catalog_busy</code></li></ul></div>
+    <div class="box"><b>query.py — 읽기 전용 SQL 가드</b><ul>
+      <li>문장 수 = 1</li>
+      <li><code>json_serialize_sql</code> + CTE 내부 문장 종류 검사</li>
+      <li>등록된 뷰만, 시간·행 제한, 잘림 표시</li></ul></div>
+    <div class="box"><b>search.py</b><ul>
+      <li>Retriever: BM25(Kiwi) · 문자 n-gram · Fuzzy(score_cutoff)</li>
+      <li>RRF 결합, 결과 없음 허용</li></ul></div>
+    <div class="box"><b>profile.py</b><ul>
+      <li>기본 처음 1,000행 → 전체 전환</li>
+      <li>표본·근사 여부 표시, unique는 정확 계산</li></ul></div>
+  </div>
+</div>
+<div class="arrow"><span>↓</span> 원본에 닿는 길은 아래 두 모듈뿐</div>
+<div class="row">
+  <div class="layer adapt" style="flex:2.2"><span class="tag">④ 어댑터 (adapters) — 원본 열기·ATTACH의 유일한 통로</span>
+    <div class="row">
+      <div class="box"><b>sqlite.py</b><ul>
+        <li>헤더 18~19바이트로 WAL 판별</li>
+        <li>WAL이면 <code>.ldx/snapshots/</code>에 DB+WAL 복사 후 읽기</li>
+        <li>아니면 <code>Path.as_uri()</code> + <code>mode=ro</code> + <code>query_only</code></li></ul></div>
+      <div class="box"><b>csv.py</b><ul>
+        <li>인코딩 지정·사용자 저장값, UTF-8 실패 시 CP949</li>
+        <li>행 단위 거부 기록, 빈 파일은 <code>empty</code></li></ul></div>
+      <div class="box"><b>xlsx.py</b><ul>
+        <li>bytes로 읽어 메모리 처리(핸들 즉시 닫기)</li>
+        <li>시트 1개 = 테이블 1개, 표시 이름은 별도</li></ul></div>
+    </div>
+  </div>
+  <div class="layer" style="flex:1; background:#fff"><span class="tag">⑤ engine.py — DuckDB 연결 소유</span>
+    <div class="box engine"><b>연결 팩토리 (모든 연결이 여기서만)</b><ul>
+      <li>설정 순서 고정: ① adapters가 만든 ATTACH 명세(원본·스냅샷, READ_ONLY)를 실행 → ② <code>temp_directory</code>(절대경로) → ③ <code>enable_external_access=false</code> → ④ autoinstall/autoload 끄기 → ⑤ <code>lock_configuration=true</code></li>
+      <li>조회용은 in-memory, 카탈로그는 READ_ONLY ATTACH</li></ul></div>
+  </div>
+</div>
+</div>
+<div class="side" style="margin-left:14px; align-self:flex-start; margin-top:4px">
+  <b>types.py — 의존 없음</b><ul>
+  <li>결과 봉투 <code>{ok, data, truncated, total_rows, total_rows_exact, limitations[], read_completeness}</code></li>
+  <li>자산 타입(파일·테이블·열)</li>
+  <li>오류 종류: <code>sql_rejected</code>, <code>catalog_busy</code>, <code>source_locked</code>, <code>immutability_violation</code> …</li></ul>
+  <b style="margin-top:10px">용어 (GLOSSARY.md)</b><ul>
+  <li>결과 봉투 = 결과를 잘림·못 읽은 항목·완전성과 함께 감싼 공통 응답</li>
+  <li>읽기 전용 SQL 가드 = 실행 전 읽기 외 문장 거부</li>
+  <li>부수효과 선언 = 명령이 일으키는 바깥 영향의 선언</li></ul>
+</div>
+</div>
+
+<div class="zones">
+  <div class="owned"><h3>ldx 소유 저장소 — 쓰기 허용 영역</h3>
+    위치: <code>ldx_workbench/.ldx/</code> (경로는 cwd가 아니라 패키지 위치 기준, git 제외)<br>
+    <code>catalog.duckdb</code> · <code>snapshots/</code> · <code>index/</code> · <code>tmp/</code> · <code>logs/</code></div>
+  <div class="source"><h3>원본 데이터 — 읽기 전용 경계 (원본 불변)</h3>
+    예: <code>D:\dev_eval_team\…\*.sqlite</code>(최대 약 2.2GB, 현재 전부 비WAL) · 공고 마스터 <code>*.xlsx</code> · CSV(CP949 포함)<br>
+    금지: 내용 변경 · <code>-wal</code>/<code>-shm</code>/<code>-journal</code> · DuckDB 임시 파일 · 같은 폴더의 새 파일<br>
+    등록 폴더 안의 <code>.ldx</code>는 스캔에서 제외(등록 거부 아님), 정션·심볼릭 링크는 따라가지 않음</div>
+</div>
+<div class="legend">
+  <span><i class="k" style="background:var(--iface)"></i>인터페이스</span><span><i class="k" style="background:var(--contract)"></i>명령 계약</span>
+  <span><i class="k" style="background:var(--core)"></i>핵심 로직</span><span><i class="k" style="background:var(--adapt)"></i>어댑터</span>
+  <span><i class="k" style="background:var(--engine)"></i>엔진 설정</span>
+  <span>근거: adversarial_review_v1.md R01~R27, subflows.yaml</span>
+</div>
+</body></html>

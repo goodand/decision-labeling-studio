@@ -1,0 +1,26 @@
+# 이름(식별자) 검증 기준 v1.2 — 1회차 읽기 후 N04·N12·N16·N21 강화, 2회차 읽기 후 N04 오해 신호를 '차이 계산'으로 좁히고 N16 동의어 추가 (2026-11-03) — 용어 검증과 같은 방식(terms.yaml 스키마)
+# 목적: 설계 v3에 나오는 코드 이름이 이름만 보고 의도한 뜻으로 읽히는지(인지 부하) 확인
+# intended는 모델에게 보여 주지 않는다. 판정은 scripts/check_terms.py 규칙 + 메인 교차 확인.
+terms:
+  - {id: N01, term: scan, intended: 등록된 폴더의 파일을 다시 훑어 바뀐 파일의 사본·목록을 갱신, must: [["파일", "폴더", "디렉터리", "데이터"], ["훑", "검사", "탐색", "스캔", "갱신", "목록", "읽", "찾"]], must_not: ["바이러스", "악성", "이미지", "종이", "스캐너"], candidates: ["refresh", "sync", "rescan"]}
+  - {id: N02, term: source add, intended: 읽을 폴더나 파일을 데이터 출처로 등록, must: [["등록", "추가"], ["소스", "출처", "폴더", "파일", "데이터"]], must_not: ["소스 코드", "코드를 추가"], candidates: ["source register", "folder add"]}
+  - {id: N03, term: show, intended: 등록된 파일·시트·표·열 목록을 보여 줌, must: [["목록", "보여", "표시", "출력", "조회"]], must_not: [], candidates: ["list"]}
+  - {id: N04, term: compare, intended: 같은 사업을 여러 소스에서 찾아 행을 나란히 보여 줌(합치지 않음), must: [["나란히", "옆에", "함께 보여", "병렬", "맞대", "견주"]], must_not: ["diff", "차이를 계산", "차이를 출력", "어느 쪽이 큰"], candidates: ["side-by-side", "crosscheck"]}
+  - {id: N05, term: export, intended: 결과를 원본 밖 새 파일로 내보냄, must: [["내보", "추출", "저장", "출력", "파일로"]], must_not: [], candidates: []}
+  - {id: N06, term: ok, intended: 명령 성공 여부, must: [["성공", "정상", "문제 없", "참"]], must_not: [], candidates: ["success"]}
+  - {id: N07, term: data, intended: 명령 결과 본문, must: [["결과", "본문", "내용", "반환", "응답", "페이로드", "payload"]], must_not: [], candidates: ["result", "rows"]}
+  - {id: N08, term: truncated, intended: 결과가 한도에 걸려 일부만 반환됐는지 여부, must: [["잘", "생략", "일부", "한도", "제한", "잘림"]], must_not: ["소수점", "반올림"], candidates: ["is_truncated", "partial_result"]}
+  - {id: N09, term: total_rows, intended: 잘리기 전 전체 결과 행 수, must: [["전체", "총", "모든"], ["행", "row", "레코드"]], must_not: ["금액", "합계 값"], candidates: ["row_count_total"]}
+  - {id: N10, term: total_rows_exact, intended: 전체 행 수가 추정·하한이 아닌 정확한 값인지 여부, must: [["정확", "추정", "근사", "실제"]], must_not: [], candidates: ["total_rows_is_exact"]}
+  - {id: N11, term: limitations, intended: 못 읽거나 빠진 대상과 그 이유 목록, must: [["못", "실패", "누락", "빠진", "제외", "제약", "한계", "제한", "불가"]], must_not: [], candidates: ["skipped", "unread_items", "gaps"]}
+  - {id: N12, term: read_completeness, intended: 대상 중 실제로 읽은 비율(0~1), must: [["비율", "퍼센트", "%", "0~1", "0과 1", "몇 %", "분수"]], must_not: ["독서", "책", "진도"], candidates: ["read_ratio", "coverage_ratio"]}
+  - {id: N13, term: mtime_ns, intended: 파일 마지막 수정 시각(나노초), must: [["수정", "변경"], ["시각", "시간", "타임", "time"], ["나노", "ns"]], must_not: [], candidates: ["modified_ns"]}
+  - {id: N14, term: status, intended: 파일 읽기 상태(ok·locked·error), must: [["읽", "처리", "잠", "오류", "성공", "실패"]], must_not: [], candidates: ["read_status"]}
+  - {id: N15, term: locked, intended: 다른 프로그램이 파일을 열고 있어 읽지 못함, must: [["잠", "열려", "사용 중", "점유"]], must_not: ["암호", "비밀번호", "권한"], candidates: ["in_use"]}
+  - {id: N16, term: location_only, intended: 셀 원문 없이 위치(파일·시트·행)만 반환, must: [["위치"], ["제외", "숨", "빼", "없이 반환", "생략", "가리", "표시하지 않", "포함하지 않", "대신"]], must_not: ["아직", "확보", "gps", "지리", "좌표", "지도", "주소"], candidates: ["no_cell_text", "positions_only"]}
+  - {id: N17, term: _행, intended: 원래 엑셀 시트의 행 번호, must: [["행"], ["번호", "위치", "인덱스"]], must_not: [], candidates: ["원본_행", "_source_row"]}
+  - {id: N18, term: sql_rejected, intended: 허용되지 않은 SQL(쓰기·여러 문장 등)을 거부함, must: [["거부", "거절", "차단", "허용되지", "허용 안", "반려"], ["sql", "쿼리", "질의"]], must_not: [], candidates: []}
+  - {id: N19, term: catalog_busy, intended: 카탈로그가 다른 프로세스에 잠겨 사용 중이니 잠시 후 재시도, must: [["사용 중", "잠", "바쁨", "바쁜", "점유", "busy"]], must_not: [], candidates: ["catalog_locked"]}
+  - {id: N20, term: catalog, intended: 등록된 파일·시트·표·열 목록(메타데이터), must: [["목록", "메타", "색인", "카탈로그", "정보"]], must_not: ["상품", "쇼핑"], candidates: ["inventory"]}
+  - {id: N21, term: .ldx/data, intended: ldx가 만든 원본 사본과 엑셀 변환 DB 보관 폴더, must: [["사본", "복사", "복제", "스냅샷", "원본"]], must_not: [], candidates: [".ldx/copies", ".ldx/snapshots", ".ldx/mirror"]}
+  - {id: N22, term: types.py, intended: 의존 없는 공용 자료형(결과 봉투·오류 종류) 정의 모듈, must: [["자료형", "타입", "type", "데이터 구조", "클래스", "형식"]], must_not: [], candidates: []}

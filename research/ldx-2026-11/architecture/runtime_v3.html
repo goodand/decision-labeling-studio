@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>ldx 실행 흐름 v3</title>
+<style>
+  :root { --ink:#1f2328; --mute:#57606a; --reuse:#ddf4ff; --glue:#fff8c5; --danger:#cf222e; }
+  body { margin:0; padding:28px 36px; color:var(--ink); background:#fff; font-family:"Malgun Gothic",sans-serif; font-size:15px; width:1600px; }
+  h1 { font-size:26px; margin:0 0 4px; } .sub { color:var(--mute); margin:0 0 14px; }
+  .flow { border:1.5px solid #d0d7de; border-radius:10px; padding:10px 14px; margin-bottom:12px; }
+  .flow h2 { font-size:17px; margin:0 0 8px; }
+  .steps { display:flex; align-items:stretch; gap:0; }
+  .s { flex:1; border:1.5px solid #8c959f; border-radius:8px; padding:7px 9px; font-size:13.5px; position:relative; margin-right:26px; }
+  .s:not(:last-child)::after { content:"→"; position:absolute; right:-22px; top:40%; font-size:20px; color:var(--ink); }
+  .s:last-child { margin-right:0; }
+  .reuse { background:var(--reuse); } .glue { background:var(--glue); }
+  .bad { border:2px solid var(--danger); background:#fff5f5; }
+  code { font-family:Consolas,monospace; font-size:12.5px; background:#eaeef2; padding:0 3px; border-radius:3px; }
+</style></head><body>
+<h1>ldx 실행 흐름 v3 — 명령별 단계</h1>
+<p class="sub">파랑 = 재사용 코드가 하는 단계, 노랑 = 접착 코드, 빨강 테두리 = 실패·한계를 결과 봉투의 <code>limitations[]</code>로 남기는 지점. 모든 흐름의 끝은 결과 봉투 하나.</p>
+
+<div class="flow"><h2>scan — 등록 폴더 갱신 (SC3·SC1, A01~A03·A08·A15)</h2><div class="steps">
+  <div class="s glue">TMP·TEMP·cwd를 <code>.ldx/tmp</code>로</div>
+  <div class="s glue">폴더 순회, <code>.ldx</code> 자신은 samefile로 제외</div>
+  <div class="s glue">catalog의 (size, mtime_ns)와 비교 → 바뀐·새 파일만</div>
+  <div class="s glue">SQLite: 본체+<code>-wal</code>·<code>-shm</code>·<code>-journal</code>를 <code>.ldx/data/&lt;ID&gt;</code>로 복사 → 복사 전후 (size, mtime_ns) 같을 때만 채택 → 사본에서 체크포인트</div>
+  <div class="s reuse">엑셀: python-calamine(메모리 바이트) → sqlite-utils 시트별 표 + <code>_행</code> + FTS5 trigram</div>
+  <div class="s bad">잠김·손상·빈 파일 → status=locked/error, limitation</div>
+  <div class="s glue">catalog 갱신, 봉투(read_completeness = 읽은 파일/대상 파일)</div>
+</div></div>
+
+<div class="flow"><h2>search "질의" (SC4·SC7, A12·A13)</h2><div class="steps">
+  <div class="s glue">catalog에서 대상 표 목록 (모든 시트)</div>
+  <div class="s bad">FTS 없는 표 → 제외하고 limitation (조용한 전체 반환 방지)</div>
+  <div class="s reuse">FTS5 trigram MATCH (사본 DB, <code>immutable=1</code>)</div>
+  <div class="s reuse">0건이면 kiwipiepy로 띄어쓰기·조사 정규화 후 재검색</div>
+  <div class="s glue">파일·시트·열·<code>_행</code> + 셀 원문(<code>--location-only</code>면 제거)</div>
+  <div class="s glue">한도 초과 → truncated, total_rows</div>
+</div></div>
+
+<div class="flow"><h2>compare "사업명" (SC2, A16)</h2><div class="steps">
+  <div class="s glue">search를 소스별로 호출</div>
+  <div class="s glue">소스마다 일치 행의 원래 열 이름·값 그대로</div>
+  <div class="s glue">소스·시트·행을 나란히 (합치기·정규화 없음)</div>
+  <div class="s reuse">GUI: Datasette 플러그인 화면 / CLI: JSON</div>
+</div></div>
+
+<div class="flow"><h2>query --sql (SC6, A04·A05·A09·A14)</h2><div class="steps">
+  <div class="s reuse">Datasette <code>validate_sql_select</code> (SELECT만)</div>
+  <div class="s glue">문장 수 = 1, ATTACH·load_extension 거부</div>
+  <div class="s bad">위반 → <code>sql_rejected</code>, 종료 코드</div>
+  <div class="s reuse">사본 DB, <code>immutable=1</code> + <code>query_only</code>로 실행</div>
+  <div class="s glue">한도 초과 → truncated, 숫자는 봉투 값</div>
+</div></div>
+
+<div class="flow"><h2>export (SC1, A17)</h2><div class="steps">
+  <div class="s glue">대상 경로가 <code>.ldx/exports/</code> 또는 원본 밖 지정 경로인지 확인</div>
+  <div class="s bad">같은 이름 존재·원본 폴더 안 → 거부</div>
+  <div class="s reuse">sqlite-utils / openpyxl로 새 파일 쓰기</div>
+  <div class="s glue">봉투에 새 파일 경로</div>
+</div></div>
+</body></html>

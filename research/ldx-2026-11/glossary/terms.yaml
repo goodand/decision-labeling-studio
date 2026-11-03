@@ -1,0 +1,140 @@
+# 용어 검증 기준 (v1, 2026-11-02)
+# intended: 의도한 뜻(정답). Haiku에게는 보여 주지 않는다.
+# must: 모든 그룹에서 단어 하나 이상이 설명에 나와야 통과(대소문자 무시, 부분 일치)
+# must_not: 하나라도 나오면 오해로 보고 실패
+# candidates: 실패 시 다음 회차에 바꿔 볼 이름(웹 검색·표준 용어 기반). 앞쪽이 우선.
+# 판정은 규칙(scripts/check_terms.py)으로 하고, 메인이 설명문을 직접 읽어 교차 확인한다(LLM 판정 안 씀).
+
+terms:
+  - id: T01
+    term: 명세 수준 테스트
+    intended: 구현 코드를 보지 않고 테스트만 읽어도 기능 전체(입출력 형태·오류·엣지 케이스)를 다시 구현할 수 있을 만큼 완전한 테스트
+    must: [["명세", "사양", "스펙", "specification", "요구", "테스트 문서"], ["재구현", "다시 구현", "다시 만들", "구현할 수 있", "대체", "문서 역할", "문서로"]]
+    must_not: []
+    candidates: ["실행 가능한 명세 테스트", "명세로서의 테스트(재구현 가능 수준)", "재구현 가능 테스트"]
+    sources: ["https://www.testmuai.com/blog/executable-specifications/", "https://engineered.at/articles/a-sufficiently-comprehensive-spec-is-not-necessarily-code"]
+
+  - id: T02
+    term: 수용 테스트
+    intended: 사용자 관점에서 기대 동작과 반드시 지킬 속성을 구현 방식과 무관하게 확인하는 블랙박스 테스트
+    must: [["사용자", "고객", "요구사항", "요구 사항", "인수"], ["충족", "만족", "확인", "검증", "승인"]]
+    must_not: []
+    candidates: ["인수 테스트", "사용자 수용 테스트"]
+
+  - id: T03
+    term: 설계 검증
+    intended: 코드 작성 전에 설계를 형식 모델(TLA+ 등)로 만들어 모델 검사로 속성 위반 반례를 찾는 것
+    must: [["형식", "정형", "모델 검사", "모델 체킹", "model check", "tla", "수학적", "반례"]]
+    must_not: []
+    candidates: ["정형 설계 검증(모델 검사)", "모델 검사", "형식 검증"]
+
+  - id: T04
+    term: 적대 검증
+    intended: 다른 검토자가 일부러 반례·약점을 찾아 결함을 드러내는 검토
+    must: [["반례", "약점", "결함", "취약", "공격", "허점", "깨뜨", "문제점", "오류"], ["의도적", "일부러", "적극", "찾", "공격자"]]
+    must_not: []
+    candidates: ["레드팀 검토", "적대적 리뷰(반례 찾기)"]
+    sources: ["https://techtarget.com/searchsoftwarequality/definition/quality-gate"]
+
+  - id: T05
+    term: 원본 불변
+    intended: 도구가 원본 데이터 파일을 수정하지 않고 그 폴더에 새 파일도 만들지 않는다는 원칙
+    must: [["원본", "원래", "소스"], ["수정", "변경", "바꾸", "바뀌", "불변"]]
+    must_not: []
+    candidates: ["원본 읽기 전용 보장", "소스 파일 무변경 원칙"]
+
+  - id: T06
+    term: 읽기 전용 게이트
+    intended: 실행 전에 SQL을 검사해 읽기(SELECT) 외의 문장을 거부하는 관문
+    must: [["쿼리", "sql", "질의", "요청", "명령", "문장", "접근"], ["거부", "차단", "막", "허용", "통과", "제한"], ["읽기", "조회", "select"]]
+    must_not: []
+    candidates: ["읽기 전용 SQL 가드", "SQL 읽기 전용 검사기", "쓰기 차단 SQL 검사"]
+    sources: ["https://dev.to/datanestdigital/a-read-only-sql-guard-for-llm-generated-queries-with-sqlglot-418j"]
+
+  - id: T07
+    term: 결과 봉투
+    intended: 모든 명령 결과를 데이터와 메타정보(잘림 여부, 못 읽은 항목, 완전성)로 감싸는 공통 응답 형식
+    must: [["응답", "결과", "출력", "데이터", "반환"], ["감싸", "포장", "래핑", "래퍼", "wrapper", "envelope", "형식", "구조", "메타"]]
+    must_not: ["우편", "편지", "봉투에 넣", "서류 봉투"]
+    candidates: ["응답 봉투(response envelope)", "공통 응답 형식", "결과 래퍼"]
+    sources: ["https://hector-reyesaleman.medium.com/api-response-wrapper-patterns-49d846578ac0", "https://uwwoe-docs.pages.dev/api/envelope/"]
+
+  - id: T08
+    term: Subflow
+    intended: 독립적으로 재사용·통합할 수 있는 기능 단위(파일 스캔, 검색 등)
+    must: [["기능 단위", "모듈", "컴포넌트", "구성 요소", "구성요소", "기능의 최소", "기능 묶음", "기능의 묶음", "기능의 덩어리"]]  # 6표본 교차 확인: 뜻은 맞고 표현만 다른 경우
+    must_not: ["하위 흐름", "작업 흐름 안"]  # 1회차 교차 확인으로 강화
+    candidates: ["기능 모듈", "기능 구성 요소(capability)", "재사용 기능 단위"]
+
+  - id: T09
+    term: 효과 플래그
+    intended: 각 명령이 원본 쓰기·네트워크·프로세스 실행 같은 부수 효과를 하는지 선언한 표시
+    must: [["부수 효과", "부수효과", "부작용", "side effect", "side-effect", "외부 영향", "외부에 주는 영향", "바깥에 영향", "외부 변화", "바깥 세계"], ["선언", "표시", "표기", "나타", "명시"]]
+    must_not: ["시각 효과", "애니메이션", "특수 효과", "이펙트", "feature flag", "기능 플래그", "켜고 끌"]  # 4회차: feature flag 오해
+    candidates: ["부수효과 선언", "부수효과 플래그(side-effect flags)", "도구 효과 주석"]
+    sources: ["https://www.mcpbundles.com/guides/tool-annotations"]
+
+  - id: T10
+    term: 단일 진실
+    intended: 하나의 정의(계약)에서 CLI·API를 모두 만들어 정보가 한 곳에만 있게 하는 원칙
+    must: [["한 곳", "하나의", "단일", "한곳", "하나로", "하나만"], ["정보", "데이터", "정의", "원천", "출처", "공급원"]]
+    must_not: []
+    candidates: ["단일 진실 공급원(SSOT)", "단일 정의 원칙"]
+    sources: ["https://www.mulesoft.com/integration/what-is-single-source-of-truth-ssot"]
+
+  - id: T11
+    term: 증분 갱신
+    intended: 바뀐 파일만 다시 처리해 카탈로그를 갱신하는 것
+    must: [["변경", "바뀐", "달라진", "새로", "추가된", "차이"], ["만", "부분", "일부"]]
+    must_not: []
+    candidates: ["변경분 갱신", "증분 재색인"]
+
+  - id: T12
+    term: 카탈로그 최신성
+    intended: 카탈로그가 원본 파일의 현재 상태를 얼마나 반영하는지(오래된 정보 문제)
+    must: [["최신", "현재", "오래된", "갱신", "반영"], ["목록", "메타데이터", "카탈로그", "정보", "데이터"]]
+    must_not: []
+    candidates: ["카탈로그 신선도", "카탈로그 동기화 상태"]
+
+  - id: T13
+    term: 관문
+    intended: 개발 흐름에서 다음 단계로 가기 위해 통과해야 하는 검사 기준
+    must: [["단계", "검사", "기준", "조건", "승인", "통과"]]
+    must_not: ["성문", "문을 지나", "건축", "출입구", "국경"]
+    candidates: ["품질 관문(quality gate)", "단계 통과 기준", "통과 기준"]
+    sources: ["https://concepts.dsebastien.net/concept/quality-gate/"]
+
+  - id: T14
+    term: 잘림 표시
+    intended: 결과가 한도 때문에 일부만 반환되었음을 알리는 표시
+    must: [["일부", "잘", "제한", "한도", "생략", "초과"], ["결과", "출력", "데이터", "행", "텍스트", "내용"]]
+    must_not: []
+    candidates: ["결과 잘림 여부(truncated)", "부분 결과 표시"]
+
+  - id: T15
+    term: 되돌아가기 규칙
+    intended: 관문에서 실패했을 때 어느 단계로 돌아가 다시 할지 정한 규칙
+    must: [["실패", "문제", "오류", "반례", "통과하지"], ["이전 단계", "앞 단계", "돌아", "재수행", "다시", "되돌"]]
+    must_not: ["롤백", "복원", "복구", "이전 상태", "실행 취소", "undo", "되돌리기 기능", "체크포인트", "이전 시점"]  # 1회차 교차 확인으로 강화
+    candidates: ["실패 시 재작업 경로", "재작업 규칙", "단계 회귀 규칙"]
+
+  - id: T16
+    term: 기능 재사용
+    intended: 다른 제품의 동작·UX 규칙을 코드 없이 따라 만드는 재사용(코드 재사용과 구분)
+    must: [["동작", "ux", "사용자 경험", "기능 설계", "행동", "흐름", "아이디어"]]
+    must_not: []
+    candidates: ["동작·UX 재사용", "기능 설계 차용", "행동 모방(코드 없음)"]
+
+  - id: T17
+    term: 아키텍처 재사용
+    intended: 다른 제품의 구조 패턴(계층·계약 방식)을 코드 없이 따라 쓰는 재사용
+    must: [["구조", "패턴", "설계", "계층"]]
+    must_not: []
+    candidates: ["구조 패턴 차용", "아키텍처 패턴 재사용"]
+
+  - id: T18
+    term: coverage
+    intended: (결과 필드) 이번 결과가 대상 원본을 빠짐없이 다 읽었는지(complete) 확인 못했는지(unknown)
+    must: [["다 읽", "빠짐없", "완전", "전부", "모든 원본", "누락"]]
+    must_not: ["코드 커버리지", "테스트 커버리지", "보험", "보장 범위"]
+    candidates: ["completeness", "read_completeness", "scan_complete"]
