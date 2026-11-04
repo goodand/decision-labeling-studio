@@ -6,7 +6,7 @@
 
 공통 필드:
 
-- `kind`: `capture` 또는 `record`.
+- `kind`: `capture` 또는 `record`. 계약 예정(구현 전): [`grid_compare_triage`](#grid_compare_triage).
 - `title`, `question`: 화면 제목과 판정 질문. 문자열.
 - `pages`: JSON 디렉터리 기준 이미지 상대 경로 배열. PNG/JPEG/WebP/SVG. 한 페이지당 한 이미지이며 최소 1개.
 - `cases`: 최소 1개. `id`는 중복 없는 영문·숫자·`_`·`-` 문자열, `label`은 표시명, `page`는 `pages`의 1부터 시작하는 번호.
@@ -30,3 +30,16 @@
 API는 화면용 `GET /api/cases`, 페이지용 `GET /api/source-page`, capture 후보·crop API, record의 `GET /api/source-preview`를 제공합니다. 저장은 capture의 `POST /api/decision`, record의 `POST /api/vote`입니다. 데이터셋별 선택지는 기존 UI와 같습니다. 판정불가 사유와 record의 상이 사유는 필수입니다.
 
 저장 파일은 `schema: studio-votes/v1`, 입력·이미지 결합 해시인 `input_sha256`, `decisions` 또는 `votes`를 포함합니다. `submitted_via: local_review_ui`는 전달 경로이며 실제 Human 신원 인증을 의미하지 않습니다. 입력 변경 시 파일을 덮어 재활용하지 말고 새 `--votes`를 지정하세요. 이 계약은 협업 중 충돌 병합이나 사용자 인증을 제공하지 않습니다.
+
+<a id="grid_compare_triage"></a>
+## grid_compare_triage 데이터셋 (계약 예정, 구현 전)
+
+상태: 이름과 정의만 정한 단계. 화면·서버 구현과 필드 형식은 아직 없음. 이름은 바뀔 수 있음.
+
+정의: 사람이 소스별 grid끼리 대조해 같음·다름·한쪽에만 있음 패턴을 파악하고, 범위·의미·대응·정제 여부를 고려해 그 패턴에 해당하는 레코드 집합을 조건 단위로 처리(현재 라벨: 보존·정제 후 보존·폐기·보류, 바뀔 수 있음)할지 결정하며, 그 근거로 일관된 결정을 하도록 보조하는 스튜디오 화면 유형.
+
+- 데이터셋: 짝 저장소 [goodand/tabular-compare-engine](https://github.com/goodand/tabular-compare-engine)(화면 없는 계산 엔진)이 이 계약 형식으로 만들어 줄 예정. 형식은 그때 이 절에 정한다.
+- 판정 단위: 레코드 한 행이 아니라 조건(규칙)과 그 조건에 해당하는 레코드 집합.
+- 판정 저장: 기존 규칙과 같다. 입력 해시(`input_sha256`)에 묶인 votes, 입력이 바뀌면 새 `--votes`.
+- 이름 근거: 이름만 보여 주고 설명하게 한 검증(Sonnet·Haiku × 개발자·최종 사용자·UI/UX 설계자 관점 × 3회). 사람 관점 12건 오독 0, 개발자 관점 6건 중 2건이 "시뮬레이션 격자 출력 비교"로 읽힘. 화면 유형 이름은 사람이 읽으므로 사람 관점 기준으로 채택.
+
