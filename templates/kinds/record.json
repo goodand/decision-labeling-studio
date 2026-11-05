@@ -1,5 +1,7 @@
 {
  "kind": "record",
+ "wants": null,
+ "needs": null,
  "artifact": "항목 ↔ 원문 근거 후보",
  "pattern": null,
  "factors": null,

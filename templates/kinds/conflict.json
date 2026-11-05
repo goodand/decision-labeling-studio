@@ -1,5 +1,7 @@
 {
  "kind": "conflict",
+ "wants": null,
+ "needs": null,
  "artifact": "감사 카드 인용 ↔ HWP 원본 위치",
  "pattern": [
   "ok",

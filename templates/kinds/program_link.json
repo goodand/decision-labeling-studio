@@ -1,5 +1,7 @@
 {
  "kind": "program_link",
+ "wants": null,
+ "needs": null,
  "artifact": "A 문서의 대상 ↔ B 문서의 구획",
  "pattern": [
   "located",

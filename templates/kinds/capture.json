@@ -1,5 +1,7 @@
 {
  "kind": "capture",
+ "wants": null,
+ "needs": null,
  "artifact": "원본 페이지의 목표 영역 ↔ 후보 이미지",
  "pattern": null,
  "factors": null,
