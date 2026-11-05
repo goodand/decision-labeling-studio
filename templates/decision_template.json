@@ -10,18 +10,18 @@
   "input_variables": [
    "wants",
    "needs",
-   "artifact",
-   "pattern",
+   "content",
+   "match_status",
    "factors",
    "selector",
    "action"
   ],
   "partial_variables": {
    "viewpoint": "최종 사용자(사람, 그림 중심 관점)",
-   "support_role": "일관된 판단과 실행을 가능하게 하는",
-   "surface": "스튜디오 화면 유형"
+   "task_support": "일관된 판단과 실행을 가능하게 하는",
+   "interface": "스튜디오 화면 유형"
   },
-  "template": "{viewpoint}가 {wants}을 위해, {artifact}끼리 대조해 {pattern} 패턴을 파악하고, {needs}에 비추어 {factors}을 고려해 {selector}을 {action}할지 결정하며, 그 근거로 {support_role} {surface}",
+  "template": "{viewpoint}가 {wants}을 위해, {content}끼리 대조해 {match_status}을 파악하고, {needs}에 비추어 {factors}을 고려해 {selector}을 {action}할지 결정하며, 그 근거로 {task_support} {interface}",
   "slots": [
    {
     "symbol": "ZZ",
@@ -39,68 +39,61 @@
    },
    {
     "symbol": "AA",
-    "key": "artifact",
+    "key": "content",
     "definition": "관찰하거나 상호작용하는 대상 및 매개체",
     "question": "무엇을 보는가?",
     "values": "kind별"
    },
    {
     "symbol": "BB",
-    "key": "pattern",
-    "definition": "대조해 계산되는 패턴. 사람은 바꾸지 않는다",
+    "key": "match_status",
+    "definition": "대조해 계산되는 상태값. 사람은 바꾸지 않는다(일치 여부 외에 위치 확정 상태 같은 kind별 계산값도 담는다)",
     "question": "무엇이 같고 다른가?",
-    "values": "kind별, 계산",
-    "name_status": "임시"
+    "values": "kind별, 계산"
    },
    {
     "symbol": "CC",
     "key": "factors",
     "definition": "needs 충족 여부를 판정해 선택지를 좁히고(조건 기반·우선순위 기반 배제) DD+EE를 표현할 만큼 구체화하는 판단 요인",
     "question": "무엇을 따져 좁히는가?",
-    "values": "kind별",
-    "name_status": "임시"
+    "values": "kind별"
    },
    {
     "symbol": "DD",
     "key": "selector",
     "definition": "결정이 적용되는 대상(사례 하나 또는 조건으로 고른 레코드 집합)",
     "question": "어디에 적용하는가?",
-    "values": "결정마다",
-    "name_status": "임시"
+    "values": "결정마다"
    },
    {
     "symbol": "EE",
     "key": "action",
     "definition": "대상에 내리는 처리. 라벨은 바뀔 수 있다",
     "question": "무엇을 하는가?",
-    "values": "kind별",
-    "name_status": "임시"
+    "values": "kind별"
    },
    {
     "symbol": "FF",
-    "key": "support_role",
+    "key": "task_support",
     "definition": "일관된 판단과 실행을 가능하게 하는 지원 역할(도구가 맡는 역할. 사용자 권한이나 고객지원 직무가 아님)",
     "question": "무엇을 지원하는가?",
-    "values": "공통(partial_variables)",
-    "name_status": "임시"
+    "values": "공통(partial_variables)"
    },
    {
     "symbol": "GG",
-    "key": "surface",
+    "key": "interface",
     "definition": "Program의 구현 및 인터페이스 유형",
     "question": "이것은 무엇인가?",
-    "values": "공통(partial_variables), surface마다 다름",
-    "name_status": "임시"
+    "values": "공통(partial_variables), surface마다 다름"
    },
    {
     "symbol": "HH",
     "key": "viewpoint",
     "definition": "사용 주체와 정보 표현 관점(값에 주체와 관점을 함께 쓴다. 예: 최종 사용자(사람, 그림 중심 관점), 에이전트(텍스트 중심))",
     "question": "누가 어떤 관점에서 사용하는가?",
-    "values": "공통(partial_variables), 기본 사람",
-    "name_status": "임시"
+    "values": "공통(partial_variables), 기본 사람"
    }
   ],
-  "_doc": "kind 파일은 input_variables 7칸을 채운다(쓰지 않는 칸은 null). wants·needs는 용도마다 달라 kind 파일 examples에 예시로 둔다. viewpoint·support_role·surface는 studio kind 공통값이며 다른 surface(예: 에이전트용 CLI)에서는 바꿔 쓴다. name_status가 임시인 칸 이름은 이름 검증 중."
+  "_doc": "칸 이름 10개 확정(2026-11-05, 사람 관점 이름 검증: Sonnet·Haiku·gpt-6-luna, 맥락 없는 관점과 비교·결정 상황 관점, 이름끼리 뜻 겹침 없음). kind 파일은 input_variables 7칸을 채운다(쓰지 않는 칸은 null). wants·needs는 용도마다 달라 kind 파일 examples에 예시로 둔다. viewpoint·task_support·interface는 studio kind 공통값이며 다른 interface(예: 에이전트용 CLI)에서는 바꿔 쓴다."
  }
 }

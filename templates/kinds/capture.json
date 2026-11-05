@@ -2,8 +2,8 @@
  "kind": "capture",
  "wants": null,
  "needs": null,
- "artifact": "원본 페이지의 목표 영역 ↔ 후보 이미지",
- "pattern": null,
+ "content": "원본 페이지의 목표 영역 ↔ 후보 이미지",
+ "match_status": null,
  "factors": null,
  "selector": "사례 하나",
  "action": [

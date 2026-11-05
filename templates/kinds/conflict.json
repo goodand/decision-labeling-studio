@@ -2,8 +2,8 @@
  "kind": "conflict",
  "wants": null,
  "needs": null,
- "artifact": "감사 카드 인용 ↔ HWP 원본 위치",
- "pattern": [
+ "content": "감사 카드 인용 ↔ HWP 원본 위치",
+ "match_status": [
   "ok",
   "missing_or_changed"
  ],

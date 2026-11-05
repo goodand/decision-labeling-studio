@@ -2,8 +2,8 @@
  "kind": "grid_compare_triage",
  "wants": null,
  "needs": null,
- "artifact": "소스별 grid",
- "pattern": [
+ "content": "소스별 grid",
+ "match_status": [
   "same",
   "differ",
   "only_a",

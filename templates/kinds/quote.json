@@ -2,8 +2,8 @@
  "kind": "quote",
  "wants": null,
  "needs": null,
- "artifact": "인용 ↔ HWP 원본",
- "pattern": [
+ "content": "인용 ↔ HWP 원본",
+ "match_status": [
   "ok",
   "missing_or_changed"
  ],
