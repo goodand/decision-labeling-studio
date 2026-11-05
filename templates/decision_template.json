@@ -17,11 +17,11 @@
    "action"
   ],
   "partial_variables": {
-   "actor": "최종 사용자(사람, 그림 중심 관점)",
+   "viewpoint": "최종 사용자(사람, 그림 중심 관점)",
    "support_role": "일관된 판단과 실행을 가능하게 하는",
    "surface": "스튜디오 화면 유형"
   },
-  "template": "{actor}가 {wants}을 위해, {artifact}끼리 대조해 {pattern} 패턴을 파악하고, {needs}에 비추어 {factors}을 고려해 {selector}을 {action}할지 결정하며, 그 근거로 {support_role} {surface}",
+  "template": "{viewpoint}가 {wants}을 위해, {artifact}끼리 대조해 {pattern} 패턴을 파악하고, {needs}에 비추어 {factors}을 고려해 {selector}을 {action}할지 결정하며, 그 근거로 {support_role} {surface}",
   "slots": [
    {
     "symbol": "ZZ",
@@ -94,13 +94,13 @@
    },
    {
     "symbol": "HH",
-    "key": "actor",
-    "definition": "사용 주체와 정보 표현 관점",
+    "key": "viewpoint",
+    "definition": "사용 주체와 정보 표현 관점(값에 주체와 관점을 함께 쓴다. 예: 최종 사용자(사람, 그림 중심 관점), 에이전트(텍스트 중심))",
     "question": "누가 어떤 관점에서 사용하는가?",
     "values": "공통(partial_variables), 기본 사람",
     "name_status": "임시"
    }
   ],
-  "_doc": "kind 파일은 input_variables 7칸을 채운다(쓰지 않는 칸은 null). wants·needs는 용도마다 달라 kind 파일 examples에 예시로 둔다. actor·support_role·surface는 studio kind 공통값이며 다른 surface(예: 에이전트용 CLI)에서는 바꿔 쓴다. name_status가 임시인 칸 이름은 이름 검증 중."
+  "_doc": "kind 파일은 input_variables 7칸을 채운다(쓰지 않는 칸은 null). wants·needs는 용도마다 달라 kind 파일 examples에 예시로 둔다. viewpoint·support_role·surface는 studio kind 공통값이며 다른 surface(예: 에이전트용 CLI)에서는 바꿔 쓴다. name_status가 임시인 칸 이름은 이름 검증 중."
  }
 }
