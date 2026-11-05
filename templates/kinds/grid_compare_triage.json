@@ -1,0 +1,27 @@
+{
+ "kind": "grid_compare_triage",
+ "observe": "소스별 grid",
+ "pattern": [
+  "same",
+  "differ",
+  "only_a",
+  "only_b"
+ ],
+ "factors": [
+  "범위",
+  "의미",
+  "대응",
+  "정제"
+ ],
+ "selector": "조건으로 고른 레코드 집합",
+ "action": [
+  "보존",
+  "정제 후 보존",
+  "폐기",
+  "보류"
+ ],
+ "note_required": [
+  "폐기",
+  "보류"
+ ]
+}

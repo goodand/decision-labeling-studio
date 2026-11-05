@@ -1,0 +1,15 @@
+{
+ "kind": "capture",
+ "observe": "원본 페이지의 목표 영역 ↔ 후보 이미지",
+ "pattern": null,
+ "factors": null,
+ "selector": "사례 하나",
+ "action": [
+  "accurate",
+  "error",
+  "undecidable"
+ ],
+ "note_required": [
+  "undecidable"
+ ]
+}

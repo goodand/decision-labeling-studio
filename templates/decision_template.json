@@ -1,0 +1,23 @@
+{
+ "lc": 1,
+ "type": "constructor",
+ "id": [
+  "decision_labeling_studio",
+  "templates",
+  "DecisionTemplate"
+ ],
+ "kwargs": {
+  "input_variables": [
+   "observe",
+   "pattern",
+   "factors",
+   "selector",
+   "action"
+  ],
+  "partial_variables": {
+   "common_tail": "그 근거로 일관된 결정을 하도록 보조하는 스튜디오 화면 유형"
+  },
+  "template": "사람이 {observe}끼리 대조해 {pattern} 패턴을 파악하고, {factors}을 고려해 {selector}을 {action}할지 결정하며, {common_tail}",
+  "_doc": "칸 이름은 임시(이름 검증 중). 값은 templates/kinds/<kind>.json. pattern은 계산된 값이라 사람이 바꾸지 않는다. 쓰지 않는 칸은 null."
+ }
+}

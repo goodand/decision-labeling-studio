@@ -1,0 +1,22 @@
+{
+ "kind": "conflict",
+ "observe": "감사 카드 인용 ↔ HWP 원본 위치",
+ "pattern": [
+  "ok",
+  "missing_or_changed"
+ ],
+ "factors": [
+  "subject",
+  "comparison",
+  "scope"
+ ],
+ "selector": "사례 하나",
+ "action": [
+  "유사중복 있음",
+  "유사중복 없음",
+  "판단불가"
+ ],
+ "note_required": [
+  "choice=uncertain"
+ ]
+}

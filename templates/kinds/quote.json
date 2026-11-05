@@ -1,0 +1,19 @@
+{
+ "kind": "quote",
+ "observe": "인용 ↔ HWP 원본",
+ "pattern": [
+  "ok",
+  "missing_or_changed"
+ ],
+ "factors": null,
+ "selector": "사례 하나",
+ "action": [
+  "맞음",
+  "틀림",
+  "판단불가"
+ ],
+ "note_required": [
+  "틀림",
+  "판단불가"
+ ]
+}

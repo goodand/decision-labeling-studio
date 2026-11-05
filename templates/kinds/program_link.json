@@ -1,0 +1,18 @@
+{
+ "kind": "program_link",
+ "observe": "A 문서의 대상 ↔ B 문서의 구획",
+ "pattern": [
+  "located",
+  "unlocatable",
+  "unrendered"
+ ],
+ "factors": null,
+ "selector": "구획 하나(대상 결과는 aggregate_rules로 계산)",
+ "action": [
+  "일치",
+  "부분일치",
+  "불일치",
+  "판단불가"
+ ],
+ "note_required": []
+}
