@@ -18,7 +18,7 @@ class DecisionTemplateTests(unittest.TestCase):
         for kind, v in KINDS.items():
             with self.subTest(kind=kind):
                 self.assertTrue(set(BASE['input_variables']) <= set(v))
-                self.assertTrue(v['observe'] and v['selector'] and v['action'])
+                self.assertTrue(v['artifact'] and v['selector'] and v['action'])
 
     def test_capture_and_record_match_studio_server(self):
         src = (ROOT / 'studio_server.py').read_text(encoding='utf-8')
