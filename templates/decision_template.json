@@ -8,7 +8,7 @@
  ],
  "kwargs": {
   "input_variables": [
-   "observe",
+   "artifact",
    "pattern",
    "factors",
    "selector",
@@ -17,7 +17,7 @@
   "partial_variables": {
    "common_tail": "그 근거로 일관된 결정을 하도록 보조하는 스튜디오 화면 유형"
   },
-  "template": "사람이 {observe}끼리 대조해 {pattern} 패턴을 파악하고, {factors}을 고려해 {selector}을 {action}할지 결정하며, {common_tail}",
-  "_doc": "칸 이름은 임시(이름 검증 중). 값은 templates/kinds/<kind>.json. pattern은 계산된 값이라 사람이 바꾸지 않는다. 쓰지 않는 칸은 null."
+  "template": "사람이 {artifact}끼리 대조해 {pattern} 패턴을 파악하고, {factors}을 고려해 {selector}을 {action}할지 결정하며, {common_tail}",
+  "_doc": "칸 이름 중 artifact(관찰·상호작용하는 대상)는 확정, 나머지는 임시(이름 검증 중). 값은 templates/kinds/<kind>.json. pattern은 계산된 값이라 사람이 바꾸지 않는다. 쓰지 않는 칸은 null. wants(주체가 원하는 행동·경험·상태)와 needs(wants를 위해 충족할 조건·평가 모델)는 용도마다 달라 칸으로 두지 않고 kind 파일의 examples로 둔다. 용도는 늘어날 수 있다."
  }
 }

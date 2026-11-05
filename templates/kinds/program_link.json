@@ -1,6 +1,6 @@
 {
  "kind": "program_link",
- "observe": "A 문서의 대상 ↔ B 문서의 구획",
+ "artifact": "A 문서의 대상 ↔ B 문서의 구획",
  "pattern": [
   "located",
   "unlocatable",

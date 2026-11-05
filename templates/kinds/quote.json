@@ -1,6 +1,6 @@
 {
  "kind": "quote",
- "observe": "인용 ↔ HWP 원본",
+ "artifact": "인용 ↔ HWP 원본",
  "pattern": [
   "ok",
   "missing_or_changed"

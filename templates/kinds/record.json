@@ -1,6 +1,6 @@
 {
  "kind": "record",
- "observe": "항목 ↔ 원문 근거 후보",
+ "artifact": "항목 ↔ 원문 근거 후보",
  "pattern": null,
  "factors": null,
  "selector": "사례 하나",

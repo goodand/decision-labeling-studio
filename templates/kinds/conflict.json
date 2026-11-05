@@ -1,6 +1,6 @@
 {
  "kind": "conflict",
- "observe": "감사 카드 인용 ↔ HWP 원본 위치",
+ "artifact": "감사 카드 인용 ↔ HWP 원본 위치",
  "pattern": [
   "ok",
   "missing_or_changed"
